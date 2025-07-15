@@ -4,7 +4,7 @@ import json
 import shutil
 from io import BytesIO
 import tempfile
-
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import pdfplumber
@@ -242,3 +242,33 @@ if st.sidebar.button("Procesar PDFs"):
     
     # Limpiar archivos subidos después del procesamiento
     limpiar_subidas()
+
+
+with st.sidebar:
+    # Mensaje de ayuda
+    st.markdown("""
+    **🆘 Ayuda rápida:**
+    1. Sube tus facturas en PDF usando el botón arriba
+    2. Haz clic en **Procesar PDFs**
+    3. Descarga los resultados en Excel
+    """)
+    
+    st.markdown("---")  # Separador
+    
+    # Mensaje informativo
+    st.markdown("""
+    **ℹ️ Información:**
+    - La IA extraerá: número, fecha, base, IVA, IRPF y total
+    - Soporta facturas escaneadas (usará OCR)
+    - Formato europeo: 1.234,56
+    """)
+    
+    st.markdown("---")  # Separador
+    
+    # Copyright con año actual
+    current_year = datetime.now().year
+    st.markdown(f"""
+    **© {current_year} [Tu Nombre o Empresa]**
+    - Versión 2.0
+    - Todos los derechos reservados
+    """)
