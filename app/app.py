@@ -5,7 +5,7 @@
 # sudo apt update
 # sudo apt install python3 python3-venv python3-pip tesseract-ocr poppler-utils
 # 
-## pip install streamlit pdfplumber pytesseract pdf2image pandas ollama xlsxwriter.
+## pip install streamlit pdfplumber pytesseract pdf2image pandas ollama xlsxwriter.. (ubuntu)
 
 
 import os
