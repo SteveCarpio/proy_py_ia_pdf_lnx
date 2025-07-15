@@ -41,11 +41,13 @@ def limpiar_json_respuesta(respuesta):
     return respuesta
 
 # Opción 1: Selección de carpeta local (como antes)
-st.sidebar.subheader("Opción 1: Procesar desde servidor")
-folder = st.sidebar.text_input("Ruta de carpeta con PDFs en el servidor", value=os.getcwd())
+#st.sidebar.subheader("Opción 1: Procesar desde servidor")
+# folder = st.sidebar.text_input("Ruta de carpeta con PDFs en el servidor", value=os.getcwd())
+folder = "/home/robot/Descargas"
 
 # Opción 2: Subida de archivos desde el cliente
-st.sidebar.subheader("Opción 2: Subir archivos desde tu PC")
+#st.sidebar.subheader("Opción 2: Subir archivos desde tu PC")
+st.sidebar.subheader("Subir archivos desde tu PC")
 uploaded_files = st.sidebar.file_uploader(
     "Selecciona archivos PDF para procesar",
     type=["pdf"],
@@ -158,13 +160,30 @@ if st.sidebar.button("Procesar PDFs"):
     else:
         st.warning("⚠️ Campo 'fecha' no encontrado en la respuesta.")
 
+    # Convertir campos monetarios a float, manejando errores y valores nulos
+    # Por esta versión más robusta:
     for col in ["base", "iva", "irpf", "total"]:
         if col in df.columns:
-            df[col] = df[col].apply(
-                lambda x: float(re.sub(r"[^\d\.,]", "", str(x)).replace(",", ".")) if pd.notna(x) else None
-            )
+            def convertir_valor(x):
+                try:
+                    if pd.isna(x) or x is None or str(x).strip() in ["", "null"]:
+                        return None
+                    # Limpieza más exhaustiva
+                    valor_limpio = re.sub(r"[^\d\.,-]", "", str(x).strip())
+                    valor_limpio = valor_limpio.replace(",", ".")
+                    # Manejo de valores negativos
+                    if "-" in valor_limpio and not valor_limpio.startswith("-"):
+                        valor_limpio = "-" + valor_limpio.replace("-", "")
+                    return float(valor_limpio)
+                except Exception as e:
+                    st.warning(f"Error convirtiendo {col}={x}: {str(e)}")
+                    return None
+            
+            df[col] = df[col].apply(convertir_valor)
         else:
             st.warning(f"⚠️ Campo '{col}' no encontrado en la respuesta.")
+
+
 
     # Mostrar tabla
     st.subheader("✅ Datos extraídos")
