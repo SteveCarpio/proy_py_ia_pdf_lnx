@@ -35,8 +35,8 @@ def main():
         st.markdown(f"**Modelo activo:** `{model_choice}`")
 
     # Área principal del chat
-    st.title("🤖 Chat con Modelos Locales")
-    st.caption("Nota: Los modelos se ejecutan localmente en tu servidor Ubuntu a través de Ollama")
+    st.title("🤖 ChatTDA Local rev. 2023")
+    st.caption("Nota: Se ejecutará usando un modelo pre-entrenado (en construcción), los datos no se almacenan en ningún servidor exterior/local.")
 
     # Inicializar historial de chat
     if "messages" not in st.session_state:

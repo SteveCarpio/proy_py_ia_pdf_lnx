@@ -14,7 +14,7 @@ APPS = {
     "Inicio": None,
     "IA: Facturas PDF": app1,
     "IA: Transcripción de Audio": app2,
-    "IA: Chat de Texto": app3
+    "IA: ChatTDA": app3
 }
 
 def main():
