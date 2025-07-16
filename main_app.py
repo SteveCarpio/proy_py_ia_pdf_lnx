@@ -4,8 +4,8 @@ from app import app1, app2, app3  # Importa tus apps aquí
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Listado de Aplicaciones",
-    page_icon="🚀",
+    page_title="Portal IA ( TdA )",
+    page_icon="💼",  # 💼  🏛️
     layout="wide"
 )
 

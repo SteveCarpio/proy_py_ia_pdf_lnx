@@ -5,22 +5,24 @@ from pathlib import Path
 
 def main():
     # Configuración de la página (debe ser lo primero en Streamlit)
-    st.set_page_config(
-        page_title="Chat con Modelos Locales",
-        page_icon="🤖",
-        layout="wide"
-    )
+    #st.set_page_config(
+    #    page_title="Chat con Modelos Locales",
+    #    page_icon="🤖",
+    #    layout="wide"
+    #)
 
     # Sidebar para configuración
     with st.sidebar:
-        st.title("⚙️ Configuración del Modelo")
+        st.markdown("---")  # Separador
+
+        #st.title("Configuración del Modelo") #  ⚙️
         
         # Selector de modelo
         model_choice = st.selectbox(
-            "Selecciona el modelo:",
+            "🧠 Selecciona el modelo:",
             ["llama3:instruct", "mistral:latest", "mixtral:latest"],
             index=0,
-            help="Modelos disponibles localmente a través de Ollama"
+            help="Modelos disponibles localmente (en continuo desarrollo)."
         )
         
         st.markdown("---")

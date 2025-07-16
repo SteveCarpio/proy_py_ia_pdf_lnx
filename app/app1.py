@@ -17,7 +17,7 @@ def main():
 
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
-    st.title("📄 Lector de Facturas con IA")
+    st.title("🗂️ Lector de Facturas con IA")  # 🗂️ 📄
     st.text("Extrae datos de facturas en PDF usando IA y OCR")
 
     # Crear directorio temporal para subidas
@@ -217,7 +217,7 @@ def main():
                 st.warning(f"⚠️ Campo '{col}' no encontrado en la respuesta.")
 
         # Mostrar tabla con formato europeo
-        st.subheader("✅ Datos extraídos")
+        st.subheader(f"✅ Datos extraídos")
         
         # Crear DataFrame para visualización
         df_mostrar = df.copy()
