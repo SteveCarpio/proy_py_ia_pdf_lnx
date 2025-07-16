@@ -1,6 +1,7 @@
 import streamlit as st
 
 def main():
+    import streamlit as st
     import os
     import re
     import json
@@ -8,7 +9,6 @@ def main():
     from io import BytesIO
     import tempfile
     from datetime import datetime
-    import streamlit as st
     import pandas as pd
     import pdfplumber
     from pdf2image import convert_from_bytes
@@ -94,23 +94,18 @@ def main():
             respuesta += "}"
         return respuesta
 
-    # Opción 1: Selección de carpeta local
+    # Opción 1: Selección de carpeta local predeterminada
     folder = "/home/robot/Descargas"
 
         
     st.sidebar.markdown("---")  # Separador
 
     # Opción 2: Subida de archivos desde el cliente
-    
-    st.sidebar.markdown("""
-    **📁 Seleccione Archivos PDF**  
-    """, unsafe_allow_html=True)
-
     uploaded_files = st.sidebar.file_uploader(
-        "",  # Dejamos el texto vacío aquí
+        label="📁 Seleccione Archivos PDF ",  
         type=["pdf"],
         accept_multiple_files=True,
-        label_visibility="collapsed"  # Ocultamos el label por defecto
+        label_visibility="visible" 
     )
 
     # Procesar archivos subidos
