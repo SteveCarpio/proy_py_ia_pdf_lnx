@@ -1,3 +1,18 @@
+# app.py
+# curl https://ollama.ai/install.sh | sh
+# ollama pull mistral
+#
+# sudo apt update
+# sudo apt install python3 python3-venv python3-pip tesseract-ocr poppler-utils
+# 
+# pip install streamlit pdfplumber pytesseract pdf2image pandas ollama xlsxwriter
+# pip install -r requirements.txt
+#
+# python3 -m venv venv
+#
+# source venv/bin/activate
+# streamlit run app.py
+
 import os
 import re
 import json
@@ -15,6 +30,7 @@ import ollama
 # Configuración inicial de la app
 st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
 st.title("📄 (TDA) Lector de Facturas con IA")
+st.text("Extrae datos de facturas en PDF usando IA y OCR")
 
 # Crear directorio temporal para subidas
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
@@ -245,6 +261,9 @@ if st.sidebar.button("Procesar PDFs"):
 
 
 with st.sidebar:
+
+    st.markdown("---")  # Separador
+
     # Mensaje de ayuda
     st.markdown("""
     **🆘 Ayuda rápida:**
@@ -268,7 +287,7 @@ with st.sidebar:
     # Copyright con año actual
     current_year = datetime.now().year
     st.markdown(f"""
-    **© {current_year} [Tu Nombre o Empresa]**
+    **© {current_year} [TdA S.A.]**
     - Versión 2.0
     - Todos los derechos reservados
     """)
