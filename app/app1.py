@@ -17,7 +17,7 @@ def main():
 
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
-    st.title("🗂️ Lector de Facturas con IA")  # 🗂️ 📄
+    st.title("🤖 Lector de Facturas con IA")  # 🗂️ 📄  🤖
     st.text("Extrae datos de facturas en PDF usando IA y OCR")
 
     # Crear directorio temporal para subidas

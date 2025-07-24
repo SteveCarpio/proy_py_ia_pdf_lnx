@@ -5,11 +5,11 @@ from pathlib import Path
 
 def main():
     # Configuración de la página
-    st.set_page_config(
-        page_title="Chat con Modelos Locales",
-        page_icon="🤖",
-        layout="wide"
-    )
+    # st.set_page_config(
+    #    page_title="Chat con Modelos Locales",
+    #    page_icon="🤖",
+    #    layout="wide"
+    # )
 
     # Inicializar historial de chat si no existe
     if "messages" not in st.session_state:
@@ -29,17 +29,17 @@ def main():
             st.session_state.chat_counter += 1
             st.rerun()
         
-        st.markdown("---")
+        #st.markdown("---")
         
         # Selector de modelo
         model_choice = st.selectbox(
             "🧠 Selecciona el modelo:",
-            ["llama3:instruct", "mistral:latest", "mixtral:latest"],
+            ["llama3:instruct", "mistral:latest"],   # "mixtral:lastest"
             index=0,
             help="Modelos disponibles localmente (en continuo desarrollo)."
         )
         
-        st.markdown("---")
+        #st.markdown("---")
         st.markdown("""
         **📝 Instrucciones:**
         1. Selecciona el modelo
@@ -52,7 +52,7 @@ def main():
         st.markdown(f"**Chat actual:** #{st.session_state.chat_counter}")
 
     # Área principal del chat
-    st.title(f"🤖 ChatTDA Local rev. 2023 (Chat #{st.session_state.chat_counter})")
+    st.title(f"🤖 ChatTDA (Chat #{st.session_state.chat_counter})")
     st.caption("Nota: Se ejecutará usando un modelo pre-entrenado (en construcción), los datos no se almacenan en ningún servidor exterior/local.")
 
     # Mostrar historial de chat existente
