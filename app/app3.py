@@ -4,18 +4,32 @@ import ollama
 from pathlib import Path
 
 def main():
-    # Configuración de la página (debe ser lo primero en Streamlit)
-    #st.set_page_config(
-    #    page_title="Chat con Modelos Locales",
-    #    page_icon="🤖",
-    #    layout="wide"
-    #)
+    # Configuración de la página
+    st.set_page_config(
+        page_title="Chat con Modelos Locales",
+        page_icon="🤖",
+        layout="wide"
+    )
 
+    # Inicializar historial de chat si no existe
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    # Inicializar contador de chats si no existe
+    if "chat_counter" not in st.session_state:
+        st.session_state.chat_counter = 1
+    
     # Sidebar para configuración
     with st.sidebar:
-        st.markdown("---")  # Separador
-
-        #st.title("Configuración del Modelo") #  ⚙️
+        st.markdown("---")
+        
+        # Botón para nuevo chat
+        if st.button("🆕 Nuevo chat"):
+            st.session_state.messages = []
+            st.session_state.chat_counter += 1
+            st.rerun()
+        
+        st.markdown("---")
         
         # Selector de modelo
         model_choice = st.selectbox(
@@ -35,14 +49,11 @@ def main():
         
         # Mostrar información del modelo seleccionado
         st.markdown(f"**Modelo activo:** `{model_choice}`")
+        st.markdown(f"**Chat actual:** #{st.session_state.chat_counter}")
 
     # Área principal del chat
-    st.title("🤖 ChatTDA Local rev. 2023")
+    st.title(f"🤖 ChatTDA Local rev. 2023 (Chat #{st.session_state.chat_counter})")
     st.caption("Nota: Se ejecutará usando un modelo pre-entrenado (en construcción), los datos no se almacenan en ningún servidor exterior/local.")
-
-    # Inicializar historial de chat
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
 
     # Mostrar historial de chat existente
     for message in st.session_state.messages:
@@ -67,10 +78,10 @@ def main():
             start_time = time.time()
             
             try:
-                # Stream de respuesta desde Ollama
+                # Stream de respuesta desde Ollama usando TODO el historial
                 response = ollama.chat(
                     model=model_choice,
-                    messages=[{"role": "user", "content": prompt}],
+                    messages=st.session_state.messages,  # Envía todo el historial
                     stream=True
                 )
                 
@@ -93,5 +104,5 @@ def main():
                 st.error(f"Error al generar respuesta: {str(e)}")
                 st.session_state.messages.append({"role": "assistant", "content": f"Error: {str(e)}"})
 
-#if __name__ == "__main__":
-#    main()
+if __name__ == "__main__":
+    main()
