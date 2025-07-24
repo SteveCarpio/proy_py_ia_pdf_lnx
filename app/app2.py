@@ -52,7 +52,8 @@ def main():
 
     # Área principal del chat
     st.title(f"🤖 Transcrición de Audio a ({model_choice})")
-    st.caption("Nota: Se ejecutará usando un modelos Volsk (en construcción), los datos no se almacenan en ningún servidor exterior/local.")
+    st.caption("Combina ASR (Reconocimiento Automático de Voz) con modelos LLM para transformar audio en texto estructurado y resúmenes contextuales.")
+    st.text("🚧 .... En Construcción .... 🚧 ")
 
 
 if __name__ == "__main__":

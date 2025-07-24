@@ -18,7 +18,7 @@ def main():
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
     st.title("🤖 Lector de Facturas con IA")  # 🗂️ 📄  🤖
-    st.text("Extrae datos de facturas en PDF usando IA y OCR")
+    st.caption("Extrae automáticamente datos de facturas en PDF combinando tecnología OCR (reconocimiento óptico de caracteres) con modelos avanzados de IA (LLM) para procesamiento inteligente.")
 
     # Crear directorio temporal para subidas
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
