@@ -75,18 +75,19 @@ def main():
             - Todos los derechos reservados
             """)
 
+        # Obtener IP del cliente si está disponible
+        client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+        if client_ip:
+            access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+            #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+            with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                f.write(f"{access_time} > {client_ip} > {app_selection}\n")
 
     # Cargar la aplicación seleccionada
     else:
         APPS[app_selection].main()
 
-    # Obtener IP del cliente si está disponible
-    client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-    if client_ip:
-        access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
-        #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
-        with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-            f.write(f"{access_time} > {client_ip} > {app_selection}\n")
+    
 
 if __name__ == "__main__":
     main()
