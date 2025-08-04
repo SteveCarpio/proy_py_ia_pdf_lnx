@@ -2,6 +2,7 @@ import streamlit as st
 import time
 import ollama
 from pathlib import Path
+from datetime import datetime
 
 def main():
     # Configuración de la página
@@ -54,6 +55,15 @@ def main():
     st.title(f"🤖 Transcrición de Audio a ({model_choice})")
     st.caption("Combina ASR (Reconocimiento Automático de Voz) con modelos LLM para transformar audio en texto estructurado y resúmenes contextuales.")
     st.text("🚧 .... En Construcción .... 🚧 ")
+
+
+    # Obtener IP del cliente si está disponible
+    client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+    if client_ip:
+        access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+        #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+        with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+            f.write(f"{access_time} > {client_ip} > PAG1:Transcribir_Audio \n")
 
 
 if __name__ == "__main__":
