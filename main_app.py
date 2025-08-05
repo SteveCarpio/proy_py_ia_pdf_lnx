@@ -1,5 +1,9 @@
+# source venv/bin/activate
+
 import streamlit as st
+import base64
 from datetime import datetime
+from PIL import Image
 from app import app1, app2, app3  # Importa tus apps aquí
 
 # Configuración de la página
@@ -18,35 +22,106 @@ APPS = {
 }
 
 def main():
-    # Sidebar para selección de aplicación
+    
     st.sidebar.title("Selecciona una App")
     app_selection = st.sidebar.radio("Ir a:", list(APPS.keys()))
     
     # Página de inicio
     if app_selection == "Inicio":
-        st.title("Listado de Aplicaciones")
-        st.write("""
-        Selecciona una aplicación desde el menú lateral para comenzar.
-        """)
         
+        # Crear dos columnas (una más ancha para el título)
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            st.title("Listado de Aplicaciones")
+            st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
+
+        with col2:
+            logo = Image.open("img/logotipo.gif")
+            st.image(logo)  # Más pequeño para que quede al lado
+          
         # Mostrar miniaturas de las apps disponibles
         cols = st.columns(3)
         with cols[0]:
             st.subheader("Facturas PDF")
-            st.write("Seleccione facturas en formato PDF y serán procesadas por la IA para extraer los datos más relevantes.")
+            st.markdown(
+            """
+            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
+            <p class="small-text1">Seleccione facturas en formato PDF y serán procesadas por la IA para extraer los datos más relevantes.</p>
+            """, unsafe_allow_html=True)
+
+            st.subheader("Otros 1")
+            st.write("Aquí puede ir una de tus propuestas de aplicación IA.")
+
+            st.subheader("Otros 4")
+            st.markdown(
+            """
+            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
+            <p class="small-text1">Aquí puede ir una de tus propuestas de aplicación IA.</p>
+            """, unsafe_allow_html=True)
                 
         with cols[1]:
             st.subheader("Transcripción de Audio")
-            st.write("Seleccione un fichero de audio y la IA lo transcribirá a texto y crerá un resumen.")
+            st.write("Seleccione un fichero de audio y la IA lo transcribirá a texto y creará un resumen en formato Word.")
+
+            st.subheader("Otros 2")
+            st.markdown(
+            """
+            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
+            <p class="small-text1">Aquí puede ir una de tus propuestas de aplicación IA.</p>
+            """, unsafe_allow_html=True)
                 
         with cols[2]:
-            st.subheader("Chat de Texto")
-            st.write("Escribe un mensaje y la IA responderá de forma inteligente.")
+            st.subheader("ChatTDA")
+            st.markdown(
+            """
+            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
+            <p class="small-text1">Escribe un mensaje y la IA responderá de forma inteligente usando modelos pre-entrenados (en continuo aprendizaje).</p>
+            """, unsafe_allow_html=True)
             
+            st.subheader("Otros 3")
+            st.write("Aquí puede ir una de tus propuestas de aplicación IA.")
+        
+        st.caption(" ")
+        st.caption(" ")
+        st.caption(" ")
+        st.caption(" ")
+        st.markdown("---")  # Separador
+
+
+        # Pie de página centrado y pequeño
+        st.markdown(
+            """
+            <style>
+            .small-text2 {
+                font-size: 0.5em;
+                color: gray;
+                text-align: center;
+            }
+            </style>
+            <p class="small-text2">Para más ayuda, contactar con carpios@tda-sgft.com <br> Versión 1.0.0</p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Mostrar el logotipo centrado
+        def get_image_base64(path):
+            with open(path, "rb") as img_file:
+                return base64.b64encode(img_file.read()).decode()
+        image_base64 = get_image_base64("img/logotipo.ico")
+        st.markdown(
+            """
+            <div style='text-align: center;'>
+                <img src='data:image/png;base64,{image_base64}' width='40'>
+                <br>
+            </div>
+            """.format(image_base64=image_base64),
+            unsafe_allow_html=True
+        )
+
+
+        # Sidebar con información adicional            
         with st.sidebar:
-
             st.markdown("---")  # Separador
-
             # Mensaje de ayuda
             st.markdown("""
             **🆘 Ayuda:**
@@ -71,8 +146,6 @@ def main():
             current_year = datetime.now().year
             st.markdown(f"""
             **© {current_year} - TdA S.A.**
-            - Versión 2.0
-            - Todos los derechos reservados
             """)
 
         # Obtener IP del cliente si está disponible
