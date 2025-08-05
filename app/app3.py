@@ -2,6 +2,7 @@ import streamlit as st
 import time
 import ollama
 from pathlib import Path
+from datetime import datetime
 
 def main():
     # Configuración de la página
@@ -99,10 +100,20 @@ def main():
                 
                 # Añadir al historial
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
-                
+
+                # Obtener IP del cliente si está disponible
+                client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+                if client_ip:
+                    access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+                    #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+                    with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                        f.write(f"{access_time} > {client_ip} > Pag3 > IA_ChatTDA >> {prompt}\n")
+
             except Exception as e:
                 st.error(f"Error al generar respuesta: {str(e)}")
                 st.session_state.messages.append({"role": "assistant", "content": f"Error: {str(e)}"})
+
+    
 
 if __name__ == "__main__":
     main()
