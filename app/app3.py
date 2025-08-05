@@ -35,7 +35,7 @@ def main():
         # Selector de modelo
         model_choice = st.selectbox(
             "🧠 Selecciona el modelo:",
-            ["llama3:instruct", "mistral:latest"],   # "mixtral:lastest"
+            ["llama3:instruct", "mistral:latest", "mixtral:latest"],   # "llama3:instruct", "mistral:latest", "mixtral:latest"
             index=0,
             help="Modelos disponibles localmente (en continuo desarrollo)."
         )
@@ -107,7 +107,7 @@ def main():
                     access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
                     #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
                     with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                        f.write(f"{access_time} > {client_ip} > Pag3 > IA_ChatTDA >> {prompt}\n")
+                        f.write(f"{access_time} > {client_ip} > Pag3 > IA_ChatTDA({model_choice}) >> {prompt}\n")
 
             except Exception as e:
                 st.error(f"Error al generar respuesta: {str(e)}")
