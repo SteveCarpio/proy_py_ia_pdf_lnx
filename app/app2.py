@@ -190,22 +190,19 @@ def main():
             
             st.write("Procesando audio...")
 
-            audio_file = f"/home/robot/Python/x_audios/REUNION.mp3"
+            audio_file = f"/tmp/transcripcion_audio/REUNION_audio1_{timestamp}{extension}"
             modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
             modelo_ollama = "llama3:instruct"                                        #  [ llama3:instruct | mistral ]
             ruta_salida = "/tmp/transcripcion_audio"
             base = ruta_salida
-            #timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
+            
             # Función Procesar Audio
             texto, txt_path = procesar_audio(audio_file, modelo_dir, base, timestamp)  
-            #print(f"\n - Transcripción guardada en: {txt_path}")
-            #print(f"\n{texto}")
+            
 
             # Función Crea Resumen Modelo IA
             resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp)
-            #print(f"\n\n - Resumen guardado en: {resumen_path}")
-            #print(f"\n{resumen}\n")
+            
 
             st.write("Audio procesado y transcrito correctamente.")
 
