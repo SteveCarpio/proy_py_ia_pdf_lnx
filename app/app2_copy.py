@@ -2,18 +2,18 @@ import streamlit as st
 
 def main():
     import streamlit as st
-    from io import BytesIO # Importación de BytesIO para manejar archivos en memoria
-    import tempfile # Importación de la librería temporal para crear directorios temporales
-    import os  # Importación de la librería para operaciones de sistema (manejo de archivos y directorios)
-    import json  # Importación de la librería para trabajar con datos en formato JSON
-    from vosk import Model, KaldiRecognizer  # Importación de las clases necesarias para el reconocimiento de voz
-    import wave  # Librería para trabajar con archivos WAV
-    from pydub import AudioSegment  # Librería para convertir y manipular audios
-    import requests  # Librería para realizar solicitudes HTTP
-    import re  # Importación de la librería para expresiones regulares
-    import ollama # Importación de la librería Ollama para interactuar con modelos de IA
-    import shutil # Importación de la librería para copiar archivos y directorios
-    from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
+    import os
+    import re
+    import json
+    import shutil
+    from io import BytesIO
+    import tempfile
+    from datetime import datetime
+    import pandas as pd
+    import pdfplumber
+    from pdf2image import convert_from_bytes
+    import pytesseract
+    import ollama
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
