@@ -14,6 +14,7 @@ def main():
     import ollama # Importación de la librería Ollama para interactuar con modelos de IA
     import shutil # Importación de la librería para copiar archivos y directorios
     from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
+    import time  # Importación de la librería para manejar el tiempo
 
     # Configuración de la librería pydub para usar ffmpeg
     AudioSegment.converter = "/usr/bin/ffmpeg"
@@ -173,48 +174,50 @@ def main():
         else:
             ############## INICIO DEL PROCESAMIENTO ##############
 
-            # Si se sube el archivo a la carpeta temporal de Linux
-            if uploaded_files is not None:
-                extension = os.path.splitext(uploaded_files.name)[1]
-                os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_audio1_{timestamp}{extension}'))
+            with st.spinner('Procesando, por favor espera...'):
 
-            # Obtener IP del cliente si está disponible
-            client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-            if client_ip:
-                access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
-                with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                    f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> REUNION_audio1_{timestamp}{extension} \n")
+                # Si se sube el archivo a la carpeta temporal de Linux
+                if uploaded_files is not None:
+                    extension = os.path.splitext(uploaded_files.name)[1]
+                    os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_audio1_{timestamp}{extension}'))
 
-            audio_file = f"/tmp/transcripcion_audio/REUNION_audio1_{timestamp}{extension}"
-            modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
-            modelo_ollama = "llama3:instruct"                                        #  [ llama3:instruct | mistral ]
-            ruta_salida = "/tmp/transcripcion_audio"
-            base = ruta_salida
-            
-            # Función Procesar Audio
-            texto, txt_path = procesar_audio(audio_file, modelo_dir, base, timestamp)  
-            
-            # Función Crea Resumen Modelo IA
-            resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp)
-            
-            st.caption("📝 Resumen de la transcripción revisada por ChatTdA:")
+                # Obtener IP del cliente si está disponible
+                client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+                if client_ip:
+                    access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+                    with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> REUNION_audio1_{timestamp}{extension} \n")
 
-            # Mostrar el texto2 transcrito en la WEB
-            file_path2 = f"/tmp/transcripcion_audio/REUNION_resumen_{timestamp}.txt"  
-            markdown_content = load_markdown_file(file_path2)
-            st.markdown(markdown_content, unsafe_allow_html=False)
+                audio_file = f"/tmp/transcripcion_audio/REUNION_audio1_{timestamp}{extension}"
+                modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
+                modelo_ollama = "llama3:instruct"                                        #  [ llama3:instruct | mistral ]
+                ruta_salida = "/tmp/transcripcion_audio"
+                base = ruta_salida
+                
+                # Función Procesar Audio
+                texto, txt_path = procesar_audio(audio_file, modelo_dir, base, timestamp)  
+                
+                # Función Crea Resumen Modelo IA
+                resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp)
+                
+                st.caption("📝 Resumen de la transcripción revisada por ChatTdA:")
 
-            st.markdown("---")
+                # Mostrar el texto2 transcrito en la WEB
+                file_path2 = f"/tmp/transcripcion_audio/REUNION_resumen_{timestamp}.txt"  
+                markdown_content = load_markdown_file(file_path2)
+                st.markdown(markdown_content, unsafe_allow_html=False)
 
-            st.caption("📝 Transcripción completa del audio:")
+                st.markdown("---")
 
-            # Mostrar el texto1 transcrito en la WEB
-            file_path1 = f"/tmp/transcripcion_audio/REUNION_completo_{timestamp}.txt"  
-            markdown_content = load_markdown_file(file_path1)
-            st.markdown(markdown_content, unsafe_allow_html=False)
+                st.caption("📝 Transcripción completa del audio:")
 
-            st.markdown("---")
+                # Mostrar el texto1 transcrito en la WEB
+                file_path1 = f"/tmp/transcripcion_audio/REUNION_completo_{timestamp}.txt"  
+                markdown_content = load_markdown_file(file_path1)
+                st.markdown(markdown_content, unsafe_allow_html=False)
 
-            st.write("Audio procesado y transcrito correctamente.")
+                st.markdown("---")
+
+            st.success("¡ Audio procesado y transcrito correctamente !")
 
     
