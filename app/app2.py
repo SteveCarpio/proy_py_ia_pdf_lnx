@@ -1,70 +1,84 @@
 import streamlit as st
-import time
-import ollama
-from pathlib import Path
-from datetime import datetime
 
 def main():
-    # Configuración de la página
-    #st.set_page_config(
-    #    page_title="Chat con Modelos Locales",
-    #    page_icon="🤖",
-    #    layout="wide"
-    #)
+    import streamlit as st
+    import os
+    import re
+    import json
+    import shutil
+    from io import BytesIO
+    import tempfile
+    from datetime import datetime
+    import pandas as pd
+    import pdfplumber
+    from pdf2image import convert_from_bytes
+    import pytesseract
+    import ollama
 
-    # Inicializar historial de chat si no existe
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    
-    # Inicializar contador de chats si no existe
-    if "chat_counter" not in st.session_state:
-        st.session_state.chat_counter = 1
-    
-    # Sidebar para configuración
-    with st.sidebar:
-        st.markdown("---")
-        
-        # Botón para nuevo chat
-        if st.button("Transcribir"):
-            st.session_state.messages = []
-            st.session_state.chat_counter += 1
-            st.rerun()
-        
-        #st.markdown("---")
-        
-        # Formato de Salida
-        model_choice = st.selectbox(
-            "Selecciona el formato de salida:",
-            ["PDF", "DOC", "TXT"],
-            index=0,
-            help="Formatos disponibles (en continuo desarrollo)."
-        )
-        
-        #st.markdown("---")
-        st.markdown("""
-        **📝 Instrucciones:**
-        1. Selecciona el formato de salida
-        2. Presiona 'Transcribir'
-        """)
-        
-        # Mostrar información del modelo seleccionado
-        st.markdown(f"**Formato Seleccionado:** `{model_choice}`")
-    
-
-    # Área principal del chat
-    st.title(f"🤖 Transcrición de Audio a ({model_choice})")
+    # Configuración inicial de la app
+    #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
+    st.title("🤖 Transcrición de Audio")  # 🗂️ 📄  🤖
     st.caption("Combina ASR (Reconocimiento Automático de Voz) con modelos LLM para transformar audio en texto estructurado y resúmenes contextuales.")
-    st.text("🚧 .... En Construcción .... 🚧 ")
+
+    # Crear directorio temporal para subidas
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "transcripcion_audio")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+ 
+    # Opción 1: Selección de carpeta local predeterminada
+    folder = "/home/robot/Python/x_audios"
+
+        
+    st.sidebar.markdown("---")  # Separador
+
+    # Opción 2: Subida de archivos desde el cliente
+    uploaded_files = st.sidebar.file_uploader(
+        label="📁 Seleccione Archivo AUDIO  ",  
+        type=["mp3", "wav", "ogg"],
+        accept_multiple_files=False,
+        label_visibility="visible" 
+    )
 
 
-    # Obtener IP del cliente si está disponible
-    client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-    if client_ip:
-        access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
-        #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
-        with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-            f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio\n")
+    # Si se sube el archivo a la carpeta temporal de Linux
+    if uploaded_files is not None:
+        extension = os.path.splitext(uploaded_files.name)[1]
+        file_path = os.path.join("/tmp/transcripcion_audio/", uploaded_files.name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_files.getbuffer())
+        st.audio(uploaded_files, format=uploaded_files.type.split("/")[-1])
+        os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_audio{extension}'))
 
 
-if __name__ == "__main__":
-    main()
+
+    # Procesar archivos subidos
+    if uploaded_files:      
+        st.sidebar.success(f"✅ Se subio correctamente")
+        folder = UPLOAD_FOLDER  # Usar la carpeta de subidas para procesamiento
+
+
+    # Verificar si hay archivos para procesar
+    if not os.path.isdir(folder):
+        st.error("❌ No se ha seleccionado una ruta válida o no se han subido archivos.")
+        st.stop()
+
+    # Botón para procesar AUDIO
+    if st.sidebar.button("Procesar AUDIO"):
+        registros = []
+        audio_files = [f for f in os.listdir(folder) if f.lower().endswith((".mp3", ".wav", ".ogg"))]
+
+        st.write(uploaded_files)
+
+        if not audio_files:
+            st.error("❌ No se encontraron archivos de audio en la carpeta seleccionada.")
+            st.stop()
+
+            
+
+        # Obtener IP del cliente si está disponible
+        client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+        if client_ip:
+            access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+            #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+            with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >>  \n")
