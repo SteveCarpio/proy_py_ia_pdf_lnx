@@ -15,6 +15,8 @@ def main():
     import pytesseract
     import ollama
 
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
     st.title("🤖 Transcrición de Audio")  # 🗂️ 📄  🤖
@@ -24,11 +26,6 @@ def main():
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "transcripcion_audio")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
- 
-    # Opción 1: Selección de carpeta local predeterminada
-    folder = "/home/robot/Python/x_audios"
-
-        
     st.sidebar.markdown("---")  # Separador
 
     # Opción 2: Subida de archivos desde el cliente
@@ -47,38 +44,29 @@ def main():
         with open(file_path, "wb") as f:
             f.write(uploaded_files.getbuffer())
         st.audio(uploaded_files, format=uploaded_files.type.split("/")[-1])
-        os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_audio{extension}'))
+        os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_1_audio_{timestamp}{extension}'))
 
-
+    folder = "/home/robot/Python/x_audios"
 
     # Procesar archivos subidos
     if uploaded_files:      
         st.sidebar.success(f"✅ Se subio correctamente")
         folder = UPLOAD_FOLDER  # Usar la carpeta de subidas para procesamiento
 
-
-    # Verificar si hay archivos para procesar
-    if not os.path.isdir(folder):
-        st.error("❌ No se ha seleccionado una ruta válida o no se han subido archivos.")
-        st.stop()
-
-    # Botón para procesar AUDIO
+    # BOTÓN: para procesar AUDIO
     if st.sidebar.button("Procesar AUDIO"):
-        registros = []
-        audio_files = [f for f in os.listdir(folder) if f.lower().endswith((".mp3", ".wav", ".ogg"))]
+        
+        if uploaded_files is None:
+            st.write("")
+            st.write(" ℹ️ Debe seleccionar un fichero de audio y luego darle a 'Procesar AUDIO'")
 
-        st.write(uploaded_files)
+        else:
+            st.write("Procesando audio...")      
 
-        if not audio_files:
-            st.error("❌ No se encontraron archivos de audio en la carpeta seleccionada.")
-            st.stop()
-
-            
-
-        # Obtener IP del cliente si está disponible
-        client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-        if client_ip:
-            access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
-            #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
-            with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >>  \n")
+            # Obtener IP del cliente si está disponible
+            client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+            if client_ip:
+                access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+                #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+                with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                    f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> REUNION_1_audio_{timestamp}{extension} \n")
