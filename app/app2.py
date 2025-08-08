@@ -190,7 +190,7 @@ def main():
 
                 audio_file = f"/tmp/transcripcion_audio/REUNION_audio1_{timestamp}{extension}"
                 modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
-                modelo_ollama = "llama3:instruct"                                        #  [ llama3:instruct | mistral ]
+                modelo_ollama = "gpt-oss:20b"          #  [ llama3:instruct | mistral | gpt-oss:20b ]
                 ruta_salida = "/tmp/transcripcion_audio"
                 base = ruta_salida
                 

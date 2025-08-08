@@ -35,7 +35,7 @@ def main():
         # Selector de modelo
         model_choice = st.selectbox(
             "🧠 Selecciona el modelo:",
-            ["llama3:instruct", "mistral:latest", "mixtral:latest"],   # "llama3:instruct", "mistral:latest", "mixtral:latest"
+            ["gpt-oss:20b", "deepseek-r1:32b", "llama3:instruct", "mistral:latest", "mixtral:latest"],   # "llama3:instruct", "mistral:latest", "mixtral:latest"
             index=0,
             help="Modelos disponibles localmente (en continuo desarrollo)."
         )

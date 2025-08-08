@@ -176,7 +176,7 @@ def main():
             )
 
             try:
-                resp = ollama.chat(model="llama3:instruct", messages=[{"role": "user", "content": prompt}])
+                resp = ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])  # gpt-oss:20b | llama3:instruct
                 respuesta_texto = resp["message"]["content"]
             except Exception as e:
                 st.error(f"❌ Error llamando a Mistral con archivo {fn}: {e}")
