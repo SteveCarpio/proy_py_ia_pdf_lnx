@@ -15,7 +15,6 @@ def main():
     import shutil # Importación de la librería para copiar archivos y directorios
     from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
     import time  # Importación de la librería para manejar el tiempo
-    import whisper # Importación del modelo Whisper de OpenIA
 
     # Configuración de la librería pydub para usar ffmpeg
     AudioSegment.converter = "/usr/bin/ffmpeg"
@@ -75,31 +74,15 @@ def main():
         # Unir todas las transcripciones y devolverlas como un único texto
         return "\n".join(results).strip() 
 
-    ### Función: procesar_audio VOSK ################################################
+    ### Función: procesar_audio ################################################
     # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA
-    def procesar_audio1(audio_file, modelo_dir, base, timestamp):
+    def procesar_audio(audio_file, modelo_dir, base, timestamp):
         # Llamar a la función de transcripción para obtener el texto del audio
         texto = transcribe(audio_file, modelo_dir, timestamp)
         # Guardar el texto transcrito en un archivo .txt
         txt_path = f"{base}/Audio_{timestamp}_texto_completo.txt"
         save_txt(texto, txt_path)
         return texto, txt_path
-
-    ### Función: procesar_audio WHISPER ################################################
-    # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA
-    def procesar_audio2(audio_file, modelo_dir, base, timestamp):
-        # Cargar el modelo ( medium - large (este no va muy bien))
-        model = whisper.load_model(modelo_dir)
-        # Ruta al archivo de audio a transcribir
-        audio_path = audio_file
-        # Transcribir Audio con Whisper
-        result = model.transcribe(audio_path)
-        texto = result["text"]
-        # Guardar el texto transcrito en un archivo .txt
-        txt_path = f"{base}/Audio_{timestamp}_texto_completo.txt"
-        save_txt(texto, txt_path)
-        return texto, txt_path
-
 
 
     ### Función: resumir_ollama #########################################################################
@@ -237,17 +220,13 @@ def main():
 
                 audio_file = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
-                modelo_dir2  = "medium"    
                 modelo_ollama = "llama3:instruct"          #  [ llama3:instruct | mistral | gpt-oss:20b ]
                 ruta_salida = "/tmp/transcripcion_audio"
                 base = ruta_salida
                 
-                # Función Procesar Audio (usa el modelo VOSK)
-                #texto, txt_path = procesar_audio1(audio_file, modelo_dir, base, timestamp)  
-
-                # Función Procesar Audio (usa el modelo WHISPER)
-                texto, txt_path = procesar_audio2(audio_file, modelo_dir2, base, timestamp)  
-
+                # Función Procesar Audio
+                texto, txt_path = procesar_audio(audio_file, modelo_dir, base, timestamp)  
+                
                 # Función Crea Resumen Modelo IA
                 resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp, seleccion)
                 
