@@ -68,7 +68,7 @@ def main():
             results.append(final_json.get("text", "")) # Guardar el texto final
 
         # Copiar y Eliminar el archivo temporal
-        shutil.copy(wav_path, f'{ruta_salida}/REUNION_audio2_{timestamp}.wav')  # Copiar el archivo WAV a la ruta de salida
+        shutil.copy(wav_path, f'{ruta_salida}/Audio_{timestamp}_convertido.wav')  # Copiar el archivo WAV a la ruta de salida
         os.remove(wav_path)
         
         # Unir todas las transcripciones y devolverlas como un único texto
@@ -80,25 +80,36 @@ def main():
         # Llamar a la función de transcripción para obtener el texto del audio
         texto = transcribe(audio_file, modelo_dir, timestamp)
         # Guardar el texto transcrito en un archivo .txt
-        txt_path = f"{base}/REUNION_completo_{timestamp}.txt"
+        txt_path = f"{base}/Audio_{timestamp}_texto_completo.txt"
         save_txt(texto, txt_path)
         return texto, txt_path
 
 
     ### Función: resumir_ollama #########################################################################
     # Objetivo: Generar un resumen profesional de la reunión usando un modelo de IA (por ejemplo, Ollama)
-    def resumir_ollama(texto, modelo_ollama, base, timestamp):
-        prompt = (
-            "A continuación tienes la transcripción de una reunión en español, posiblemente sin puntuación ni formato. "
-            "Tu tarea es redactar un acta profesional de la reunión, respetando el idioma español.\n\n"
-            "Por favor, sigue estas instrucciones:\n"
-            "- Indica la fecha, hora y lugar de la reunión (si esos datos aparecen en el texto; si no, deja un espacio para completarlos).\n"
-            "- Presenta una breve descripción de los participantes, indicando nombre completo y, si es posible, su empresa o rol.\n"
-            "- Haz un listado breve y claro de los puntos tratados en la reunión.\n"
-            "- Si quedan temas pendientes o para la próxima reunión, indícalos como 'Puntos pendientes'.\n"
-            "- Mantén una redacción clara, profesional y estructurada.\n\n"
-            f"Transcripción de la reunión:\n\n{texto}\n\n"
-        )
+    def resumir_ollama(texto, modelo_ollama, base, timestamp, seleccion):
+
+        if seleccion == "Reunión":
+            prompt = (
+                "A continuación tienes la transcripción de una reunión en español, posiblemente sin puntuación ni formato. "
+                "Tu tarea es redactar un acta profesional de la reunión, respetando el idioma español.\n\n"
+                "Por favor, sigue estas instrucciones:\n"
+                "- Indica la fecha, hora y lugar de la reunión (si esos datos aparecen en el texto; si no, deja un espacio para completarlos).\n"
+                "- Presenta una breve descripción de los participantes, indicando nombre completo y, si es posible, su empresa o rol.\n"
+                "- Haz un listado breve y claro de los puntos tratados en la reunión.\n"
+                "- Si quedan temas pendientes o para la próxima reunión, indícalos como 'Puntos pendientes'.\n"
+                "- Mantén una redacción clara, profesional y estructurada.\n\n"
+                f"Transcripción de la reunión:\n\n{texto}\n\n"
+            )
+
+        if seleccion == "Conversación":
+            prompt = (
+                "A continuación tienes la transcripción de una conversación, posiblemente sin puntuación ni formato. "
+                "Tu tarea es redactar un resumen de la conversación, si la conversación no está en español lo traduces y lo colocas abajo de la linea original.\n\n"
+                "Al final debes poner la Transcripción de la conversación con un titulo\n"
+                "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
+                f"Transcripción de la conversación:\n\n{texto}\n\n"
+            )
 
         try:
             respuesta = ollama.chat(
@@ -109,7 +120,7 @@ def main():
         except Exception as e:
             raise RuntimeError(f"Error al generar el resumen con el modelo '{modelo_ollama}': {e}")
 
-        resumen_filename = f"REUNION_resumen_{timestamp}.txt"  #  f"resumen_{timestamp}.txt"
+        resumen_filename = f"Audio_{timestamp}_texto_resumen.txt"  #  f"resumen_{timestamp}.txt"
         resumen_path = os.path.join(base, resumen_filename)
 
         try:
@@ -163,10 +174,18 @@ def main():
             f.write(uploaded_files.getbuffer())
         st.audio(uploaded_files, format=uploaded_files.type.split("/")[-1])
         
+    # SelectBox para elegir el tipo de Audio
+    opciones = ["Reunión", "Conversación", "Canción", "Poema", "Otros"]  # lista de opciones
+    seleccion = st.sidebar.selectbox(
+        "Indique el tipo del audio:",
+        opciones,
+        index=0,               # índice por defecto (0 = primera opción)
+        key="opcion_elegida"   # clave opcional para mantener estado
+    )
 
     ############## BOTÓN: para procesar AUDIO ##############
     if st.sidebar.button("Procesar AUDIO"):
-        
+
         if uploaded_files is None:
             st.write("")
             st.write(" ℹ️ Debe seleccionar un fichero de audio y luego darle a 'Procesar AUDIO'")
@@ -174,21 +193,23 @@ def main():
         else:
             ############## INICIO DEL PROCESAMIENTO ##############
 
-            with st.spinner('Procesando, por favor espera...'):
+            with st.spinner(f'Tipo {seleccion}: Por favor espere...'):
+
+                nombre_audio = f'Audio_{timestamp}'
 
                 # Si se sube el archivo a la carpeta temporal de Linux
                 if uploaded_files is not None:
                     extension = os.path.splitext(uploaded_files.name)[1]
-                    os.rename(file_path, file_path.replace(uploaded_files.name, f'REUNION_audio1_{timestamp}{extension}'))
+                    os.rename(file_path, file_path.replace(uploaded_files.name, f'{nombre_audio}_original{extension}'))
 
                 # Obtener IP del cliente si está disponible
                 client_ip = st.context.ip_address  # solo disponible en v1.45.0+
                 if client_ip:
                     access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
                     with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> REUNION_audio1_{timestamp}{extension} \n")
+                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> {nombre_audio}{extension} \n")
 
-                audio_file = f"/tmp/transcripcion_audio/REUNION_audio1_{timestamp}{extension}"
+                audio_file = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
                 modelo_ollama = "gpt-oss:20b"          #  [ llama3:instruct | mistral | gpt-oss:20b ]
                 ruta_salida = "/tmp/transcripcion_audio"
@@ -198,21 +219,21 @@ def main():
                 texto, txt_path = procesar_audio(audio_file, modelo_dir, base, timestamp)  
                 
                 # Función Crea Resumen Modelo IA
-                resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp)
+                resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp, seleccion)
                 
                 st.caption("📝 Resumen de la transcripción revisada por ChatTdA:")
 
                 # Mostrar el texto2 transcrito en la WEB
-                file_path2 = f"/tmp/transcripcion_audio/REUNION_resumen_{timestamp}.txt"  
+                file_path2 = f"/tmp/transcripcion_audio/Audio_{timestamp}_texto_resumen.txt"  
                 markdown_content = load_markdown_file(file_path2)
                 st.markdown(markdown_content, unsafe_allow_html=False)
 
                 st.markdown("---")
 
-                st.caption("📝 Transcripción completa del audio:")
+                st.caption("📝 Transcripción original del audio sin IA:")
 
                 # Mostrar el texto1 transcrito en la WEB
-                file_path1 = f"/tmp/transcripcion_audio/REUNION_completo_{timestamp}.txt"  
+                file_path1 = f"/tmp/transcripcion_audio/Audio_{timestamp}_texto_completo.txt"  
                 markdown_content = load_markdown_file(file_path1)
                 st.markdown(markdown_content, unsafe_allow_html=False)
 
