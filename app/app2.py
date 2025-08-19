@@ -104,11 +104,20 @@ def main():
 
         if seleccion == "Conversación":
             prompt = (
-                "A continuación tienes la transcripción de una conversación, posiblemente sin puntuación ni formato. "
-                "Tu tarea es redactar un resumen de la conversación, si la conversación no está en español lo traduces y lo colocas abajo de la linea original.\n\n"
-                "Al final debes poner la Transcripción de la conversación con un titulo\n"
+                "A continuación tienes la transcripción de una Conversación, posiblemente sin puntuación ni formato. "
+                "Tu tarea es redactar un resumen de la Conversación, si la Conversación no está en español lo traduces.\n\n"
+                "Al final debes poner la Transcripción de la Conversación\n"
                 "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
-                f"Transcripción de la conversación:\n\n{texto}\n\n"
+                f"Transcripción de la Conversación:\n\n{texto}\n\n"
+            )
+
+        if seleccion == "Poema":
+            prompt = (
+                "A continuación tienes la transcripción de un Poema, posiblemente sin puntuación ni formato.\n "
+                "Tu tarea es intentar detectar el autor del poema, crear un resumen y escribir el poema\n si el Poema no está en español lo traduces.\n\n"
+                "Al final debes poner la Transcripción del Poema\n"
+                "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
+                f"Transcripción del Poema:\n\n{texto}\n\n"
             )
 
         try:
@@ -193,7 +202,7 @@ def main():
         else:
             ############## INICIO DEL PROCESAMIENTO ##############
 
-            with st.spinner(f'Tipo {seleccion}: Por favor espere...'):
+            with st.spinner(f'Analizando Audio de Tipo ({seleccion}): Por favor espere...'):
 
                 nombre_audio = f'Audio_{timestamp}'
 
@@ -235,7 +244,8 @@ def main():
                 # Mostrar el texto1 transcrito en la WEB
                 file_path1 = f"/tmp/transcripcion_audio/Audio_{timestamp}_texto_completo.txt"  
                 markdown_content = load_markdown_file(file_path1)
-                st.markdown(markdown_content, unsafe_allow_html=False)
+                #st.markdown(markdown_content, unsafe_allow_html=False)
+                st.caption(markdown_content, unsafe_allow_html=False)
 
                 st.markdown("---")
 
