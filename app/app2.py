@@ -26,7 +26,7 @@ def main():
     ######################################################################################################################
 
     ### Función: convert_to_wav ##########################################################################
-    # Objetivo: Convertir cualquier archivo de audio a formato WAV con un solo canal y frecuencia de 16000
+    # Objetivo: Convertir cualquier archivo de audio a formato WAV con un solo canal y frecuencia de 16000      <-----:::  STV NO SE USA
     def convert_to_wav(audio_path):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # Cargar el archivo de audio y convertirlo a formato WAV con las configuraciones especificadas
@@ -36,14 +36,8 @@ def main():
         sound.export(wav_path, format="wav") # Exportar el audio convertido
         return wav_path
 
-    ### Función: save_txt ###############################################
-    # Objetivo: Guardar el texto transcrito en un archivo de texto (.txt)
-    def save_txt(text, path):
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(text) # Escribir el texto en el archivo especificado
-
     ### Función: transcribe ##############################################################
-    # Objetivo: Transcribir el audio (en formato WAV) a texto utilizando el modelo de Vosk
+    # Objetivo: Transcribir el audio (en formato WAV) a texto utilizando el modelo de Vosk                      <-----:::  STV NO SE USA
     def transcribe(audio_path, model_path, timestamp):
         # Convertir el audio de entrada a formato WAV
         wav_path = convert_to_wav(audio_path)
@@ -76,7 +70,7 @@ def main():
         return "\n".join(results).strip() 
 
     ### Función: procesar_audio VOSK ################################################
-    # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA
+    # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA                         <-----:::  STV NO SE USA
     def procesar_audio1(audio_file, modelo_dir, base, timestamp):
         # Llamar a la función de transcripción para obtener el texto del audio
         texto = transcribe(audio_file, modelo_dir, timestamp)
@@ -100,6 +94,11 @@ def main():
         save_txt(texto, txt_path)
         return texto, txt_path
 
+    ### Función: save_txt ###############################################
+    # Objetivo: Guardar el texto transcrito en un archivo de texto (.txt)
+    def save_txt(text, path):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text) # Escribir el texto en el archivo especificado
 
 
     ### Función: resumir_ollama #########################################################################
@@ -130,8 +129,8 @@ def main():
 
         if seleccion == "Poema":
             prompt = (
-                "A continuación tienes la transcripción de un Poema, posiblemente sin puntuación ni formato y en otro idioma que no sea español.\n "
-                "Tu tarea es intentar detectar el idioma del texto, el autor del poema, crear un resumen y escribir el poema\n si el Poema no está en español lo traduces.\n\n"
+                "A continuación tienes la transcripción de un Poema, posiblemente sin puntuación ni formato y en otro idioma que no es español.\n "
+                "Tu tarea es intentar detectar el idioma del texto,\n el autor del poema, \ncrear un resumen y escribir el poema intentando realizar los saltos de lineas\n si el Poema no está en español lo traduces.\n\n"
                 "Al final debes poner la Transcripción del Poema\n"
                 "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
                 f"Transcripción del Poema:\n\n{texto}\n\n"
@@ -233,7 +232,7 @@ def main():
                 if client_ip:
                     access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
                     with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio (new) >> {nombre_audio}{extension} \n")
+                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio >> {nombre_audio}{extension} \n")
 
                 audio_file = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
