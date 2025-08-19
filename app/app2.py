@@ -120,21 +120,39 @@ def main():
 
         if seleccion == "Conversación":
             prompt = (
-                "A continuación tienes la transcripción de una Conversación, posiblemente sin puntuación ni formato. "
-                "Tu tarea es redactar un resumen de la Conversación, si la Conversación no está en español lo traduces.\n\n"
-                "Al final debes poner la Transcripción de la Conversación\n"
-                "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
-                f"Transcripción de la Conversación:\n\n{texto}\n\n"
+                "A continuación tienes la transcripción de una conversación, posiblemente sin puntuación ni formato adecuado.\n\n"
+                "Tu tarea es:\n"
+                "1. Redactar un resumen claro y profesional del contenido de la conversación.\n"
+                "2. Si la conversación no está en español, debes traducirla al español antes de hacer el resumen.\n"
+                "3. Al final, incluye la transcripción completa de la conversación, aplicando saltos de línea adecuados y puntuación básica para mejorar la legibilidad.\n\n"
+                "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
+                f"Transcripción de la conversación:\n\n{texto}\n"
             )
 
         if seleccion == "Poema":
             prompt = (
-                "A continuación tienes la transcripción de un Poema, posiblemente sin puntuación ni formato y en otro idioma que no es español.\n "
-                "Tu tarea es intentar detectar el idioma del texto,\n el autor del poema, \ncrear un resumen y escribir el poema intentando realizar los saltos de lineas\n si el Poema no está en español lo traduces.\n\n"
-                "Al final debes poner la Transcripción del Poema\n"
-                "Todo debe quedar con una estructura clara, profesional y estructurada.\n\n"
-                f"Transcripción del Poema:\n\n{texto}\n\n"
+                "A continuación tienes la transcripción de un poema, posiblemente sin puntuación, sin formato adecuado y en un idioma distinto al español.\n\n"
+                "Tu tarea es:\n"
+                "1. Detectar el idioma original del poema.\n"
+                "2. Intentar identificar al autor del poema y nombre del poema, etc en modo tabla (si es posible).\n"
+                "3. Redactar un breve resumen o interpretación del poema.\n"
+                "4. Reconstruir el poema en español aplicando saltos de línea los puntos y aparte y corregir los errores gramaticales.\n"
+                "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
+                f"Transcripción del poema:\n\n{texto}\n"
             )
+
+        if seleccion == "Canción":
+            prompt = (
+                "A continuación tienes la transcripción de una canción, posiblemente sin puntuación, sin formato adecuado y en un idioma distinto al español.\n\n"
+                "Tu tarea es:\n"
+                "1. Detectar el idioma original de la canción.\n"
+                "2. Intentar dar detalles del autor, nombre del disco, nombre de la canción, fecha de lanzamiento, etc en modo tabla (si es posible).\n"
+                "3. Redactar un breve resumen o interpretación de la letra de la canción.\n"
+                "4. Reconstruir la canción en español aplicando saltos de línea los puntos y aparte y corregir posibles errores gramaticales.\n"
+                "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
+                f"Transcripción del poema:\n\n{texto}\n"
+            )
+
 
         try:
             respuesta = ollama.chat(
