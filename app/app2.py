@@ -135,7 +135,7 @@ def main():
 
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
-    st.title("🤖 Transcrición de Audio")  # 🗂️ 📄  🤖
+    st.title("🤖 Transcripción de Audio")  # 🗂️ 📄  🤖
     st.caption("Combina ASR (Reconocimiento Automático de Voz) con modelos LLM para transformar audio en texto estructurado y resúmenes contextuales.")
 
     # Crear directorio temporal para subidas
