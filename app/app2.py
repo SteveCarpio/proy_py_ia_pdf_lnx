@@ -1,12 +1,17 @@
 import streamlit as st
 import gc
 import torch
+import whisper # Importación del modelo Whisper de OpenIA
+
+@st.cache_resource
+def cargar_modelo_whisper(nombre_modelo="medium"):
+    return whisper.load_model(nombre_modelo, device="cuda")
 
 def liberar_memoria():
-
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
 
 
 def main():
@@ -24,7 +29,7 @@ def main():
     import shutil # Importación de la librería para copiar archivos y directorios
     from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
     import time  # Importación de la librería para manejar el tiempo
-    import whisper # Importación del modelo Whisper de OpenIA
+    
 
     # Configuración de la librería pydub para usar ffmpeg
     AudioSegment.converter = "/usr/bin/ffmpeg"
@@ -91,18 +96,13 @@ def main():
     ### Función: procesar_audio WHISPER ################################################
     # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA
     def procesar_audio2(audio_file, modelo_dir, base, timestamp):
-        # Cargar el modelo ( medium - large (este no va muy bien))
-        #model = whisper.load_model(modelo_dir)
-        model = whisper.load_model(modelo_dir, device="cuda")
-        # Ruta al archivo de audio a transcribir
-        audio_path = audio_file
+        model = cargar_modelo_whisper(modelo_dir)
         # Transcribir Audio con Whisper
-        result = model.transcribe(audio_path)
+        result = model.transcribe(audio_file)
         texto = result["text"]
         # Guardar el texto transcrito en un archivo .txt
         txt_path = f"{base}/Audio_{timestamp}_texto_completo.txt"
         save_txt(texto, txt_path)
-        model = None   #  Libera memoria
         return texto, txt_path
 
     ### Función: save_txt ###############################################
@@ -110,7 +110,6 @@ def main():
     def save_txt(text, path):
         with open(path, "w", encoding="utf-8") as f:
             f.write(text) # Escribir el texto en el archivo especificado
-
 
     ### Función: resumir_ollama #########################################################################
     # Objetivo: Generar un resumen profesional de la reunión usando un modelo de IA (por ejemplo, Ollama)
@@ -300,8 +299,10 @@ def main():
 
                 st.markdown("---")
 
+
             st.success("¡ Audio procesado y transcrito correctamente !")
 
+            del texto, resumen
             liberar_memoria()
             st.info("🧹 Memoria liberada después del procesamiento.")
 
