@@ -28,6 +28,7 @@ def main():
     app_selection = st.sidebar.radio("Ir a:", list(APPS.keys()))
 
     #if st.sidebar.button('🔄 Liberar Memoria'):
+    #    st.sidebar.success("✅ Memoria liberada manualmente")
     #    gc.collect()
     
     # Página de inicio
@@ -164,6 +165,7 @@ def main():
     # Cargar la aplicación seleccionada
     else:
         APPS[app_selection].main()
+        gc.collect()  # Limpia la memoria tras ejecutar una app
 
     
 
