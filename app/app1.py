@@ -1,7 +1,17 @@
 import streamlit as st
+import pdfplumber
+import pytesseract
+import ollama
+import gc
+
+
+@st.cache_resource
+def get_ollama_response(prompt):
+    return ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])     # gpt-oss:20b | llama3:instruct
+
 
 def main():
-    import streamlit as st
+    #import streamlit as st # --
     import os
     import re
     import json
@@ -10,10 +20,10 @@ def main():
     import tempfile
     from datetime import datetime
     import pandas as pd
-    import pdfplumber
+    #import pdfplumber  # --
     from pdf2image import convert_from_bytes
-    import pytesseract
-    import ollama
+    #import pytesseract # --
+    #import ollama      # --
 
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
@@ -176,7 +186,9 @@ def main():
             )
 
             try:
-                resp = ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])  # gpt-oss:20b | llama3:instruct
+                #resp = ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])  # gpt-oss:20b | llama3:instruct
+                resp = get_ollama_response(prompt)
+
                 respuesta_texto = resp["message"]["content"]
             except Exception as e:
                 st.error(f"❌ Error llamando al Modelo IA con archivo {fn}: {e}")
@@ -194,6 +206,9 @@ def main():
 
             registros.append({**{"archivo": fn}, **rec})
             progress_bar.progress((i + 1) / total_pdfs)
+
+            del text, path
+            gc.collect()
 
         # Si no hay registros válidos
         if not registros:

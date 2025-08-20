@@ -267,7 +267,7 @@ def main():
                 audio_file      = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]
                 modelo_whisper  = "medium"                                 #  [ medium  |  large ]
-                modelo_ollama   = "gpt-oss:20b"                            #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
+                modelo_ollama   = "llama3:instruct"                            #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
                 ruta_salida     = "/tmp/transcripcion_audio"
                 base            = ruta_salida
                 
