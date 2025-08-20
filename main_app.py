@@ -27,8 +27,8 @@ def main():
     st.sidebar.title("Selecciona una App")
     app_selection = st.sidebar.radio("Ir a:", list(APPS.keys()))
 
-    if st.sidebar.button('🔄 Liberar Memoria'):
-        gc.collect()
+    #if st.sidebar.button('🔄 Liberar Memoria'):
+    #    gc.collect()
     
     # Página de inicio
     if app_selection == "Inicio":

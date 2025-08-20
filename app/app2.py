@@ -1,4 +1,13 @@
 import streamlit as st
+import gc
+import torch
+
+def liberar_memoria():
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
 
 def main():
     import streamlit as st
@@ -83,7 +92,8 @@ def main():
     # Objetivo: Transcribir el audio y luego generar un resumen utilizando la IA
     def procesar_audio2(audio_file, modelo_dir, base, timestamp):
         # Cargar el modelo ( medium - large (este no va muy bien))
-        model = whisper.load_model(modelo_dir)
+        #model = whisper.load_model(modelo_dir)
+        model = whisper.load_model(modelo_dir, device="cuda")
         # Ruta al archivo de audio a transcribir
         audio_path = audio_file
         # Transcribir Audio con Whisper
@@ -92,6 +102,7 @@ def main():
         # Guardar el texto transcrito en un archivo .txt
         txt_path = f"{base}/Audio_{timestamp}_texto_completo.txt"
         save_txt(texto, txt_path)
+        model = None   #  Libera memoria
         return texto, txt_path
 
     ### Función: save_txt ###############################################
@@ -172,6 +183,8 @@ def main():
                 f.write(resumen)
         except Exception as e:
             raise IOError(f"No se pudo guardar el archivo de resumen en {resumen_path}: {e}")
+        
+        respuesta = None
 
         return resumen, resumen_path
 
@@ -288,5 +301,8 @@ def main():
                 st.markdown("---")
 
             st.success("¡ Audio procesado y transcrito correctamente !")
+
+            liberar_memoria()
+            st.info("🧹 Memoria liberada después del procesamiento.")
 
     
