@@ -5,6 +5,7 @@ import base64
 from datetime import datetime
 from PIL import Image
 from app import app1, app2, app3  # Importa tus apps aquí
+import gc
 
 # Configuración de la página
 st.set_page_config(
@@ -25,6 +26,9 @@ def main():
     
     st.sidebar.title("Selecciona una App")
     app_selection = st.sidebar.radio("Ir a:", list(APPS.keys()))
+
+    if st.sidebar.button('🔄 Liberar Memoria'):
+        gc.collect()
     
     # Página de inicio
     if app_selection == "Inicio":
