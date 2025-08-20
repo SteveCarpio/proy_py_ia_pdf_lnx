@@ -179,7 +179,7 @@ def main():
                 resp = ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])  # gpt-oss:20b | llama3:instruct
                 respuesta_texto = resp["message"]["content"]
             except Exception as e:
-                st.error(f"❌ Error llamando a Mistral con archivo {fn}: {e}")
+                st.error(f"❌ Error llamando al Modelo IA con archivo {fn}: {e}")
                 continue
 
             # Limpiar y convertir JSON
