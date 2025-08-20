@@ -252,18 +252,18 @@ def main():
                     with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
                         f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio >> {nombre_audio}{extension} \n")
 
-                audio_file = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
-                modelo_dir  = "/opt/models/vosk/vosk-model-es-0.42"    
-                modelo_dir2  = "medium"    
-                modelo_ollama = "llama3:instruct"          #  [ llama3:instruct | mistral | gpt-oss:20b ]
-                ruta_salida = "/tmp/transcripcion_audio"
-                base = ruta_salida
+                audio_file      = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
+                modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]
+                modelo_whisper  = "medium"                                 #  [ medium  |  large ]
+                modelo_ollama   = "gpt-oss:20b"                            #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
+                ruta_salida     = "/tmp/transcripcion_audio"
+                base            = ruta_salida
                 
                 # Función Procesar Audio (usa el modelo VOSK)
-                #texto, txt_path = procesar_audio1(audio_file, modelo_dir, base, timestamp)  
+                #texto, txt_path = procesar_audio1(audio_file, modelo_vosk, base, timestamp)  
 
                 # Función Procesar Audio (usa el modelo WHISPER)
-                texto, txt_path = procesar_audio2(audio_file, modelo_dir2, base, timestamp)  
+                texto, txt_path = procesar_audio2(audio_file, modelo_whisper, base, timestamp)  
 
                 # Función Crea Resumen Modelo IA
                 resumen, resumen_path = resumir_ollama(texto, modelo_ollama, base, timestamp, seleccion)
