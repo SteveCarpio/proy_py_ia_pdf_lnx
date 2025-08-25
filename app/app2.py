@@ -1,7 +1,21 @@
-import streamlit as st
 import gc
+import os  # Importación de la librería para operaciones de sistema (manejo de archivos y directorios)
+import re  # Importación de la librería para expresiones regulares
+import json  # Importación de la librería para trabajar con datos en formato JSON
+import wave  # Librería para trabajar con archivos WAV
+import time  # Importación de la librería para manejar el tiempo
 import torch
+import ollama # Importación de la librería Ollama para interactuar con modelos de IA
+import shutil # Importación de la librería para copiar archivos y directorios
 import whisper # Importación del modelo Whisper de OpenIA
+import tempfile # Importación de la librería temporal para crear directorios temporales
+import requests  # Librería para realizar solicitudes HTTP
+import streamlit as st
+from io import BytesIO # Importación de BytesIO para manejar archivos en memoria
+from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
+from pydub import AudioSegment  # Librería para convertir y manipular audios
+from vosk import Model, KaldiRecognizer  # Importación de las clases necesarias para el reconocimiento de voz
+
 
 @st.cache_resource
 def cargar_modelo_whisper(nombre_modelo="medium"):
@@ -13,27 +27,7 @@ def liberar_memoria():
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
 
-
 def main():
-    import streamlit as st
-    from io import BytesIO # Importación de BytesIO para manejar archivos en memoria
-    import tempfile # Importación de la librería temporal para crear directorios temporales
-    import os  # Importación de la librería para operaciones de sistema (manejo de archivos y directorios)
-    import json  # Importación de la librería para trabajar con datos en formato JSON
-    from vosk import Model, KaldiRecognizer  # Importación de las clases necesarias para el reconocimiento de voz
-    import wave  # Librería para trabajar con archivos WAV
-    from pydub import AudioSegment  # Librería para convertir y manipular audios
-    import requests  # Librería para realizar solicitudes HTTP
-    import re  # Importación de la librería para expresiones regulares
-    import ollama # Importación de la librería Ollama para interactuar con modelos de IA
-    import shutil # Importación de la librería para copiar archivos y directorios
-    from datetime import datetime # Importación de la clase datetime para manejar fechas y horas
-    import time  # Importación de la librería para manejar el tiempo
-    
-
-    # Configuración de la librería pydub para usar ffmpeg
-    AudioSegment.converter = "/usr/bin/ffmpeg"
-    AudioSegment.ffprobe = "/usr/bin/ffprobe"
 
     ######################################################################################################################
     ### FUNCIONES VARIAS
@@ -197,6 +191,10 @@ def main():
     ### INICIO DEL PROGRAMA
     ######################################################################################################################
 
+    # Configuración de la librería pydub para usar ffmpeg
+    AudioSegment.converter = "/usr/bin/ffmpeg"
+    AudioSegment.ffprobe = "/usr/bin/ffprobe"
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Configuración inicial de la app
@@ -248,6 +246,8 @@ def main():
         else:
             ############## INICIO DEL PROCESAMIENTO ##############
 
+            access_inicio = datetime.now().strftime("%H:%M:%S")
+
             with st.spinner(f'Analizando Audio de Tipo ({seleccion}): Por favor espere...'):
 
                 nombre_audio = f'Audio_{timestamp}'
@@ -257,17 +257,10 @@ def main():
                     extension = os.path.splitext(uploaded_files.name)[1]
                     os.rename(file_path, file_path.replace(uploaded_files.name, f'{nombre_audio}_original{extension}'))
 
-                # Obtener IP del cliente si está disponible
-                client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-                if client_ip:
-                    access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
-                    with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio >> {nombre_audio}{extension} \n")
-
                 audio_file      = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]
                 modelo_whisper  = "medium"                                 #  [ medium  |  large ]
-                modelo_ollama   = "llama3:instruct"                            #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
+                modelo_ollama   = "llama3:instruct"                        #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
                 ruta_salida     = "/tmp/transcripcion_audio"
                 base            = ruta_salida
                 
@@ -299,8 +292,15 @@ def main():
 
                 st.markdown("---")
 
+                # Obtener IP del cliente si está disponible
+                client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+                if client_ip:
+                    access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
+                    with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio({seleccion}) >> /tmp/transcripcion_audio/{nombre_audio}_* \n")
 
-            st.success("¡ Audio procesado y transcrito correctamente !")
+
+            st.success(f"¡ Audio procesado y transcrito correctamente ! : {access_time}")
 
             del texto, resumen
             liberar_memoria()

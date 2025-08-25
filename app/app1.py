@@ -1,8 +1,17 @@
-import streamlit as st
+import gc
+import os
+import re
+import json
+import ollama
+import shutil
+import tempfile
 import pdfplumber
 import pytesseract
-import ollama
-import gc
+import pandas as pd
+import streamlit as st
+from io import BytesIO
+from datetime import datetime
+from pdf2image import convert_from_bytes
 
 
 @st.cache_resource
@@ -11,28 +20,7 @@ def get_ollama_response(prompt):
 
 
 def main():
-    #import streamlit as st # --
-    import os
-    import re
-    import json
-    import shutil
-    from io import BytesIO
-    import tempfile
-    from datetime import datetime
-    import pandas as pd
-    #import pdfplumber  # --
-    from pdf2image import convert_from_bytes
-    #import pytesseract # --
-    #import ollama      # --
-
-    # Configuración inicial de la app
-    #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
-    st.title("🤖 Lector de Facturas con IA")  # 🗂️ 📄  🤖
-    st.caption("Extrae automáticamente datos de facturas en PDF combinando tecnología OCR (reconocimiento óptico de caracteres) con modelos avanzados de IA (LLM) para procesamiento inteligente.")
-
-    # Crear directorio temporal para subidas
-    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    ### FUNCIONES VARIAS ###############################################################################
 
     # Función para limpiar el directorio de subidas
     def limpiar_subidas():
@@ -104,13 +92,24 @@ def main():
             respuesta += "}"
         return respuesta
 
-    # Opción 1: Selección de carpeta local predeterminada
-    folder = "/home/robot/Descargas"
 
-        
+    ### INCIO DEL PROGRAMA ##############################################################################################
+
+    # Configuración inicial de la app
+    #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
+    st.title("🤖 Lector de Facturas con IA")  # 🗂️ 📄  🤖
+    st.caption("Extrae automáticamente datos de facturas en PDF combinando tecnología OCR (reconocimiento óptico de caracteres) con modelos avanzados de IA (LLM) para procesamiento inteligente.")
+
+    # Crear directorio temporal para subidas
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    # Selección de carpeta local predeterminada
+    folder = "/tmp/facturas_subidas"
+
     st.sidebar.markdown("---")  # Separador
 
-    # Opción 2: Subida de archivos desde el cliente
+    # ---[ BOTON: Selección de Archivos PDF ]--- #
     uploaded_files = st.sidebar.file_uploader(
         label="📁 Seleccione Archivos PDF ",  
         type=["pdf"],
@@ -141,8 +140,11 @@ def main():
         st.error("❌ No se ha seleccionado una ruta válida o no se han subido archivos.")
         st.stop()
 
-    # Botón para procesar PDFs
+    # ---[ BOTON: PROCESAR PDFS ]--- #
     if st.sidebar.button("Procesar PDFs"):
+
+        access_inicio = datetime.now().strftime("%H:%M:%S")
+
         registros = []
         pdf_files = [f for f in os.listdir(folder) if f.lower().endswith(".pdf")]
         
@@ -268,7 +270,9 @@ def main():
         # Obtener IP del cliente si está disponible
         client_ip = st.context.ip_address  # solo disponible en v1.45.0+
         if client_ip:
-            access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
+            access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
             #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
             with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
                 f.write(f"{access_time} > {client_ip} > Pag1 > IA_Facturas_PDF >> {total_pdfs} \n")
+
+        st.success(f"¡ Facturas procesadas ! : {access_time}")

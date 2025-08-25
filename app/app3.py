@@ -54,7 +54,7 @@ def main():
 
     # Área principal del chat
     st.title(f"🤖 ChatTDA (Chat #{st.session_state.chat_counter})")
-    st.caption("Nota: Se ejecutará usando un modelo pre-entrenado (en construcción), los datos no se almacenan en ningún servidor exterior/local.")
+    st.caption(f"La ejecución se realizará utilizando el modelo previamente entrenado {model_choice}. Cualquier dato ingresado durante el proceso no será almacenado en ningún servidor o base de datos.")
 
     # Mostrar historial de chat existente
     for message in st.session_state.messages:
