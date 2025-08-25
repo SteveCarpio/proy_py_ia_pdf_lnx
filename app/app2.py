@@ -191,6 +191,12 @@ def main():
     ### INICIO DEL PROGRAMA
     ######################################################################################################################
 
+    # Recuperar la opción elegida
+    opciones = ["Reunión", "Conversación", "Canción", "Poema", "Otros"]  # lista de opciones
+    index_predeterminado=0
+    if "opcion_elegidax" in st.session_state:
+        index_predeterminado = opciones.index(st.session_state.opcion_elegidax)
+
     # Configuración de la librería pydub para usar ffmpeg
     AudioSegment.converter = "/usr/bin/ffmpeg"
     AudioSegment.ffprobe = "/usr/bin/ffprobe"
@@ -239,13 +245,15 @@ def main():
         st.audio(uploaded_files, format=uploaded_files.type.split("/")[-1])
         
     # ---[SELECTBOX: Tipo de Audio ]--- #
-    opciones = ["Reunión", "Conversación", "Canción", "Poema", "Otros"]  # lista de opciones
+    
     seleccion = st.sidebar.selectbox(
         "Indique el tipo del audio:",
         opciones,
-        index=0,               # índice por defecto (0 = primera opción)
+        index=index_predeterminado,     # índice por defecto (0 = primera opción)
         key="opcion_elegida"   # clave opcional para mantener estado
     )
+
+    st.session_state.opcion_elegidax = seleccion
 
  
     
