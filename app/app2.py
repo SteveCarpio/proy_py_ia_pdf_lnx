@@ -302,6 +302,7 @@ def main():
 
             st.success(f"¡ Audio procesado y transcrito correctamente ! : {access_time}")
 
+            # Limpiar archivos subidos después del procesamiento
             del texto, resumen
             liberar_memoria()
             st.info("🧹 Memoria liberada después del procesamiento.")

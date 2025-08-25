@@ -20,6 +20,7 @@ def get_ollama_response(prompt):
 
 
 def main():
+
     ### FUNCIONES VARIAS ###############################################################################
 
     # Función para limpiar el directorio de subidas
@@ -95,10 +96,17 @@ def main():
 
     ### INCIO DEL PROGRAMA ##############################################################################################
 
+
+
     # Configuración inicial de la app
     #st.set_page_config("(TDA) Lector de Facturas IA", layout="wide")
     st.title("🤖 Lector de Facturas con IA")  # 🗂️ 📄  🤖
     st.caption("Extrae automáticamente datos de facturas en PDF combinando tecnología OCR (reconocimiento óptico de caracteres) con modelos avanzados de IA (LLM) para procesamiento inteligente.")
+
+    # Mostrar datos previamente calculados
+    if "df_app1" in st.session_state:
+        st.success("Mostrando resultados previamente procesados")
+        st.dataframe(st.session_state.df_app1.head())
 
     # Crear directorio temporal para subidas
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
@@ -149,7 +157,7 @@ def main():
         pdf_files = [f for f in os.listdir(folder) if f.lower().endswith(".pdf")]
         
         if not pdf_files:
-            st.error("❌ No se encontraron archivos PDF en la carpeta seleccionada.")
+            st.info("ℹ️ No se encontraron archivos PDF en la carpeta seleccionada.")
             st.stop()
 
         progress_bar = st.progress(0)
@@ -241,8 +249,10 @@ def main():
         for col in ["base", "iva", "irpf", "total"]:
             if col in df_mostrar.columns:
                 df_mostrar[col] = df_mostrar[col].apply(formato_europeo)
-        
+        st.session_state.df_app1 = df_mostrar
         st.dataframe(df_mostrar)
+
+
 
         # Descargar Excel (con valores numéricos originales)
         output = BytesIO()
@@ -263,9 +273,6 @@ def main():
             file_name="facturas.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-        
-        # Limpiar archivos subidos después del procesamiento
-        limpiar_subidas()
 
         # Obtener IP del cliente si está disponible
         client_ip = st.context.ip_address  # solo disponible en v1.45.0+
@@ -275,4 +282,10 @@ def main():
             with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
                 f.write(f"{access_time} > {client_ip} > Pag1 > IA_Facturas_PDF >> {total_pdfs} \n")
 
-        st.success(f"¡ Facturas procesadas ! : {access_time}")
+        st.success(f"¡ Facturas procesadas correctamente ! : {access_time}")
+
+        # Limpiar archivos subidos después del procesamiento
+        del resp, df
+        limpiar_subidas()
+        st.info("🧹 Memoria liberada después del procesamiento.")
+    
