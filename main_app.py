@@ -4,7 +4,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app1, app2, app3  # Importa tus apps aquí
+from app import app1, app2, app3, app4    # Importa tus apps aquí
 import gc
 
 # Configuración de la página
@@ -19,7 +19,8 @@ APPS = {
     "Inicio": None,
     "IA: Facturas PDF": app1,
     "IA: Transcripción de Audio": app2,
-    "IA: ChatTDA": app3
+    "IA: ChatTDA": app3,
+    "CD: Simulación Modelos (Cuadrator)": app4
 }
 
 def main():
