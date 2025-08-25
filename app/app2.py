@@ -202,13 +202,22 @@ def main():
     st.title("🤖 Transcripción de Audio")  # 🗂️ 📄  🤖
     st.caption("Combina ASR (Reconocimiento Automático de Voz) con modelos LLM para transformar audio en texto estructurado y resúmenes contextuales.")
 
+    # Mostrar markdown previamente cargado
+    if "markdown1_app2" in st.session_state:
+        st.success("Mostrando resumen con IA previamente generado:")
+        st.markdown(st.session_state["markdown1_app2"], unsafe_allow_html=False)
+    if "markdown2_app2" in st.session_state:
+        st.success("Mostrando resumen Original previamente generado:")
+        st.markdown(st.session_state["markdown2_app2"], unsafe_allow_html=False)
+        st.markdown("---")
+
     # Crear directorio temporal para subidas
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "transcripcion_audio")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     st.sidebar.markdown("---")  # Separador
 
-    # Opción 2: Subida de archivos desde el cliente
+    # ---[ BOTON: Browse Files ]--- #
     uploaded_files = st.sidebar.file_uploader(
         label="📁 Seleccione Archivo AUDIO  ",  
         type=["mp3", "wav", "ogg"],
@@ -216,18 +225,20 @@ def main():
         label_visibility="visible" 
     )
 
-    # Procesar archivos subidos
+    # Carpeta por defecto
     folder = "/home/robot/Python/x_audios"
+
     if uploaded_files:      
         st.sidebar.success(f"✅ Se subio correctamente")
         folder = UPLOAD_FOLDER  # Usar la carpeta de subidas para procesamiento
-        # Visualizar el reproductor del audio para escuchar el audio 
+
+        # Visualizar el reproductor del audio en la web para escuchar el audio 
         file_path = os.path.join("/tmp/transcripcion_audio/", uploaded_files.name)
         with open(file_path, "wb") as f:
             f.write(uploaded_files.getbuffer())
         st.audio(uploaded_files, format=uploaded_files.type.split("/")[-1])
         
-    # SelectBox para elegir el tipo de Audio
+    # ---[SELECTBOX: Tipo de Audio ]--- #
     opciones = ["Reunión", "Conversación", "Canción", "Poema", "Otros"]  # lista de opciones
     seleccion = st.sidebar.selectbox(
         "Indique el tipo del audio:",
@@ -236,7 +247,7 @@ def main():
         key="opcion_elegida"   # clave opcional para mantener estado
     )
 
-    ############## BOTÓN: para procesar AUDIO ##############
+    # ---[ BOTÓN: Procesar AUDIO ]--- #
     if st.sidebar.button("Procesar AUDIO"):
 
         if uploaded_files is None:
@@ -278,6 +289,8 @@ def main():
                 # Mostrar el texto2 transcrito en la WEB
                 file_path2 = f"/tmp/transcripcion_audio/Audio_{timestamp}_texto_resumen.txt"  
                 markdown_content = load_markdown_file(file_path2)
+                # Guardar contenido en session_state para persistencia
+                st.session_state["markdown1_app2"] = markdown_content
                 st.markdown(markdown_content, unsafe_allow_html=False)
 
                 st.markdown("---")
@@ -287,6 +300,8 @@ def main():
                 # Mostrar el texto1 transcrito en la WEB
                 file_path1 = f"/tmp/transcripcion_audio/Audio_{timestamp}_texto_completo.txt"  
                 markdown_content = load_markdown_file(file_path1)
+                # Guardar contenido en session_state para persistencia
+                st.session_state["markdown2_app2"] = markdown_content
                 #st.markdown(markdown_content, unsafe_allow_html=False)
                 st.caption(markdown_content, unsafe_allow_html=False)
 

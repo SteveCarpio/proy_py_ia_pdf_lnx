@@ -107,6 +107,7 @@ def main():
     if "df_app1" in st.session_state:
         st.success("Mostrando resultados previamente procesados")
         st.dataframe(st.session_state.df_app1.head())
+        st.markdown("---")
 
     # Crear directorio temporal para subidas
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "facturas_subidas")
