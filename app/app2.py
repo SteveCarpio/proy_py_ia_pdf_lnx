@@ -247,6 +247,9 @@ def main():
         key="opcion_elegida"   # clave opcional para mantener estado
     )
 
+ 
+    
+
     # ---[ BOTÓN: Procesar AUDIO ]--- #
     if st.sidebar.button("Procesar AUDIO"):
 
