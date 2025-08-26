@@ -13,16 +13,50 @@ def main():
 
     # PASO 0: Solicitar Datos y Valores de entrada
     importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop, df, file_name1, file_name2 = sTv_paso0()
-    #st.write(f"resultado: {importe_Fijado} -s {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
 
-    #st.markdown("---")  # Separador
- 
+
+
+    # PASO 3: Procesar Modelo Numpy
     if st.button("Procesar Modelo"):
         if df is not None:
-            #st.write(df)
             sTv_paso3(df, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2)
+
         else:
             st.warning("No existe un DataFrame de entrada")
+
+
+
+    # PASO 4: Descagar Ficheros Excel
+
+    # Ruta en tu servidor Linux donde están los archivos Excel
+    DIRECTORIO_EXCEL = "/tmp/salida_aleatorios/"
+
+    # Verificar si existe la ruta
+    if not os.path.exists(DIRECTORIO_EXCEL):
+        st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
+    else:
+        # Obtener lista de archivos .xlsx o .xls
+        archivos_excel = [f for f in os.listdir(DIRECTORIO_EXCEL)
+                        if f.endswith(('.xlsx', '.xls'))]
+
+        if archivos_excel:
+            st.subheader("Archivos disponibles:")
+
+            for archivo in archivos_excel:
+                ruta_archivo = os.path.join(DIRECTORIO_EXCEL, archivo)
+                with open(ruta_archivo, "rb") as f:
+                    contenido = f.read()
+                    st.download_button(
+                        label=f"📥 Descargar: {archivo}",
+                        data=contenido,
+                        file_name=archivo,
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
+
+
+    st.markdown("---")
+
 
 
 """

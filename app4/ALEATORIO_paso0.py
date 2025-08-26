@@ -23,8 +23,8 @@ def sTv_paso0():
             elif file_upload1.name.endswith('.xlsx'):
                 df1 = pd.read_excel(file_upload1)
             
-            st.caption(f'- Número de Registros: {len(df1)}')
-            st.caption(f'- Importe Total del fichero: {df1['TOTAL'].sum()}')
+            st.caption(f'- Número de Registros: {len(df1):,.0f}')
+            st.caption(f'- Importe Total del fichero: {df1['TOTAL'].sum():,.0f}')
             
 
     with col2:
@@ -49,10 +49,10 @@ def sTv_paso0():
     diferencia_Menor = 20            # Es el valor más bajo para crear los Excel
     diferencia_Stop  = 0.5           # Es el valor más deseable, hará un stop del proceso
 
-    v3 = st.sidebar.slider("Indique el Importe Fijado", importe_Fijado - (int(importe_Fijado / 10)*9) , importe_Fijado * 2, step=int(importe_Fijado / 20) , value=importe_Fijado)
-    v4 = st.sidebar.slider("Indique el Número de Simulaciones", 100, 5000, step=10, value=num_Simulaciones)
-    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:      ", 1, 50, step=1, value=diferencia_Menor)
-    v6 = st.sidebar.slider(f"Indique la Diferencia Stop:       ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
+    v3 = st.sidebar.slider("Indique el Importe Fijado         ", importe_Fijado - (int(importe_Fijado / 10)*9), importe_Fijado * 2, step=int(importe_Fijado / 20), value=importe_Fijado)
+    v4 = st.sidebar.slider("Indique el Número de Simulaciones ", 100, 5000, step=10, value=num_Simulaciones)
+    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:     ", 1, 50, step=1, value=diferencia_Menor)
+    v6 = st.sidebar.slider(f"Indique la Diferencia Stop:      ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
  
     importe_Fijado = v3
     num_Simulaciones = v4

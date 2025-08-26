@@ -5,19 +5,6 @@
 from  app4.ALEATORIO_librerias import *
 import app4.ALEATORIO_variables as sTv
 
-# --- Función para comprobar la memoria en uso
-def PROC_Ver_Tamano_Objetos(nombre,objeto,opcion):
-    # Tamaño en memoria del DataFrame en bytes
-    if opcion == 1:
-        tamaño_df_bytes = objeto.memory_usage(deep=True).sum()
-        tamaño_df_mb = tamaño_df_bytes / (1024 * 1024)  # Convertir a MB
-        #print(f'Tamaño en memoria del DataFrame ({nombre}): {tamaño_df_mb:.2f} MB')
-    # Tamaño en memoria del array en bytes
-    if opcion == 2:
-        tamaño_array_bytes = objeto.nbytes
-        tamaño_array_mb = tamaño_array_bytes / (1024 * 1024)  # Convertir a MB
-        #print(f'Tamaño en memoria del array ({nombre}): {tamaño_array_mb:.2f} MB')
-
 # --- Función que ejecuta un algoritmo y crea un Array.Numpy con los reg Aleatorios
 def PROC_Crea_Seleccion_Aleatoria3(ar, importe_Fijado):
 
@@ -47,6 +34,7 @@ def PROC_Crea_Seleccion_Aleatoria3(ar, importe_Fijado):
 def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2):
 
     sw=0
+    access_inicio = dt.now().strftime("%Y%m%d_%H%M")
 
     # Total del fichero de entrada
     var_total = df3['TOTAL'].sum()
@@ -78,34 +66,23 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
             df_Resultado = pd.DataFrame(ar_Resultado, columns=['ID', 'TOTAL'])
 
             # Exporto el DataFrame a un excel
-            df_Resultado.to_excel(f'/tmp/salida_aleatorios/Modelo_Sim{i}_Dif_{importe_Fijado-suma}_numpy.xlsx',index=False)
+            df_Resultado.to_excel(f'/tmp/salida_aleatorios/{access_inicio}__Simulación_{i}__Diferencia_{importe_Fijado-suma}.xlsx',index=False)
 
             # Mostrar resultados
-            #st.markdown("---")
-            st.caption(f"Simulación Número: {i} -- Número de Registros: {len(df_Resultado)} -- Importe Total Conseguido: {suma} -- Diferencia Encontrada: {importe_Fijado - suma}" )
-            #st.caption(f'- Num Reg TSalida    : {len(df_Resultado)}')
-            #st.caption(f'- Importe Conseguido : {suma}')
-            #st.caption(f'- Diferencia         : {importe_Fijado - suma}')
-                        
+            st.caption(f"Simulación Número: {i} -- Número de Registros: {len(df_Resultado)} -- Importe Total Conseguido: {suma:,.2f} -- Diferencia Encontrada: {importe_Fijado - suma}" )
+                       
         # Detener el bucle si la DIF es igual a CERO
         if importe_Fijado - suma < diferencia_Stop:
             st.markdown("---")
-            st.success(f"¡ Enhorabuena se encontró el valor más bajo en la Simulación {i} !")
-            progress = num_Simulaciones
-            st.markdown("---")
+            st.info(f"¡ Enhorabuena se encontró el valor más bajo en la Simulación {i} !")
             break
 
     if sw == 0:
         st.warning("¡ No hubo resultados con los valores introducidos !")
     else:
         st.success("¡ Proceso Finalizado !")
-        #st.write(df_Resultado)
-
-        
-    # Invocar función para visualizar en tamaño del Objeto
-    #PROC_Ver_Tamano_Objetos('df_tmp',df3,1)
-    #PROC_Ver_Tamano_Objetos('ar_tmp',ar_tmp,2)
-    #PROC_Ver_Tamano_Objetos('ar_Resultado',ar_Resultado,2)
-
+ 
     # Liberar memoria de los objetos
     del ar_tmp, ar_Resultado, df3
+
+    
