@@ -81,11 +81,11 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
             df_Resultado.to_excel(f'/tmp/salida_aleatorios/Modelo_Sim{i}_Dif_{importe_Fijado-suma}_numpy.xlsx',index=False)
 
             # Mostrar resultados
-            st.markdown("---")
-            st.caption(f"Simulación Número: {i}")
-            st.caption(f'- Num Reg TSalida    : {len(df_Resultado)}')
-            st.caption(f'- Importe Conseguido : {suma}')
-            st.caption(f'- Diferencia         : {importe_Fijado - suma}')
+            #st.markdown("---")
+            st.caption(f"Simulación Número: {i} -- Número de Registros: {len(df_Resultado)} -- Importe Total Conseguido: {suma} -- Diferencia Encontrada: {importe_Fijado - suma}" )
+            #st.caption(f'- Num Reg TSalida    : {len(df_Resultado)}')
+            #st.caption(f'- Importe Conseguido : {suma}')
+            #st.caption(f'- Diferencia         : {importe_Fijado - suma}')
                         
         # Detener el bucle si la DIF es igual a CERO
         if importe_Fijado - suma < diferencia_Stop:

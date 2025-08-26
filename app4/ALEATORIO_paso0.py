@@ -24,7 +24,7 @@ def sTv_paso0():
                 df1 = pd.read_excel(file_upload1)
             
             st.caption(f'- Número de Registros: {len(df1)}')
-            st.caption(f'- Importe Total: {df1['TOTAL'].sum()}')
+            st.caption(f'- Importe Total del fichero: {df1['TOTAL'].sum()}')
             
 
     with col2:
@@ -40,6 +40,7 @@ def sTv_paso0():
             elif file_upload2.name.endswith('.xlsx'):
                 df2 = pd.read_excel(file_upload2)
 
+    st.markdown("---")
 
     ### Solicitar datos de entrada
 
