@@ -17,10 +17,10 @@ st.set_page_config(
 # Diccionario de aplicaciones disponibles
 APPS = {
     "Inicio": None,
-    "IA: Facturas PDF": app1,
-    "IA: Transcripción de Audio": app2,
-    "IA: ChatTDA": app3,
-    "CD: Simulación Modelos (Cuadrator)": app4
+    "1 - Facturas PDF (IA)": app1,
+    "2 - Transcripción de Audio (IA)": app2,
+    "3 - ChatTDA (IA)": app3,
+    "4 - Simulación Modelos Cuadrator": app4
 }
 
 def main():
