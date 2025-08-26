@@ -7,6 +7,7 @@ from app4.ALEATORIO_paso3 import sTv_paso3
 from app4.ALEATORIO_paso4 import sTv_paso4
 
 def main():
+    access_ini = dt.now().strftime("%Y%m%d - %H:%M:%S")
     st.title("📊 Simulador ")  # 🗂️ 📄  🤖
     st.caption("Se ejecutará varios modelos DataScience apoyados con (Pandas/Numpy)")
     st.sidebar.markdown("---")  # Separador
@@ -28,6 +29,52 @@ def main():
 
     # PASO 4: Descagar Ficheros Excel
 
+
+    # Ruta en tu servidor Linux donde están los archivos Excel
+    DIRECTORIO_EXCEL = "/tmp/salida_aleatorios/"
+
+    # Verificar si existe la ruta
+    if not os.path.exists(DIRECTORIO_EXCEL):
+        st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
+    else:
+        # Obtener lista de archivos .xlsx o .xls ordenados inversamente
+        archivos_excel = [f for f in sorted(os.listdir(DIRECTORIO_EXCEL), reverse=True)
+                        if f.endswith(('.xlsx', '.xls'))]
+
+        if archivos_excel:
+            st.subheader("Archivos disponibles:")
+
+            for archivo in archivos_excel:
+                ruta_archivo = os.path.join(DIRECTORIO_EXCEL, archivo)
+
+                # Mostrar en una fila horizontal: botón de descarga y de eliminación
+                col1, col2 = st.columns([5, 1])
+
+                with col1:
+                    with open(ruta_archivo, "rb") as f:
+                        contenido = f.read()
+                        st.download_button(
+                            label=f"📥 Descargar: {archivo}",
+                            data=contenido,
+                            file_name=archivo,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            key=f"descargar_{archivo}"
+                        )
+
+                with col2:
+                    if st.button("🗑️", key=f"eliminar_{archivo}"):
+                        try:
+                            os.remove(ruta_archivo)
+                            #st.success(f"Archivo eliminado: {archivo}")
+                            st.rerun()  # Recargar para actualizar la lista
+                        except Exception as e:
+                            st.error(f"Error al eliminar {archivo}: {e}")
+        #else:
+            #st.info("No hay archivos Excel en el directorio.")
+
+
+
+    """
     # Ruta en tu servidor Linux donde están los archivos Excel
     DIRECTORIO_EXCEL = "/tmp/salida_aleatorios/"
 
@@ -36,7 +83,11 @@ def main():
         st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
     else:
         # Obtener lista de archivos .xlsx o .xls
-        archivos_excel = [f for f in os.listdir(DIRECTORIO_EXCEL)
+        #archivos_excel = [f for f in os.listdir(DIRECTORIO_EXCEL)
+        #                if f.endswith(('.xlsx', '.xls'))]
+
+        # Obtener lista de archivos .xlsx o .xls
+        archivos_excel = [f for f in sorted(os.listdir(DIRECTORIO_EXCEL), reverse=True)
                         if f.endswith(('.xlsx', '.xls'))]
 
         if archivos_excel:
@@ -53,10 +104,11 @@ def main():
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
-
+    """
 
     st.markdown("---")
-
+    access_fin = dt.now().strftime("%H:%M:%S")
+    st.caption(f"{access_ini} --> {access_fin} ")
 
 
 """

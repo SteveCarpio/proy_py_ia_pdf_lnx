@@ -45,13 +45,13 @@ def sTv_paso0():
     ### Solicitar datos de entrada
 
     importe_Fijado   = 600000000     # Máximo importe total acumulado
-    num_Simulaciones = 1000          # Número de Simulaciones 
-    diferencia_Menor = 20            # Es el valor más bajo para crear los Excel
+    num_Simulaciones = 5000         # Número de Simulaciones 
+    diferencia_Menor = 40            # Es el valor más bajo para crear los Excel
     diferencia_Stop  = 0.5           # Es el valor más deseable, hará un stop del proceso
 
     v3 = st.sidebar.slider("Indique el Importe Fijado         ", importe_Fijado - (int(importe_Fijado / 10)*9), importe_Fijado * 2, step=int(importe_Fijado / 20), value=importe_Fijado)
-    v4 = st.sidebar.slider("Indique el Número de Simulaciones ", 100, 5000, step=10, value=num_Simulaciones)
-    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:     ", 1, 50, step=1, value=diferencia_Menor)
+    v4 = st.sidebar.slider("Indique el Número de Simulaciones ", 1000, 10000, step=1000, value=num_Simulaciones)
+    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:     ", 1, 100, step=1, value=diferencia_Menor)
     v6 = st.sidebar.slider(f"Indique la Diferencia Stop:      ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
  
     importe_Fijado = v3

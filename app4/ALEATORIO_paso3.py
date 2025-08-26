@@ -34,7 +34,7 @@ def PROC_Crea_Seleccion_Aleatoria3(ar, importe_Fijado):
 def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2):
 
     sw=0
-    access_inicio = dt.now().strftime("%Y%m%d_%H%M")
+    access_inicio = dt.now().strftime("%Y%m%d_%H%M%S")
 
     # Total del fichero de entrada
     var_total = df3['TOTAL'].sum()
@@ -61,6 +61,7 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
 
         # Evaluo... 
         if importe_Fijado - suma < diferencia_Menor:
+            time.sleep(0.5)   #   CREO que como va con el reloj si hago un sleep lo mismo tengo mas posibilidades.
             sw=1
             # Convierto el Array.Numpy "ar_Resultado" en un DataFrame
             df_Resultado = pd.DataFrame(ar_Resultado, columns=['ID', 'TOTAL'])
@@ -73,7 +74,7 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
                        
         # Detener el bucle si la DIF es igual a CERO
         if importe_Fijado - suma < diferencia_Stop:
-            st.markdown("---")
+            #st.markdown("---")
             st.info(f"¡ Enhorabuena se encontró el valor más bajo en la Simulación {i} !")
             break
 
