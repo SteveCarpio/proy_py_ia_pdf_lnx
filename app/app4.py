@@ -1,4 +1,4 @@
-import streamlit as st
+#import streamlit as st
 from app4.ALEATORIO_librerias import *
 from app4.ALEATORIO_paso0 import sTv_paso0
 from app4.ALEATORIO_paso1 import sTv_paso1
@@ -11,18 +11,19 @@ def main():
     st.caption("Se ejecutará varios modelos DataScience apoyados con (Pandas/Numpy)")
     st.sidebar.markdown("---")  # Separador
 
+    # PASO 0: Solicitar Datos y Valores de entrada
+    importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop, df, file_name1, file_name2 = sTv_paso0()
+    #st.write(f"resultado: {importe_Fijado} -s {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
 
-    
-
-    
-
-
-    # PASO 0: Solicitar Nuevos Valores de entrada
-    importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0()
-    #st.write(f"resultado: {importe_Fijado} - {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
-
-    st.markdown("---")  # Separador
+    #st.markdown("---")  # Separador
  
+    if st.button("Procesar Modelo"):
+        if df is not None:
+            #st.write(df)
+            sTv_paso3(df, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2)
+        else:
+            st.warning("No existe un DataFrame de entrada")
+
 
 """
 
@@ -32,6 +33,8 @@ def option_0():
 
     # PASO 2: Elimino ID prestamos que tenemos en un excel
     df2 = sTv_paso2(df1)
+
+
 
     # PASO 3: Ejecutamos la selección Aleatoria modelo con Numpy
     sTv_paso3(df2, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida)

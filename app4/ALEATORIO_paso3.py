@@ -44,66 +44,68 @@ def PROC_Crea_Seleccion_Aleatoria3(ar, importe_Fijado):
     # Retornamos el resultado
     return seleccionados, suma 
 
-def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida ):
+def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2):
 
-    print(Fore.YELLOW + f'\n------------- [ Paso 3: Modelo Numpy - {dt.now()} ]------------- \n')
-    print(f"Procesando ({num_Simulaciones}) simulaciones aleatorias ")
+    sw=0
 
     # Total del fichero de entrada
     var_total = df3['TOTAL'].sum()
 
-    # --- Convertir el DataFrame en un Array Numpy
+    # Convertir el DataFrame en un Array Numpy
     ar_tmp = df3.to_numpy()
     
-    sw=0
-    simuinfo = num_Simulaciones // 5
-    trocear=0
-    # --- Bucle que nos servirá para Lanzar las N Simulaciones 
-    for i in range(1,num_Simulaciones+1):
+    # Crear una barra de progreso vacía
+    progress_bar = st.progress(0)
 
-        # Mostrar avisos cada X, esta dividido x 5 las num_Simulaciones
-        trocear=trocear+1
-        if trocear == simuinfo:
-            print(f"Procesando ({i}/{num_Simulaciones}) - {dt.now().strftime("%H:%M")} ")
-            trocear=0
+    # Crear un marcador de texto para mostrar el progreso numérico
+    status_text = st.empty()
+
+    # Bucle que nos servirá para Lanzar las N Simulaciones 
+    for i in range(1 , num_Simulaciones + 1):
+
+        # Crear una barra de estado y información de N simulaciones leídas)
+        progress = i / num_Simulaciones
+        progress_bar.progress(progress)
+        status_text.text(f"Simulación {i} de {num_Simulaciones}")
 
         # Llama func, creará un Array.Numpy con datos aleatorios con el importe fijado
         ar_Resultado, suma=PROC_Crea_Seleccion_Aleatoria3(ar_tmp, importe_Fijado)
 
-        # Exporto resultado con los valores de Salida en un CSV
+        # Evaluo... 
         if importe_Fijado - suma < diferencia_Menor:
             sw=1
             # Convierto el Array.Numpy "ar_Resultado" en un DataFrame
             df_Resultado = pd.DataFrame(ar_Resultado, columns=['ID', 'TOTAL'])
 
             # Exporto el DataFrame a un excel
-            df_Resultado.to_excel(f'{sTv.var_RutaInforme}{nombre_Salida}_Sim{i}_Dif_{importe_Fijado-suma}_numpy.xlsx',index=False)
+            df_Resultado.to_excel(f'/tmp/salida_aleatorios/Modelo_Sim{i}_Dif_{importe_Fijado-suma}_numpy.xlsx',index=False)
 
             # Mostrar resultados
-            print(Fore.YELLOW + f"\n--------------------- Simulación Número: {i}")
-            print(f'Num Reg TEntrada   : {len(df3)}')
-            print(f'Num Reg TSalida    : {len(df_Resultado)}')
-            print(f'Importe Total      : {var_total}')
-            print(f'Importe Fijado     : {importe_Fijado} ')
-            print(f'Importe Conseguido : {suma}')
-            print(Fore.GREEN + f'        Diferencia : {importe_Fijado - suma}\n')
-            
-        
+            st.markdown("---")
+            st.caption(f"Simulación Número: {i}")
+            st.caption(f'- Num Reg TSalida    : {len(df_Resultado)}')
+            st.caption(f'- Importe Conseguido : {suma}')
+            st.caption(f'- Diferencia         : {importe_Fijado - suma}')
+                        
         # Detener el bucle si la DIF es igual a CERO
         if importe_Fijado - suma < diferencia_Stop:
-            print(Fore.GREEN + f"---------------------------------------------------------------------------------")
-            print(Fore.GREEN + f"------ Enhorabuena se encontró el valor más bajo en la Simulación {i} !!! -------")
-            print(Fore.GREEN + f"---------------------------------------------------------------------------------\n")
+            st.markdown("---")
+            st.success(f"¡ Enhorabuena se encontró el valor más bajo en la Simulación {i} !")
+            progress = num_Simulaciones
+            st.markdown("---")
             break
 
     if sw == 0:
-        print(f"\n")
-        print(Fore.RED + f"      ¡ No hubo resultados con los valores introducidos !\n")
+        st.warning("¡ No hubo resultados con los valores introducidos !")
+    else:
+        st.success("¡ Proceso Finalizado !")
+        #st.write(df_Resultado)
+
         
     # Invocar función para visualizar en tamaño del Objeto
-    PROC_Ver_Tamano_Objetos('df_tmp',df3,1)
-    PROC_Ver_Tamano_Objetos('ar_tmp',ar_tmp,2)
-    PROC_Ver_Tamano_Objetos('ar_Resultado',ar_Resultado,2)
+    #PROC_Ver_Tamano_Objetos('df_tmp',df3,1)
+    #PROC_Ver_Tamano_Objetos('ar_tmp',ar_tmp,2)
+    #PROC_Ver_Tamano_Objetos('ar_Resultado',ar_Resultado,2)
 
     # Liberar memoria de los objetos
     del ar_tmp, ar_Resultado, df3
