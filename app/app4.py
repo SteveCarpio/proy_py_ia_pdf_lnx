@@ -7,34 +7,48 @@ from app4.ALEATORIO_paso3 import sTv_paso3
 from app4.ALEATORIO_paso4 import sTv_paso4
 
 def main():
-    st.title("📊 Simulador de modelo 'cuadrator'")  # 🗂️ 📄  🤖
+    st.title("📊 Simulador ")  # 🗂️ 📄  🤖
     st.caption("Se ejecutará varios modelos DataScience apoyados con (Pandas/Numpy)")
+
+    st.sidebar.markdown("---")  # Separador
+
+    df1 = None
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Crea un espacio para subir el archivo
+        file_upload1 = st.file_uploader("Sube un archivo de entrada (csv, txt, excel)", type=["csv", "txt", "xlsx"])
+        if file_upload1 is not None:
+            # Lee el archivo en formato DataFrame con Pandas
+            if file_upload1.name.endswith('.csv'):
+                df1 = pd.read_csv(file_upload1)
+            elif file_upload1.name.endswith('.txt'):
+                df1 = pd.read_csv(file_upload1, delimiter='\t')  # Suponiendo que el separador es un tabulador
+            elif file_upload1.name.endswith('.xlsx'):
+                df1 = pd.read_excel(file_upload1)
+
+            # Puedes hacer algo con el DataFrame aquí
+            #st.write(df1)
+    with col2:
+        # Crea un espacio para subir el archivo
+        file_upload2 = st.file_uploader("(opcional) Sube un archivo de exclusión de prestamos", type=["csv", "txt", "xlsx"])
+        if file_upload2 is not None:
+            # Lee el archivo en formato DataFrame con Pandas
+            if file_upload2.name.endswith('.csv'):
+                df2 = pd.read_csv(file_upload2)
+            elif file_upload2.name.endswith('.txt'):
+                df2 = pd.read_csv(file_upload2, delimiter='\t')  # Suponiendo que el separador es un tabulador
+            elif file_upload2.name.endswith('.xlsx'):
+                df2 = pd.read_excel(file_upload2)
+
+            # Puedes hacer algo con el DataFrame aquí
+            st.write(df2)
 
     st.markdown("---")  # Separador
 
-    st.write("1 - Introducir el File de Entrada")
-    opcion = st.selectbox(
-        " Indique el Tipo de File de Entrada:",
-        options=["Texto (.txt)", "Excel (.xlsx)"]
-    )
-    v1 = opcion[0]
-
-    v2 = st.text_input("Indique el Nombre del Fichero de Entrada (sin extensión)")
-
-    # Evaluamos Tipo File de Entrada 1 o 2
-    if v1 == "T":
-        v1=="1"
-        v11 = "txt"
-    if v1 == "E":
-        v1 == "2"
-        v11 = "xlsx"        
-
     # Evaluamos 
-    nombre_Entrada   = f"{v2}"
-    nombre_Salida = nombre_Entrada
-
-    #st.caption(v1)
-
+    #nombre_Entrada   = f"{v2}"
+    #nombre_Salida = nombre_Entrada
 
     # Valores de entrada por defecto
     importe_Fijado   = 600000000     # Máximo importe total acumulado
@@ -44,12 +58,19 @@ def main():
 
     # PASO 0: Solicitar Nuevos Valores de entrada
     importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0(importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop)
+    #st.write(f"resultado: {importe_Fijado} - {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
+
+
+    st.markdown("---")  # Separador
+
+    
+    col11, col22 = st.columns(2)
+    with col11:
+        if df1 is not None:
+            st.markdown("Datos de Entrada: ")
+            st.write(df1)
 
 """
-
-
-# PASO 0: Solicitar Nuevos Valores de entrada
-importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0(importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop)
 
 def option_0():
     # PASO 1: Importamos el txt con los prestamos a un DataFrame
