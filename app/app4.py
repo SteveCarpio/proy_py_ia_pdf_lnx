@@ -9,66 +9,20 @@ from app4.ALEATORIO_paso4 import sTv_paso4
 def main():
     st.title("📊 Simulador ")  # 🗂️ 📄  🤖
     st.caption("Se ejecutará varios modelos DataScience apoyados con (Pandas/Numpy)")
-
     st.sidebar.markdown("---")  # Separador
 
-    df1 = None
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # Crea un espacio para subir el archivo
-        file_upload1 = st.file_uploader("Sube un archivo de entrada (csv, txt, excel)", type=["csv", "txt", "xlsx"])
-        if file_upload1 is not None:
-            # Lee el archivo en formato DataFrame con Pandas
-            if file_upload1.name.endswith('.csv'):
-                df1 = pd.read_csv(file_upload1)
-            elif file_upload1.name.endswith('.txt'):
-                df1 = pd.read_csv(file_upload1, delimiter='\t')  # Suponiendo que el separador es un tabulador
-            elif file_upload1.name.endswith('.xlsx'):
-                df1 = pd.read_excel(file_upload1)
-
-            # Puedes hacer algo con el DataFrame aquí
-            #st.write(df1)
-    with col2:
-        # Crea un espacio para subir el archivo
-        file_upload2 = st.file_uploader("(opcional) Sube un archivo de exclusión de prestamos", type=["csv", "txt", "xlsx"])
-        if file_upload2 is not None:
-            # Lee el archivo en formato DataFrame con Pandas
-            if file_upload2.name.endswith('.csv'):
-                df2 = pd.read_csv(file_upload2)
-            elif file_upload2.name.endswith('.txt'):
-                df2 = pd.read_csv(file_upload2, delimiter='\t')  # Suponiendo que el separador es un tabulador
-            elif file_upload2.name.endswith('.xlsx'):
-                df2 = pd.read_excel(file_upload2)
-
-            # Puedes hacer algo con el DataFrame aquí
-            st.write(df2)
-
-    st.markdown("---")  # Separador
-
-    # Evaluamos 
-    #nombre_Entrada   = f"{v2}"
-    #nombre_Salida = nombre_Entrada
-
-    # Valores de entrada por defecto
-    importe_Fijado   = 600000000     # Máximo importe total acumulado
-    num_Simulaciones = 1000          # Número de Simulaciones 
-    diferencia_Menor = 20            # Es el valor más bajo para crear los Excel
-    diferencia_Stop  = 0.5           # Es el valor más deseable, hará un stop del proceso
-
-    # PASO 0: Solicitar Nuevos Valores de entrada
-    importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0(importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop)
-    #st.write(f"resultado: {importe_Fijado} - {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
-
-
-    st.markdown("---")  # Separador
 
     
-    col11, col22 = st.columns(2)
-    with col11:
-        if df1 is not None:
-            st.markdown("Datos de Entrada: ")
-            st.write(df1)
+
+    
+
+
+    # PASO 0: Solicitar Nuevos Valores de entrada
+    importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0()
+    #st.write(f"resultado: {importe_Fijado} - {num_Simulaciones} - {diferencia_Menor} - {diferencia_Stop}")
+
+    st.markdown("---")  # Separador
+ 
 
 """
 

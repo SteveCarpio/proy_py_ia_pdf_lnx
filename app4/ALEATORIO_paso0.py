@@ -3,29 +3,50 @@ import app4.ALEATORIO_variables as sTv
 import streamlit as st
 
 
-def sTv_paso0(importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop):
-    #st.write('2 - Introducir los Valores que usará el modelo ')
-
-    # Solicitar datos de entrada
+def sTv_paso0():
     
-    # Crear dos columnas
     col1, col2 = st.columns(2)
-
-    # Colocar un slider en cada columna
     with col1:
-        v3 = st.slider("Indique el Importe Fijado", importe_Fijado - (int(importe_Fijado / 10)*9) , importe_Fijado * 2, step=int(importe_Fijado / 20) , value=importe_Fijado)
-        v5 = st.slider(f"Indique la Diferencia Menor:      ", 1, 50, step=1, value=diferencia_Menor)
+        # Crea un espacio para subir el archivo
+        file_upload1 = st.file_uploader("Sube un archivo de entrada (csv, txt, excel)", type=["csv", "txt", "xlsx"])
+        if file_upload1 is not None:
+            # Lee el archivo en formato DataFrame con Pandas
+            if file_upload1.name.endswith('.csv'):
+                df1 = pd.read_csv(file_upload1)
+            elif file_upload1.name.endswith('.txt'):
+                df1 = pd.read_csv(file_upload1, delimiter='\t')  # Suponiendo que el separador es un tabulador
+            elif file_upload1.name.endswith('.xlsx'):
+                df1 = pd.read_excel(file_upload1)
 
+            st.markdown("Datos de Entrada: ")
+            st.write(df1)
     with col2:
-        v4 = st.slider("Indique el Número de Simulaciones", 100, 5000, step=10, value=num_Simulaciones)
-        v6 = st.slider(f"Indique la Diferencia Stop:       ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
+        # Crea un espacio para subir el archivo
+        file_upload2 = st.file_uploader("(opcional)  Lista de préstamos NO incluidos", type=["csv", "txt", "xlsx"])
+        if file_upload2 is not None:
+            # Lee el archivo en formato DataFrame con Pandas
+            if file_upload2.name.endswith('.csv'):
+                df2 = pd.read_csv(file_upload2)
+            elif file_upload2.name.endswith('.txt'):
+                df2 = pd.read_csv(file_upload2, delimiter='\t')  # Suponiendo que el separador es un tabulador
+            elif file_upload2.name.endswith('.xlsx'):
+                df2 = pd.read_excel(file_upload2)
+
+            st.markdown("Préstamos NO incluidos: ")
+            st.write(df2)
+
+    ### Solicitar datos de entrada
+
+    importe_Fijado   = 600000000     # Máximo importe total acumulado
+    num_Simulaciones = 1000          # Número de Simulaciones 
+    diferencia_Menor = 20            # Es el valor más bajo para crear los Excel
+    diferencia_Stop  = 0.5           # Es el valor más deseable, hará un stop del proceso
+
+    v3 = st.sidebar.slider("Indique el Importe Fijado", importe_Fijado - (int(importe_Fijado / 10)*9) , importe_Fijado * 2, step=int(importe_Fijado / 20) , value=importe_Fijado)
+    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:      ", 1, 50, step=1, value=diferencia_Menor)
+    v4 = st.sidebar.slider("Indique el Número de Simulaciones", 100, 5000, step=10, value=num_Simulaciones)
+    v6 = st.sidebar.slider(f"Indique la Diferencia Stop:       ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
  
-    # Mostramos valores en el sidebar
-    st.sidebar.write(f"Importe Fijado:                    {v3:,}")
-    st.sidebar.write(f"Número de Simulaciones:            {v4:,}")
-    st.sidebar.write(f"Diferencia Menor:                  {v5}")
-    st.sidebar.write(f"Diferencia Stop:                   {v6:.1f}")
-    
     importe_Fijado = v3
     num_Simulaciones = v4
     diferencia_Menor = v5
