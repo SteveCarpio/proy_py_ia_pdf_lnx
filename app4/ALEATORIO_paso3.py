@@ -35,6 +35,7 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
 
     sw=0
     access_inicio = dt.now().strftime("%Y%m%d_%H%M%S")
+    start_time = time.time()
 
     # Total del fichero de entrada
     var_total = df3['TOTAL'].sum()
@@ -60,7 +61,7 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
         ar_Resultado, suma=PROC_Crea_Seleccion_Aleatoria3(ar_tmp, importe_Fijado)
 
         # Evaluo... 
-        if importe_Fijado - suma < diferencia_Menor:
+        if importe_Fijado - int(suma) < diferencia_Menor:
             time.sleep(0.5)   #   CREO que como va con el reloj si hago un sleep lo mismo tengo mas posibilidades.
             sw=1
             # Convierto el Array.Numpy "ar_Resultado" en un DataFrame
@@ -73,15 +74,19 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
             st.caption(f"Simulación Número: {i} -- Número de Registros: {len(df_Resultado)} -- Importe Total Conseguido: {suma:,.2f} -- Diferencia Encontrada: {importe_Fijado - suma}" )
                        
         # Detener el bucle si la DIF es igual a CERO
-        if importe_Fijado - suma < diferencia_Stop:
+        if importe_Fijado - int(suma) < diferencia_Stop:
             #st.markdown("---")
             st.info(f"¡ Enhorabuena se encontró el valor más bajo en la Simulación {i} !")
             break
 
+    end_time = time.time()
+    tiempo_total = end_time - start_time
+    minutos = int(tiempo_total // 60)
+    segundos = int(tiempo_total % 60)
     if sw == 0:
-        st.warning("¡ No hubo resultados con los valores introducidos !")
+        st.warning(f"¡ No hubo resultados con los valores introducidos ! - Tiempo de ejecución {minutos}:{segundos}")
     else:
-        st.success("¡ Proceso Finalizado !")
+        st.success(f"¡ Proceso Finalizado ! - Tiempo de ejecución {minutos}:{segundos}")
  
     # Liberar memoria de los objetos
     del ar_tmp, ar_Resultado, df3
