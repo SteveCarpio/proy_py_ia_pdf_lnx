@@ -8,7 +8,7 @@ from app4.ALEATORIO_paso4 import sTv_paso4
 
 def main():
     access_ini = dt.now().strftime("%Y%m%d - %H:%M:%S")
-    st.title("📊 Simulador ")  # 🗂️ 📄  🤖
+    st.title("📊 Simulador de Números Aleatorios ")  # 🗂️ 📄  🤖
     st.caption("Se ejecutarán varios modelos de simulación de números aleatorios usando matrices multidimensionales (Numpy y Pandas) y técnicas de Data Science.")
     st.sidebar.markdown("---")  # Separador
 
@@ -71,43 +71,29 @@ def main():
         #else:
             #st.info("No hay archivos Excel en el directorio.")
 
+    #st.markdown("---")
 
 
-    """
-    # Ruta en tu servidor Linux donde están los archivos Excel
-    DIRECTORIO_EXCEL = "/tmp/salida_aleatorios/"
+    with st.expander("📖 Ayuda", expanded=False):
+        st.markdown("""
+        **Proceso de Selección de Números Aleatorios (Cuadrator).**  
 
-    # Verificar si existe la ruta
-    if not os.path.exists(DIRECTORIO_EXCEL):
-        st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
-    else:
-        # Obtener lista de archivos .xlsx o .xls
-        #archivos_excel = [f for f in os.listdir(DIRECTORIO_EXCEL)
-        #                if f.endswith(('.xlsx', '.xls'))]
+        Valores de entrada:  
+        - Importe a Buscar: Es el importe máximo que se debe alcanzar.
+        - Número de Simulaciones: Es el número de intentos que se realizarán para llegar el importe esperado.
+        - Diferencia Máxima: Es la diferencia en la que comenzará a crear los archivos Excel de salida.
+        - Diferencia Mínima: Es la diferencia más pequeña que se asume como esperada; en caso de llegar a este valor, el proceso se detendrá.
 
-        # Obtener lista de archivos .xlsx o .xls
-        archivos_excel = [f for f in sorted(os.listdir(DIRECTORIO_EXCEL), reverse=True)
-                        if f.endswith(('.xlsx', '.xls'))]
+        **Tips**  
+        - …  
+        - …
 
-        if archivos_excel:
-            st.subheader("Archivos disponibles:")
+        > *By sTv*  
+        """)
 
-            for archivo in archivos_excel:
-                ruta_archivo = os.path.join(DIRECTORIO_EXCEL, archivo)
-                with open(ruta_archivo, "rb") as f:
-                    contenido = f.read()
-                    st.download_button(
-                        label=f"📥 Descargar: {archivo}",
-                        data=contenido,
-                        file_name=archivo,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
-    """
-
-    st.markdown("---")
     access_fin = dt.now().strftime("%H:%M:%S")
-    st.caption(f"{access_ini} --> {access_fin} ")
+    st.caption(f"{access_ini} -- {access_fin} ")
+
 
 
 """
@@ -120,39 +106,6 @@ def option_0():
     df2 = sTv_paso2(df1)
 
 
-
-    # PASO 3: Ejecutamos la selección Aleatoria modelo con Numpy
-    sTv_paso3(df2, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida)
-    
-    # PASO 4: Ejecutamos la selección Aleatoria modelo con Pandas
-    sTv_paso4(df2, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida)
-
-def option_1():
-    # PASO 1: Importamos el txt con los prestamos a un DataFrame
-    df1 = sTv_paso1(nombre_Entrada, nombre_Salida, v1)
-
-    # PASO 2: Elimino ID prestamos que tenemos en un excel
-    df2 = sTv_paso2(df1)
-
-    # PASO 3: Ejecutamos la selección Aleatoria modelo con Numpy
-    sTv_paso3(df2, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida)
-
-def option_2():
-    # PASO 1: Importamos el txt con los prestamos a un DataFrame
-    df1 = sTv_paso1(nombre_Entrada, nombre_Salida, v1)
-
-    # PASO 2: Elimino ID prestamos que tenemos en un excel
-    df2 = sTv_paso2(df1)
-
-    # PASO 4: Ejecutamos la selección Aleatoria modelo con Pandas
-    sTv_paso4(df2, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, nombre_Salida)
-
-def option_3():
-    global importe_Fijado
-    global num_Simulaciones
-    global diferencia_Menor
-    global diferencia_Stop
-    importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop = sTv_paso0(importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop)
 
 def option_Help():
     print(Fore.MAGENTA + "------------- [ Proceso de Selección de Números Aleatorios ] -------------  \n")
