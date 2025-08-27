@@ -9,16 +9,16 @@ from app4.ALEATORIO_paso4 import sTv_paso4
 def main():
     access_ini = dt.now().strftime("%Y%m%d - %H:%M:%S")
     st.title("📊 Simulador ")  # 🗂️ 📄  🤖
-    st.caption("Se ejecutará varios modelos DataScience apoyados con (Pandas/Numpy)")
+    st.caption("Se ejecutarán varios modelos de simulación de números aleatorios usando matrices multidimensionales (Numpy y Pandas) y técnicas de Data Science.")
     st.sidebar.markdown("---")  # Separador
 
-    # PASO 0: Solicitar Datos y Valores de entrada
+    # PASO 0: Solicitar Datos y Valores de entrada ##############################################################################
     importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop, df, file_name1, file_name2 = sTv_paso0()
 
 
 
-    # PASO 3: Procesar Modelo Numpy
-    if st.button("Procesar Modelo"):
+    # PASO 3: Procesar Modelo Numpy #############################################################################################
+    if st.sidebar.button("Procesar Modelo"):
         if df is not None:
             sTv_paso3(df, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2)
 
@@ -27,8 +27,7 @@ def main():
 
 
 
-    # PASO 4: Descagar Ficheros Excel
-
+    # PASO 4: Descagar Ficheros Excel ###########################################################################################
 
     # Ruta en tu servidor Linux donde están los archivos Excel
     DIRECTORIO_EXCEL = "/tmp/salida_aleatorios/"

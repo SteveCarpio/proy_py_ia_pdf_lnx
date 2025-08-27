@@ -12,6 +12,8 @@ def sTv_paso0():
     col1, col2 = st.columns(2)
     with col1:
         # Crea un espacio para subir el archivo
+        
+        #st.write("<span style='color:blue; font-size:14px;'> Sube un archivo de entrada (csv, txt, excel) </span>", unsafe_allow_html=True)
         file_upload1 = st.file_uploader("Sube un archivo de entrada (csv, txt, excel)", type=["csv", "txt", "xlsx"])
         if file_upload1 is not None:
             file_name1 = file_upload1.name
@@ -22,10 +24,12 @@ def sTv_paso0():
                 df1 = pd.read_csv(file_upload1, delimiter='\t')  # Suponiendo que el separador es un tabulador
             elif file_upload1.name.endswith('.xlsx'):
                 df1 = pd.read_excel(file_upload1)
-            
-            st.caption(f'- Número de Registros: {len(df1):,.0f}')
-            st.caption(f'- Importe Total del fichero: {df1['TOTAL'].sum():,.0f}')
-            
+
+            col1A, col1B = st.columns(2)
+            with col1A:
+                st.caption(f'- Número de Registros: {len(df1):,.0f}')
+            with col1B:
+                st.caption(f'- Importe Total del fichero: {df1['TOTAL'].sum():,.0f}')
 
     with col2:
         # Crea un espacio para subir el archivo
@@ -40,6 +44,12 @@ def sTv_paso0():
             elif file_upload2.name.endswith('.xlsx'):
                 df2 = pd.read_excel(file_upload2)
 
+            col2A, col2B = st.columns(2)
+            with col2A:
+                st.caption(f'- Número de Registros: {len(df2):,.0f}')
+            with col2B:
+                st.caption(f'- Importe Total del fichero: {df2['TOTAL'].sum():,.0f}')
+
     st.markdown("---")
 
     ### Solicitar datos de entrada
@@ -49,10 +59,10 @@ def sTv_paso0():
     diferencia_Menor = 40            # Es el valor más bajo para crear los Excel
     diferencia_Stop  = 1.0           # Es el valor más deseable, hará un stop del proceso
 
-    v3 = st.sidebar.slider("Indique el Importe Fijado         ", importe_Fijado - (int(importe_Fijado / 10)*9), importe_Fijado * 2, step=int(importe_Fijado / 20), value=importe_Fijado)
-    v4 = st.sidebar.slider("Indique el Número de Simulaciones ", 1000, 10000, step=1000, value=num_Simulaciones)
-    v5 = st.sidebar.slider(f"Indique la Diferencia Menor:     ", 1, 100, step=1, value=diferencia_Menor)
-    v6 = st.sidebar.slider(f"Indique la Diferencia Stop:      ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
+    v3 = st.sidebar.slider("Importe a Buscar:         ", importe_Fijado - (int(importe_Fijado / 10)*9), importe_Fijado * 2, step=int(importe_Fijado / 20), value=importe_Fijado)
+    v4 = st.sidebar.slider("Número de Simulaciones: ", 1000, 10000, step=1000, value=num_Simulaciones)
+    v5 = st.sidebar.slider(f"Diferencia Máxima:     ", 1, 100, step=1, value=diferencia_Menor)
+    v6 = st.sidebar.slider(f"Diferencia Minima:      ", 0.0, 10.0, step=0.1, value=diferencia_Stop, format="%f")
  
     importe_Fijado = v3
     num_Simulaciones = v4
