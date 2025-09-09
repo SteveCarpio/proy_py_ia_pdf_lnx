@@ -34,7 +34,8 @@ def main():
 
     # Verificar si existe la ruta
     if not os.path.exists(DIRECTORIO_EXCEL):
-        st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
+        #st.error(f"La ruta {DIRECTORIO_EXCEL} no existe.")
+        os.makedirs(DIRECTORIO_EXCEL)
     else:
         # Obtener lista de archivos .xlsx o .xls ordenados inversamente
         archivos_excel = [f for f in sorted(os.listdir(DIRECTORIO_EXCEL), reverse=True)
