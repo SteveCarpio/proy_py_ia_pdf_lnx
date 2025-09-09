@@ -111,8 +111,8 @@ def main():
 
         if seleccion == "Reunión":
             prompt = (
-                "A continuación tienes la transcripción de una reunión en español, posiblemente sin puntuación ni formato. "
-                "Tu tarea es redactar un acta profesional de la reunión, respetando el idioma español.\n\n"
+                "A continuación tienes la transcripción de una reunión, posiblemente sin puntuación ni formato. "
+                "Tu tarea es redactar un acta profesional en ESPAÑOL.\n\n"
                 "Por favor, sigue estas instrucciones:\n"
                 "- Indica la fecha, hora y lugar de la reunión (si esos datos aparecen en el texto; si no, deja un espacio para completarlos).\n"
                 "- Presenta una breve descripción de los participantes, indicando nombre completo y, si es posible, su empresa o rol.\n"
@@ -280,7 +280,7 @@ def main():
                     os.rename(file_path, file_path.replace(uploaded_files.name, f'{nombre_audio}_original{extension}'))
 
                 audio_file      = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
-                modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]
+                modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]    #  <<-- no se usa -->>
                 modelo_whisper  = "medium"                                 #  [ medium  |  large ]
                 modelo_ollama   = "llama3:instruct"                        #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
                 ruta_salida     = "/tmp/transcripcion_audio"
