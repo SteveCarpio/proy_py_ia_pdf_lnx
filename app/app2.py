@@ -4,7 +4,7 @@ import re  # Importación de la librería para expresiones regulares
 import json  # Importación de la librería para trabajar con datos en formato JSON
 import wave  # Librería para trabajar con archivos WAV
 import time  # Importación de la librería para manejar el tiempo
-import torch
+import torch # 
 import ollama # Importación de la librería Ollama para interactuar con modelos de IA
 import shutil # Importación de la librería para copiar archivos y directorios
 import whisper # Importación del modelo Whisper de OpenIA
@@ -119,30 +119,33 @@ def main():
                 "- Haz un listado breve y claro de los puntos tratados en la reunión.\n"
                 "- Si quedan temas pendientes o para la próxima reunión, indícalos como 'Puntos pendientes'.\n"
                 "- Mantén una redacción clara, profesional y estructurada.\n\n"
-                f"Transcripción de la reunión:\n\n{texto}\n\n"
+                f"Transcripción de la reunión:\n\n{texto}\n\n\n"
+                "Recuerda traducir la respuesta al idioma ESPAÑOL.\n"
             )
 
         if seleccion == "Conversación":
             prompt = (
-                "A continuación tienes la transcripción de una conversación, posiblemente sin puntuación ni formato adecuado.\n\n"
-                "Tu tarea es:\n"
+                "A continuación tienes la transcripción de una conversación, posiblemente sin puntuación ni formato. "
+                "Tu tarea es hacer hacer un resumen en ESPAÑOL con los siguientes puntos: \n\n"
                 "1. Redactar un resumen claro y profesional del contenido de la conversación.\n"
                 "2. Si la conversación no está en español, debes traducirla al español antes de hacer el resumen.\n"
                 "3. Al final, incluye la transcripción completa de la conversación, aplicando saltos de línea adecuados y puntuación básica para mejorar la legibilidad.\n\n"
                 "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
-                f"Transcripción de la conversación:\n\n{texto}\n"
+                f"Transcripción de la conversación:\n\n{texto}\n\n\n"
+                "Recuerda traducir la respuesta al idioma ESPAÑOL.\n"
             )
 
         if seleccion == "Poema":
             prompt = (
-                "A continuación tienes la transcripción de un poema, posiblemente sin puntuación, sin formato adecuado y en un idioma distinto al español.\n\n"
-                "Tu tarea es:\n"
+                "A continuación tienes la transcripción de un poema, posiblemente sin puntuación ni formato adecuado.\n\n"
+                "Tu tarea es hacer hacer un resumen en ESPAÑOL con los siguientes puntos: \n\n"
                 "1. Detectar el idioma original del poema.\n"
                 "2. Intentar identificar al autor del poema y nombre del poema, etc en modo tabla (si es posible).\n"
                 "3. Redactar un breve resumen o interpretación del poema.\n"
                 "4. Reconstruir el poema en español aplicando saltos de línea los puntos y aparte y corregir los errores gramaticales.\n"
                 "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
-                f"Transcripción del poema:\n\n{texto}\n"
+                f"Transcripción del poema:\n\n{texto}\n\n\n"
+                "Recuerda traducir la respuesta al idioma ESPAÑOL.\n"
             )
 
         if seleccion == "Canción":
@@ -154,7 +157,8 @@ def main():
                 "3. Redactar un breve resumen o interpretación de la letra de la canción.\n"
                 "4. Reconstruir la canción en español aplicando saltos de línea los puntos y aparte y corregir posibles errores gramaticales.\n"
                 "Toda la respuesta debe tener una estructura clara, profesional y bien organizada.\n\n"
-                f"Transcripción del poema:\n\n{texto}\n"
+                f"Transcripción del poema:\n\n{texto}\n\n"
+                "Si necesita traducción la canción hazlo en ambos idiomas, idioma original y en ESPAÑOL.\n"
             )
 
 
@@ -282,7 +286,7 @@ def main():
                 audio_file      = f"/tmp/transcripcion_audio/{nombre_audio}_original{extension}"
                 modelo_vosk     = "/opt/models/vosk/vosk-model-es-0.42"    #  [ vosk-model-es-0.42  |  ]    #  <<-- no se usa -->>
                 modelo_whisper  = "medium"                                 #  [ medium  |  large ]
-                modelo_ollama   = "llama3:instruct"                        #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest ]
+                modelo_ollama   = "llama3:instruct"   #  [ llama3:instruct  |  mistral:latest  |  gpt-oss:20b  |  deepseek-r1:32b | mixtral:latest | jobautomation/OpenEuroLLM-Spanish ]
                 ruta_salida     = "/tmp/transcripcion_audio"
                 base            = ruta_salida
                 
