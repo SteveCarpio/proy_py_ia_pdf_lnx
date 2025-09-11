@@ -11,10 +11,9 @@ def sTv_paso0():
 
     col1, col2 = st.columns(2)
     with col1:
-        # Crea un espacio para subir el archivo
-        
-        #st.write("<span style='color:blue; font-size:14px;'> Sube un archivo de entrada (csv, txt, excel) </span>", unsafe_allow_html=True)
-        file_upload1 = st.file_uploader("Subir un archivo de entrada (CSV, TXT, EXCEL)", type=["csv", "txt", "xlsx"])
+        # BOTON: Subir fichero 1
+       #file_upload1 = st.file_uploader("Subir un archivo de entrada (CSV, TXT, EXCEL)", type=["csv", "txt", "xlsx"])
+        file_upload1 = st.file_uploader("**Subir un archivo de entrada (EXCEL)** ... más adelante: TXT y CSV", type=["xlsx"])
         if file_upload1 is not None:
             file_name1 = file_upload1.name
             # Lee el archivo en formato DataFrame con Pandas
@@ -32,7 +31,7 @@ def sTv_paso0():
                 st.caption(f'- Suma Total del fichero: <br> {df1['TOTAL'].sum():,.0f}', unsafe_allow_html=True)
 
     with col2:
-        # Crea un espacio para subir el archivo
+        # BOTON: Subir fichero 2
         file_upload2 = st.file_uploader("Subir los préstamos que no se deben incluir (CSV, TXT, EXCEL) — opcional.", type=["csv", "txt", "xlsx"])
         if file_upload2 is not None:
             file_name2 = file_upload2.name
