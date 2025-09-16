@@ -11,8 +11,8 @@ data/
 *.pyc
 *.pyo
 *.spec
-#*.pdf
-#*.PDF
+*.pdf
+*.PDF
 *.png
 *.mp3
 
