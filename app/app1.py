@@ -16,7 +16,7 @@ from pdf2image import convert_from_bytes
 
 @st.cache_resource
 def get_ollama_response(prompt):
-    return ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])     # gpt-oss:20b | llama3:instruct
+    return ollama.chat(model="llama3:instruct", messages=[{"role": "user", "content": prompt}])     # gpt-oss:20b | llama3:instruct
 
 
 def main():
