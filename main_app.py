@@ -1,10 +1,10 @@
 # source venv/bin/activate
-
+# 🆕 💼 🏛️ 🆕 🗑️
 import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app1, app2, app3, app4    # Importa tus apps aquí
+from app import app1, app2, app3, app4, app5    # Importa tus apps aquí
 import gc
 
 # Configuración de la página
@@ -19,8 +19,10 @@ APPS = {
     "Inicio": None,
     "1 - Facturas PDF (IA)": app1,
     "2 - Transcripción de Audio (IA)": app2,
-    "3 - ChatTDA (IA)": app3,
-    "4 - Cuadrator": app4
+    "3 - ChatTDA (IA) 🆕": app3,
+    "4 - Cuadrator": app4,
+    "5 - Nuevo Proyecto": app5
+
 }
 
 def main():
@@ -55,25 +57,25 @@ def main():
             <p class="small-text1">Seleccione facturas en formato PDF y serán procesadas por la IA para extraer los datos más relevantes.</p>
             """, unsafe_allow_html=True)
 
-            st.subheader("Otros 1")
-            st.write("Aquí puede ir una de tus propuestas de aplicación IA.")
+            st.subheader("Cuadrator")
+            st.write("Selección Aleatoria de Préstamos usando Pandas, Numpy y Algoritmos de Simulación como Montecarlo, basados en Ciencia de Datos.")
 
-            st.subheader("Otros 4")
+            st.subheader("Nuevo Proyecto 3")
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Aquí puede ir una de tus propuestas de aplicación IA.</p>
+            <p class="small-text1">Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.</p>
             """, unsafe_allow_html=True)
                 
         with cols[1]:
             st.subheader("Transcripción de Audio")
-            st.write("Seleccione un fichero de audio y la IA lo transcribirá a texto y creará un resumen en formato Word.")
+            st.write("Seleccione un archivo de audio y la IA lo transcribirá a texto, generando automáticamente un resumen en formato Word.")
 
-            st.subheader("Otros 2")
+            st.subheader("Nuevo Proyecto 1")
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Aquí puede ir una de tus propuestas de aplicación IA.</p>
+            <p class="small-text1">Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.</p>
             """, unsafe_allow_html=True)
                 
         with cols[2]:
@@ -81,11 +83,11 @@ def main():
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Escribe un mensaje y la IA responderá de forma inteligente usando modelos pre-entrenados (en continuo aprendizaje).</p>
+            <p class="small-text1">Escribe o agrega un archivo, y la IA responderá de forma inteligente utilizando modelos preentrenados en constante aprendizaje.</p>
             """, unsafe_allow_html=True)
             
-            st.subheader("Otros 3")
-            st.write("Aquí puede ir una de tus propuestas de aplicación IA.")
+            st.subheader("Nuevo Proyecto 2")
+            st.write("Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.")
         
         st.caption(" ")
         st.caption(" ")
