@@ -21,7 +21,7 @@ APPS = {
     "2 - Transcripción de Audio (IA)": app2,
     "3 - ChatTDA (IA) 🆕": app3,
     "4 - Cuadrator": app4,
-    "5 - Nuevo Proyecto": app5
+    "5 - SmartMail (IA)": app5
 
 }
 
@@ -60,7 +60,7 @@ def main():
             st.subheader("Cuadrator")
             st.write("Selección Aleatoria de Préstamos usando Pandas, Numpy y Algoritmos de Simulación como Montecarlo, basados en Ciencia de Datos.")
 
-            st.subheader("Nuevo Proyecto 3")
+            st.subheader("Nuevo Proyecto 2")
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
@@ -71,11 +71,11 @@ def main():
             st.subheader("Transcripción de Audio")
             st.write("Seleccione un archivo de audio y la IA lo transcribirá a texto, generando automáticamente un resumen en formato Word.")
 
-            st.subheader("Nuevo Proyecto 1")
+            st.subheader("Zimbra")
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.</p>
+            <p class="small-text1">Accede a tu correo, navega por las carpetas, filtra mensajes y utiliza IA para analizar uno o varios correos: resumir, extraer datos o responder preguntas.</p>
             """, unsafe_allow_html=True)
                 
         with cols[2]:
@@ -86,7 +86,7 @@ def main():
             <p class="small-text1">Escribe o agrega un archivo, y la IA responderá de forma inteligente utilizando modelos preentrenados en constante aprendizaje.</p>
             """, unsafe_allow_html=True)
             
-            st.subheader("Nuevo Proyecto 2")
+            st.subheader("Nuevo Proyecto 1")
             st.write("Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.")
         
         st.caption(" ")

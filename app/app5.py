@@ -79,9 +79,8 @@ def preguntar_a_ollama(prompt):
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
-    # STREAMLIT UI
-    st.set_page_config(page_title="Lectura de Correos - app6", layout="wide")
-    st.title("📬 Análisis de Correos con IA - App6")
+    st.title("📬 SmartMail: Análisis Inteligente de Correos")
+    st.caption("Conéctate a tu cuenta de correo, explora todas tus carpetas, filtra mensajes por palabras clave y aplica inteligencia artificial para resumir, extraer información o responder preguntas sobre un correo específico o sobre todos los correos filtrados.")
 
     with st.sidebar:
         st.header("🔐 Configuración IMAP")
