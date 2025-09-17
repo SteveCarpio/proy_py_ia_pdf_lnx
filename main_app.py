@@ -19,7 +19,7 @@ APPS = {
     "Inicio": None,
     "1 - Facturas PDF (IA)": app1,
     "2 - Transcripción de Audio (IA)": app2,
-    "3 - ChatTDA (IA) 🆕": app3,
+    "3 - ChatTDA (IA)": app3,
     "4 - Cuadrator": app4,
     "5 - SmartMail (IA)": app5
 
