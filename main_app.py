@@ -4,7 +4,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app1, app2, app3, app4, app5    # Importa tus apps aquí
+from app import app1, app2, app3, app4, app5, app6    # Importa tus apps aquí
 import gc
 
 # Configuración de la página
@@ -21,7 +21,8 @@ APPS = {
     "2 - Transcripción de Audio (IA)": app2,
     "3 - ChatTDA (IA)": app3,
     "4 - Cuadrator": app4,
-    "5 - SmartMail (IA)": app5
+    "5 - SmartMail (IA)": app5,
+    "Pruebas STEVE": app6
 
 }
 
@@ -71,11 +72,11 @@ def main():
             st.subheader("Transcripción de Audio")
             st.write("Seleccione un archivo de audio y la IA lo transcribirá a texto, generando automáticamente un resumen en formato Word.")
 
-            st.subheader("Zimbra")
+            st.subheader("SmartMail")
             st.markdown(
             """
             <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Accede a tu correo, navega por las carpetas, filtra mensajes y utiliza IA para analizar uno o varios correos: resumir, extraer datos o responder preguntas.</p>
+            <p class="small-text1">Accede a tu correo ZIMBRA, navega por las carpetas, filtra mensajes y utiliza IA para analizar uno o varios correos: resumir, extraer datos o responder preguntas.</p>
             """, unsafe_allow_html=True)
                 
         with cols[2]:
