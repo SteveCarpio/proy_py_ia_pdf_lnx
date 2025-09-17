@@ -84,10 +84,12 @@ def main():
 
     with st.sidebar:
         st.header("🔐 Configuración IMAP")
-        usuario = st.text_input("Correo", placeholder="carpios@tda-sgft.com")
+        #usuario = st.text_input("Correo", placeholder="carpios@tda-sgft.com")
+        usuario = st.text_input("Correo", value="@tda-sgft.com")
         password = st.text_input("Contraseña", type="password")
-        servidor = st.text_input("Servidor IMAP", value="zimbra.tda-sgft.com")
-        cantidad = st.slider("Número de correos", 1, 50, 10)
+        #servidor = st.text_input("Servidor IMAP", value="zimbra.tda-sgft.com")
+        servidor = "zimbra.tda-sgft.com"
+        cantidad = st.slider("Número de correos", 1, 100, 10)
 
         carpetas_disponibles = ["INBOX"]
         if usuario and password and servidor:
