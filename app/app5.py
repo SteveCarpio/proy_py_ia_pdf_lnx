@@ -204,10 +204,5 @@ def main():
         else:
             st.warning("⚠️ No hay correos que coincidan con el filtro.")
 
-
-
-
-
-
 if __name__ == "__main__":
     main()
