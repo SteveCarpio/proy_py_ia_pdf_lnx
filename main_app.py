@@ -110,7 +110,42 @@ def mostrar_inicio():
 
     #############################################################################################################
 
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.title("Apps basados en Reporting: 📈")
+        #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
+    with col2:
+        x=None
 
+    cols = st.columns(3)
+    with cols[0]:
+        st.subheader("Eventos Relevantes")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">Cuadros de Análisis de los datos de BMW y BIVA.</p>
+        """, unsafe_allow_html=True)
+
+        st.subheader("Estados Financieros")
+        st.write("Extracción contable de los estados financieros de BMW ")
+
+    with cols[1]:
+        st.subheader(" ")
+        st.write(" ")
+
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    with cols[2]:
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    #############################################################################################################
     st.markdown("---")
 
     st.markdown("""
