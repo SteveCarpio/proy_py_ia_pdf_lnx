@@ -5,7 +5,7 @@ from email.header import decode_header
 import ollama
 
 # CONFIGURACIÓN DEL MODELO
-OLLAMA_MODEL = "llama3:instruct"
+OLLAMA_MODEL = "llama3:instruct" #  "gpt-oss:20b"  # "llama3:instruct"
 
 # FUNCIÓN: Conectar a Zimbra via IMAP
 @st.cache_resource
@@ -60,7 +60,10 @@ def obtener_emails(mail, carpeta="INBOX", cantidad=10):
             else:
                 cuerpo = str(payload)
 
-        correos.append({"asunto": asunto, "de": de, "cuerpo": cuerpo})
+        #correos.append({"asunto": asunto, "de": de, "cuerpo": cuerpo})
+        correos.append({"asunto": asunto, "de": de, "cuerpo": cuerpo, "carpeta": carpeta})
+
+
     return correos
 
 # FUNCIÓN: Llamar al modelo local con ollama
@@ -81,15 +84,14 @@ def preguntar_a_ollama(prompt):
 def main():
     st.title("📬 SmartMail: Análisis Inteligente de Correos")
     st.caption("Conéctate a tu cuenta de correo, explora todas tus carpetas, filtra mensajes por palabras clave y aplica inteligencia artificial para resumir, extraer información o responder preguntas sobre un correo específico o sobre todos los correos filtrados.")
-
+    st.sidebar.markdown("---")  # Separador
+    
     with st.sidebar:
         st.header("🔐 Configuración IMAP")
-        #usuario = st.text_input("Correo", placeholder="carpios@tda-sgft.com")
         usuario = st.text_input("Correo", value="@tda-sgft.com")
         password = st.text_input("Contraseña", type="password")
-        #servidor = st.text_input("Servidor IMAP", value="zimbra.tda-sgft.com")
         servidor = "zimbra.tda-sgft.com"
-        cantidad = st.slider("Número de correos", 1, 100, 10)
+        cantidad = st.slider("Número de correos por carpeta", 1, 100, 10)
 
         carpetas_disponibles = ["INBOX"]
         if usuario and password and servidor:
@@ -99,22 +101,55 @@ def main():
             except Exception as e:
                 st.error(f"❌ Error al obtener carpetas: {e}")
 
+        # Agregar opción "TODAS LAS CARPETAS"
+        carpetas_disponibles = ["TODAS LAS CARPETAS"] + carpetas_disponibles
         carpeta = st.selectbox("Selecciona carpeta", carpetas_disponibles)
+
+        # Si se elige "TODAS LAS CARPETAS", mostrar filtro previo
+        filtro_sidebar = ""
+        if carpeta == "TODAS LAS CARPETAS":
+            filtro_sidebar = st.text_input("🔍 Filtro previo (buscar en asunto, remitente o cuerpo):", key="filtro_sidebar")
 
         if st.button("🔄 Conectar y Cargar Correos"):
             if usuario and password and servidor:
                 try:
                     mail = conectar_imap(usuario, password, servidor)
-                    st.session_state["correos"] = obtener_emails(mail, carpeta, cantidad)
+                    correos_totales = []
+
+                    if carpeta == "TODAS LAS CARPETAS":
+                        for nombre_carpeta in carpetas_disponibles:
+                            if nombre_carpeta != "TODAS LAS CARPETAS":
+                                try:
+                                    correos = obtener_emails(mail, nombre_carpeta, cantidad)
+                                    # Aplicar filtro si se especificó
+                                    if filtro_sidebar:
+                                        correos = [
+                                            c for c in correos if filtro_sidebar.lower() in c["asunto"].lower()
+                                            or filtro_sidebar.lower() in c["de"].lower()
+                                            or filtro_sidebar.lower() in c["cuerpo"].lower()
+                                        ]
+                                    correos_totales.extend(correos)
+                                except Exception as e:
+                                    st.warning(f"No se pudo leer la carpeta {nombre_carpeta}: {e}")
+                        st.session_state["filtro_usado"] = filtro_sidebar
+                    else:
+                        correos_totales = obtener_emails(mail, carpeta, cantidad)
+                        st.session_state["filtro_usado"] = ""
+
+                    st.session_state["correos"] = correos_totales
                     st.success("✅ Correos cargados correctamente.")
                 except Exception as e:
                     st.error(f"❌ Error al conectar: {e}")
             else:
                 st.warning("⚠️ Por favor completa todos los campos.")
 
+
     # Mostrar correos si ya están cargados
     if "correos" in st.session_state:
         st.subheader("📨 Correos recibidos")
+        if "filtro_usado" in st.session_state and st.session_state["filtro_usado"]:
+            st.info(f"Los correos ya fueron filtrados al cargar con el término: **{st.session_state['filtro_usado']}**")
+
 
         # Filtro por patrón
         patron = st.text_input("🔍 Filtrar correos (por asunto, remitente o cuerpo):")
@@ -132,8 +167,20 @@ def main():
             correos_filtrados = st.session_state["correos"]
 
         if correos_filtrados:
+          
+            #seleccion = st.selectbox("Selecciona un correo", [f"{c['asunto']} - {c['de']}" for c in correos_filtrados])
             seleccion = st.selectbox("Selecciona un correo", [f"{c['asunto']} - {c['de']}" for c in correos_filtrados])
-            correo = next(c for c in correos_filtrados if f"{c['asunto']} - {c['de']}" == seleccion)
+            seleccion = st.selectbox(
+                "Selecciona un correo",
+                [f"[{c.get('carpeta', 'INBOX')}] {c['asunto']} - {c['de']}" for c in correos_filtrados]
+            )
+
+
+            #correo = next(c for c in correos_filtrados if f"{c['asunto']} - {c['de']}" == seleccion)
+            correo = next(c for c in correos_filtrados if f"[{c.get('carpeta', 'INBOX')}] {c['asunto']} - {c['de']}" == seleccion)
+
+
+
 
             st.markdown(f"### ✉️ Asunto: {correo['asunto']}")
             st.markdown(f"**De:** {correo['de']}")
