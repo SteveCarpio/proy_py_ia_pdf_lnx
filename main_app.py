@@ -1,176 +1,190 @@
 # source venv/bin/activate
-# 🆕 💼 🏛️ 🆕 🗑️
+# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖
+
 import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app1, app2, app3, app4, app5, app6    # Importa tus apps aquí
+from app import app1, app2, app3, app4, app5, app6
 import gc
 
-# Configuración de la página
+# Configuración
 st.set_page_config(
     page_title="Portal IA (TdA)",
-    page_icon="💼",  # 💼  🏛️
+    page_icon="💼",
     layout="wide"
 )
 
-# Diccionario de aplicaciones disponibles
-APPS = {
-    "Inicio": None,
-    "1 - Facturas PDF (IA)": app1,
-    "2 - Transcripción de Audio (IA)": app2,
-    "3 - ChatTDA (IA)": app3,
-    "4 - Cuadrator": app4,
-    "5 - SmartMail (IA)": app5,
-    "Pruebas STEVE": app6
+###### CUSTOMIZAR BOTONES ###############
 
+#####################
+
+
+# Diccionarios por bloque
+IA_APPS = {
+    "1 - Facturas PDF": app1,
+    "2 - Transcripción de Audio": app2,
+    "3 - ChatTDA": app3,
+    "4 - SmartMail": app5
 }
 
-def main():
-    
-    st.sidebar.title("Selecciona una App")
-    app_selection = st.sidebar.radio("Ir a:", list(APPS.keys()))
+DS_APPS = {
+    "1 - Cuadrator": app4,
+    "2 - Pruebas STEVE": app6
+}
 
-    #if st.sidebar.button('🔄 Liberar Memoria'):
-    #    st.sidebar.success("✅ Memoria liberada manualmente")
-    #    gc.collect()
-    
-    # Página de inicio
-    if app_selection == "Inicio":
-        
-        # Crear dos columnas (una más ancha para el título)
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.title("Listado de Aplicaciones")
-            st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
-
-        with col2:
-            logo = Image.open("img/logotipo.gif")
-            st.image(logo)  # Más pequeño para que quede al lado
-          
-        # Mostrar miniaturas de las apps disponibles
-        cols = st.columns(3)
-        with cols[0]:
-            st.subheader("Facturas PDF")
-            st.markdown(
-            """
-            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Seleccione facturas en formato PDF y serán procesadas por la IA para extraer los datos más relevantes.</p>
-            """, unsafe_allow_html=True)
-
-            st.subheader("Cuadrator")
-            st.write("Selección Aleatoria de Préstamos usando Pandas, Numpy y Algoritmos de Simulación como Montecarlo, basados en Ciencia de Datos.")
-
-            st.subheader("Nuevo Proyecto 2")
-            st.markdown(
-            """
-            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.</p>
-            """, unsafe_allow_html=True)
-                
-        with cols[1]:
-            st.subheader("Transcripción de Audio")
-            st.write("Seleccione un archivo de audio y la IA lo transcribirá a texto, generando automáticamente un resumen en formato Word.")
-
-            st.subheader("SmartMail")
-            st.markdown(
-            """
-            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Accede a tu correo ZIMBRA, navega por las carpetas, filtra mensajes y utiliza IA para analizar uno o varios correos: resumir, extraer datos o responder preguntas.</p>
-            """, unsafe_allow_html=True)
-                
-        with cols[2]:
-            st.subheader("ChatTDA")
-            st.markdown(
-            """
-            <style> .small-text1 {font-size: 0.5em;color: #8B0000; text-align: left;} </style>
-            <p class="small-text1">Escribe o agrega un archivo, y la IA responderá de forma inteligente utilizando modelos preentrenados en constante aprendizaje.</p>
-            """, unsafe_allow_html=True)
-            
-            st.subheader("Nuevo Proyecto 1")
-            st.write("Este espacio está destinado a propuestas basadas en Inteligencia Artificial o Ciencia de Datos.")
-        
-        st.caption(" ")
-        st.caption(" ")
-        st.caption(" ")
-        st.caption(" ")
-        st.markdown("---")  # Separador
+RP_APPS = {
+    "1 - Reporting": app4,
+    "2 - Pruebas STEVE": app6
+}
 
 
-        # Pie de página centrado y pequeño
-        st.markdown(
-            """
-            <style>
-            .small-text2 {
-                font-size: 0.5em;
-                color: gray;
-                text-align: center;
-            }
-            </style>
-            <p class="small-text2">Para más ayuda, contactar con carpios@tda-sgft.com <br> Versión 1.0.0</p>
-            """,
-            unsafe_allow_html=True
-        )
+def mostrar_inicio():
 
-        # Mostrar el logotipo centrado
-        def get_image_base64(path):
-            with open(path, "rb") as img_file:
-                return base64.b64encode(img_file.read()).decode()
-        image_base64 = get_image_base64("img/logotipo.ico")
-        st.markdown(
-            """
-            <div style='text-align: center;'>
-                <img src='data:image/png;base64,{image_base64}' width='40'>
-                <br>
-            </div>
-            """.format(image_base64=image_base64),
-            unsafe_allow_html=True
-        )
+    #############################################################################################################
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.title("Apps basados en IA: 🤖")
+        #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
+    with col2:
+        logo = Image.open("img/logotipo.gif")
+        st.image(logo)
+
+    cols = st.columns(3)
+    with cols[0]:
+        st.subheader("Facturas PDF ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">IA que procesa facturas en PDF y extrae información.</p>
+        """, unsafe_allow_html=True)
+
+        st.subheader("SmartMail ")
+        st.write("Analiza correos ZIMBRA con IA, resume y extrae datos clave.")
+
+    with cols[1]:
+        st.subheader("Transcripción de Audio ")
+        st.write("IA para convertir audio a texto con resumen automático.")
+
+        st.subheader("  ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    with cols[2]:
+        st.subheader("ChatTDA ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">Chat inteligente con modelos preentrenados y archivos adjuntos.</p>
+        """, unsafe_allow_html=True)
+
+    #############################################################################################################
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.title("Apps basados en Data Science: 📊")
+        #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
+    with col2:
+        x=None
+
+    cols = st.columns(3)
+    with cols[0]:
+        st.subheader("Cuadrator")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">Análisis aleatorio de préstamos con Pandas, Numpy y Montecarlo.</p>
+        """, unsafe_allow_html=True)
+
+        st.subheader("  ")
+        st.write(" ")
+
+    with cols[1]:
+        st.subheader(" ")
+        st.write(" ")
+
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    with cols[2]:
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    #############################################################################################################
 
 
-        # Sidebar con información adicional            
-        with st.sidebar:
-            st.markdown("---")  # Separador
-            # Mensaje de ayuda
-            st.markdown("""
-            **🆘 Ayuda:**
-            1. Selecciona una App (están todas en fase de contrucción).
-            2. Tu explorador debe tener libre el puerto **8501**
-            3. Cualquier duda contactar con: Steve Carpio (TdA)
-            """)
-            
-            st.markdown("---")  # Separador
-            
-            # Mensaje informativo
-            st.markdown("""
-            **ℹ️ Información:**
-            - IA TdA, se usan modelos preentrenados para extracción de datos.
-            - Soporta ficheros escaneadas (usará OCR)
-            - Formato europeo: 1.234,56
-            """)
-            
-            st.markdown("---")  # Separador
-            
-            # Copyright con año actual
-            current_year = datetime.now().year
-            st.markdown(f"""
-            **© {current_year} - TdA S.A.**
-            """)
+    st.markdown("---")
 
-        # Obtener IP del cliente si está disponible
-        client_ip = st.context.ip_address  # solo disponible en v1.45.0+
-        if client_ip:
-            access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S > %H:%M:%S")
-            #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
-            with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                f.write(f"{access_time} > {client_ip} > Pag0 > Inicio\n")
+    st.markdown("""
+    <style>
+    .small-text2 {
+        font-size: 0.5em;
+        color: gray;
+        text-align: center;
+    }
+    </style>
+    <p class="small-text2">Para más ayuda, contactar con carpios@tda-sgft.com <br> Versión 1.0.0</p>
+    """, unsafe_allow_html=True)
 
-    # Cargar la aplicación seleccionada
-    else:
-        APPS[app_selection].main()
-        gc.collect()  # Limpia la memoria tras ejecutar una app
+    def get_image_base64(path):
+        with open(path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
 
-    
+    image_base64 = get_image_base64("img/logotipo.ico")
+    st.markdown(
+        f"""
+        <div style='text-align: center;'>
+            <img src='data:image/png;base64,{image_base64}' width='40'>
+            <br>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-if __name__ == "__main__":
-    main()
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("""
+        **🆘 Ayuda:**
+        - Selecciona una App.
+        - Puerto 8501 habilitado.
+        - Contacto: Steve Carpio
+        """)
+        st.markdown("---")
+        st.markdown("""
+        **ℹ️ Información:**
+        - IA TdA usa modelos preentrenados para OCR y análisis de datos.
+        - Soporta PDF escaneados.
+        """)
+        st.markdown("---")
+        current_year = datetime.now().year
+        st.markdown(f"**© {current_year} - TdA S.A.**")
+
+# Interfaz lateral
+st.sidebar.title("Portal TdA")
+
+mostrar_inicio_flag = False
+selected_app = None
+
+if st.sidebar.button("🏠 Ir a Inicio"):
+    mostrar_inicio_flag = True
+
+with st.sidebar.expander("🤖 Inteligencia Artificial"):
+    for name, app in IA_APPS.items():
+        if st.button(name, key=f"btn_ia_{name}"):
+            selected_app = app
+
+with st.sidebar.expander("📊 Data Science"):
+    for name, app in DS_APPS.items():
+        if st.button(name, key=f"btn_ds_{name}"):
+            selected_app = app
+
+# Mostrar app o inicio
+if selected_app:
+    selected_app.main()
+    gc.collect()
+else:
+    mostrar_inicio()
