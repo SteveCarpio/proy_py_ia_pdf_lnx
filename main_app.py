@@ -1,5 +1,5 @@
 # source venv/bin/activate
-# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖
+# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖 📈 🔬
 
 import streamlit as st
 import base64
@@ -10,27 +10,27 @@ import gc
 
 # Configuración
 st.set_page_config(
-    page_title="Portal IA (TdA)",
+    page_title="Portal Python (TdA)",
     page_icon="💼",
     layout="wide"
 )
 
-# Diccionarios por bloque
+# Diccionario Inteligencia Artificial
 IA_APPS = {
     "1 - Facturas PDF": app1,
     "2 - Transcripción de Audio": app2,
     "3 - ChatTDA": app3,
     "4 - SmartMail": app5
 }
-
+# Diccionario Data Sciencie
 DS_APPS = {
     "1 - Cuadrator": app4,
-    "2 - Pruebas STEVE": app6
+    "2 - Data Sciencie2": app6
 }
-
+# Diccionario Reporting
 RP_APPS = {
-    "1 - Reporting": app4,
-    "2 - Pruebas STEVE": app6
+    "1 - Eventos Relevantes": app6,
+    "2 - Estados Financieros": app6
 }
 
 def mostrar_inicio():
@@ -75,7 +75,7 @@ def mostrar_inicio():
     #############################################################################################################
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.title("Apps basados en Data Science: 📊")
+        st.title("Apps basados en Data Science: 🔬")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -178,11 +178,18 @@ with st.sidebar.expander("🤖 Inteligencia Artificial"):
             st.rerun()
 
 # Botones para Data Science
-with st.sidebar.expander("📊 Data Science"):
+with st.sidebar.expander("🔬 Data Science"):
     for name in DS_APPS:
         if st.button(name, key=f"btn_ds_{name}"):
             st.session_state.selected_app_key = name
             st.rerun()
+
+# Botones para Reporting
+with st.sidebar.expander("📈 Reporting"):
+    for name in RP_APPS:
+        if st.button(name, key=f"btn_rp_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()            
 
 # Mostrar la app seleccionada
 if st.session_state.selected_app_key:
@@ -190,6 +197,8 @@ if st.session_state.selected_app_key:
         IA_APPS[st.session_state.selected_app_key].main()
     elif st.session_state.selected_app_key in DS_APPS:
         DS_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in RP_APPS:
+        RP_APPS[st.session_state.selected_app_key].main()
     gc.collect()
 else:
     mostrar_inicio()

@@ -4,7 +4,7 @@ import streamlit as st
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
-    st.title("Pruebas de --[Steve]--")
+    st.title("Pruebas. --")
     st.caption("no usar está página por favor.. ")
 
 
