@@ -15,11 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-###### CUSTOMIZAR BOTONES ###############
-
-#####################
-
-
 # Diccionarios por bloque
 IA_APPS = {
     "1 - Facturas PDF": app1,
@@ -37,7 +32,6 @@ RP_APPS = {
     "1 - Reporting": app4,
     "2 - Pruebas STEVE": app6
 }
-
 
 def mostrar_inicio():
 
@@ -163,28 +157,39 @@ def mostrar_inicio():
         current_year = datetime.now().year
         st.markdown(f"**© {current_year} - TdA S.A.**")
 
-# Interfaz lateral
-st.sidebar.title("Portal TdA")
+# ----------------------------------
+# LÓGICA PRINCIPAL
+# ----------------------------------
 
-mostrar_inicio_flag = False
-selected_app = None
+# Inicializar la variable de sesión si no existe
+if "selected_app_key" not in st.session_state:
+    st.session_state.selected_app_key = None
 
+# Botón para volver al inicio
 if st.sidebar.button("🏠 Ir a Inicio"):
-    mostrar_inicio_flag = True
+    st.session_state.selected_app_key = None
+    st.rerun()
 
+# Botones para IA
 with st.sidebar.expander("🤖 Inteligencia Artificial"):
-    for name, app in IA_APPS.items():
+    for name in IA_APPS:
         if st.button(name, key=f"btn_ia_{name}"):
-            selected_app = app
+            st.session_state.selected_app_key = name
+            st.rerun()
 
+# Botones para Data Science
 with st.sidebar.expander("📊 Data Science"):
-    for name, app in DS_APPS.items():
+    for name in DS_APPS:
         if st.button(name, key=f"btn_ds_{name}"):
-            selected_app = app
+            st.session_state.selected_app_key = name
+            st.rerun()
 
-# Mostrar app o inicio
-if selected_app:
-    selected_app.main()
+# Mostrar la app seleccionada
+if st.session_state.selected_app_key:
+    if st.session_state.selected_app_key in IA_APPS:
+        IA_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in DS_APPS:
+        DS_APPS[st.session_state.selected_app_key].main()
     gc.collect()
 else:
     mostrar_inicio()
