@@ -5,7 +5,7 @@ from email.header import decode_header
 import ollama
 
 # CONFIGURACIÓN DEL MODELO
-OLLAMA_MODEL = "llama3:instruct"
+OLLAMA_MODEL = "llama3:instruct" #  "gpt-oss:20b"  # "llama3:instruct"
 
 # FUNCIÓN: Conectar a Zimbra via IMAP
 @st.cache_resource

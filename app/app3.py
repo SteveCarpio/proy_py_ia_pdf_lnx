@@ -47,17 +47,20 @@ def main():
     if "chat_counter" not in st.session_state:
         st.session_state.chat_counter = 1
 
+    # Inicializar contenido de archivo
+    if "file_content" not in st.session_state:
+        st.session_state.file_content = None
+
     # SIDEBAR
     with st.sidebar:
         st.markdown("---")
 
-        # Botón para nuevo chat
-        if st.button("🗑️ Nuevo chat"):   # 🗑️   🆕
+        if st.button("🗑️ Nuevo chat"):
             st.session_state.messages = []
             st.session_state.chat_counter += 1
+            st.session_state.file_content = None
             st.rerun()
 
-        # Selector de modelo
         model_choice = st.selectbox(
             "🧠 Selecciona el modelo:",
             ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish"],
@@ -67,10 +70,10 @@ def main():
 
         st.markdown("""
         **📝 Instrucciones:**
-        1. Sube un archivo (opcional)
-        2. Selecciona un modelo (opcional)
-        2. Escribe tu pregunta
-        3. Presiona 'Enviar'
+        1. Sube un archivo (opcional)  
+        2. Selecciona un modelo (opcional)  
+        3. Escribe tu pregunta  
+        4. Presiona 'Enviar'
         """)
 
         st.markdown(f"**Modelo activo:** `{model_choice}`")
@@ -84,31 +87,28 @@ def main():
     st.markdown("### 📄 Subir archivo para análisis")
     uploaded_file = st.file_uploader("Sube un archivo (.txt, .pdf, .xlsx, .csv)", type=["txt", "pdf", "xlsx", "csv"])
 
-    file_content = None
     if uploaded_file is not None:
         try:
             file_content = leer_archivo(uploaded_file)
-            st.success(f"Archivo '{uploaded_file.name}' cargado correctamente.")
-            with st.expander("📃 Ver contenido del archivo"):
-                st.text(file_content[:2000] + "..." if len(file_content) > 2000 else file_content)
-
-            # Agregar contenido como contexto del sistema
-            st.session_state.messages.append({
-                "role": "system",
-                "content": f"El usuario ha subido un archivo con el siguiente contenido:\n\n{file_content}"
-            })
-
+            st.session_state.file_content = file_content
+            #st.success(f"Archivo '{uploaded_file.name}' cargado correctamente.")
         except Exception as e:
             st.error(f"❌ Error al procesar el archivo: {str(e)}")
 
-    # MOSTRAR HISTORIAL
+    # Mostrar contenido del archivo en un expander (si existe)
+    if st.session_state.file_content:
+        with st.expander("📃 Ver contenido del archivo cargado", expanded=False):
+            content = st.session_state.file_content
+            st.text(content[:2000] + "..." if len(content) > 2000 else content)
+
+    # MOSTRAR HISTORIAL DEL CHAT
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # ENTRADA DEL USUARIO
     if prompt := st.chat_input("Escribe tu pregunta aquí..."):
-        # Mostrar pregunta del usuario
+        # Mostrar entrada del usuario
         with st.chat_message("user"):
             st.markdown(prompt)
 
@@ -119,14 +119,18 @@ def main():
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-
             start_time = time.time()
 
             try:
-                # Enviar todo el historial al modelo
+                # Crear historial incluyendo el contexto del archivo como system (solo si existe)
+                mensajes_para_modelo = st.session_state.messages.copy()
+                if st.session_state.file_content:
+                    mensajes_para_modelo = [{"role": "system", "content": f"El usuario ha subido un archivo con el siguiente contenido:\n\n{st.session_state.file_content}"}] + mensajes_para_modelo
+
+                # Llamada al modelo
                 response = ollama.chat(
                     model=model_choice,
-                    messages=st.session_state.messages,
+                    messages=mensajes_para_modelo,
                     stream=True
                 )
 
@@ -138,13 +142,12 @@ def main():
 
                 message_placeholder.markdown(full_response)
                 end_time = time.time()
-
                 st.caption(f"⏱ Tiempo de respuesta: {end_time - start_time:.2f} segundos")
 
                 # Añadir respuesta al historial
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-                # Guardar IP si es posible (opcional, versión Streamlit 1.45+)
+                # (Opcional) Guardar IP
                 client_ip = getattr(st.context, "ip_address", None)
                 if client_ip:
                     access_time = datetime.now().strftime("%Y-%m-%d > %H:%M:%S")
