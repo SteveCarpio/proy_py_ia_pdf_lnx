@@ -1,5 +1,5 @@
 # source venv/bin/activate
-# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖 📈 🔬
+# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖 📈 🔬 🌐
 
 import streamlit as st
 import base64
@@ -25,7 +25,11 @@ IA_APPS = {
 # Diccionario Data Sciencie
 DS_APPS = {
     "1 - Cuadrator": app4,
-    "2 - Data Sciencie2": app6
+}
+# Diccionario WebScraping
+WS_APPS = {
+    "1 - Eventos Relevantes": app6,
+    "2 - Estados Financieros": app6
 }
 # Diccionario Reporting
 RP_APPS = {
@@ -35,10 +39,10 @@ RP_APPS = {
 
 def mostrar_inicio():
 
-    #############################################################################################################
+    # [ INTELIGENCIA ARTIFICIAL] ############################################################################################################
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.title("Apps basados en IA: 🤖")
+        st.header("Apps basados en IA: 🤖")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         logo = Image.open("img/logotipo.gif")
@@ -54,6 +58,12 @@ def mostrar_inicio():
 
         st.subheader("SmartMail ")
         st.write("Analiza correos ZIMBRA con IA, resume y extrae datos clave.")
+
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">  </p>
+        """, unsafe_allow_html=True)
 
     with cols[1]:
         st.subheader("Transcripción de Audio ")
@@ -72,10 +82,10 @@ def mostrar_inicio():
         <p class="small-text1">Chat inteligente con modelos preentrenados y archivos adjuntos.</p>
         """, unsafe_allow_html=True)
 
-    #############################################################################################################
+    # [ DATA SCIENCIE ] ############################################################################################################
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.title("Apps basados en Data Science: 🔬")
+        st.header("Apps basados en Data Science: 🔬")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -108,11 +118,11 @@ def mostrar_inicio():
         <p class="small-text1"> </p>
         """, unsafe_allow_html=True)
 
-    #############################################################################################################
+    # [ WEB SCRAPING ]############################################################################################################
 
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.title("Apps basados en Reporting: 📈")
+        st.header("Apps basados en WebScraping: 🌐")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -122,15 +132,52 @@ def mostrar_inicio():
         st.subheader("Eventos Relevantes")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1">Cuadros de Análisis de los datos de BMW y BIVA.</p>
+        <p class="small-text1">Extacción de los datos de eventos relevantes de todos los emisores activos para TDA publicados en BMV.com y BIVA.com</p>
         """, unsafe_allow_html=True)
 
-        st.subheader("Estados Financieros")
-        st.write("Extracción contable de los estados financieros de BMW ")
+        st.subheader("Estados Financieros ")
+        st.write("Extracción trimestral de los datos contables financieros de la web CNBV.com")
 
     with cols[1]:
         st.subheader(" ")
         st.write(" ")
+
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    with cols[2]:
+        st.subheader(" ")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1"> </p>
+        """, unsafe_allow_html=True)
+
+    # [ REPORTING ]############################################################################################################
+
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.header("Apps basados en Reporting: 📈")
+        #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
+    with col2:
+        x=None
+
+    cols = st.columns(3)
+    with cols[0]:
+        st.subheader("Eventos Relevantes")
+        st.markdown("""
+        <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
+        <p class="small-text1">Historicos de eventos relevantes de todos los emisores activos para TDA publicados en BMV.com y BIVA.com</p>
+        """, unsafe_allow_html=True)
+
+        st.subheader(" ")
+        st.write(" ")
+
+    with cols[1]:
+        st.subheader("Estados Financieros")
+        st.write("Total de los datos trimestrales de los datos financieros de la web CNBV.com")
 
         st.subheader(" ")
         st.markdown("""
@@ -174,19 +221,16 @@ def mostrar_inicio():
         unsafe_allow_html=True
     )
 
-    with st.sidebar:
-        st.markdown("---")
+    with st.sidebar.expander("ℹ️ Info"):
         st.markdown("""
-        **🆘 Ayuda:**
-        - Selecciona una App.
-        - Puerto 8501 habilitado.
-        - Contacto: Steve Carpio
+        - Agregar la IP http://10.10.30.7:8501/ como ruta de confianza
+        - El puerto 8501 debe estar habilitado.
+        - Seleccione una Aplicación.
+        - Algunas App tendrán valores configurables
+        - Para más ayuda contactar con: Steve Carpio
         """)
-        st.markdown("---")
-        st.markdown("""
-        **ℹ️ Información:**
-        - IA TdA usa modelos preentrenados para OCR y análisis de datos.
-        - Soporta PDF escaneados.
+        st.caption("""
+        Los modelos IA están preentrenados en constante aprendisaje.
         """)
         st.markdown("---")
         current_year = datetime.now().year
@@ -219,12 +263,20 @@ with st.sidebar.expander("🔬 Data Science"):
             st.session_state.selected_app_key = name
             st.rerun()
 
+# Botones para Web Scraping
+with st.sidebar.expander("🌐 Web Scraping"):
+    for name in WS_APPS:
+        if st.button(name, key=f"btn_ws_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()
+
 # Botones para Reporting
 with st.sidebar.expander("📈 Reporting"):
     for name in RP_APPS:
         if st.button(name, key=f"btn_rp_{name}"):
             st.session_state.selected_app_key = name
             st.rerun()            
+
 
 # Mostrar la app seleccionada
 if st.session_state.selected_app_key:
@@ -234,6 +286,10 @@ if st.session_state.selected_app_key:
         DS_APPS[st.session_state.selected_app_key].main()
     elif st.session_state.selected_app_key in RP_APPS:
         RP_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in WS_APPS:
+        WS_APPS[st.session_state.selected_app_key].main()
+
+    # Limpia GarbageCollector    
     gc.collect()
 else:
     mostrar_inicio()
