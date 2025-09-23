@@ -84,10 +84,11 @@ def preguntar_a_ollama(prompt):
 def main():
     st.title("📬 SmartMail: Análisis Inteligente de Correos")
     st.caption("Conéctate a tu cuenta de correo, explora todas tus carpetas, filtra mensajes por palabras clave y aplica inteligencia artificial para resumir, extraer información o responder preguntas sobre un correo específico o sobre todos los correos filtrados.")
-    st.sidebar.markdown("---")  # Separador
+    
+    st.sidebar.title("🤖 : SmartMail")
     
     with st.sidebar:
-        st.header("🔐 Configuración IMAP")
+        #st.header("🔐 Configuración IMAP")
         usuario = st.text_input("Correo", value="@tda-sgft.com")
         password = st.text_input("Contraseña", type="password")
         servidor = "zimbra.tda-sgft.com"

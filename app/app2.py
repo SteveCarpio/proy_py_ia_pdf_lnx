@@ -225,7 +225,7 @@ def main():
     UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "transcripcion_audio")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    st.sidebar.markdown("---")  # Separador
+    st.sidebar.title("🤖 : Transcripción de Audio")
 
     # ---[ BOTON: Browse Files ]--- #
     uploaded_files = st.sidebar.file_uploader(

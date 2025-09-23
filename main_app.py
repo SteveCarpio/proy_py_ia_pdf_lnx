@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app1, app2, app3, app4, app5, app6
+from app import app0, app1, app2, app3, app4, app5, app6
 import gc
 
 # Configuración
@@ -19,8 +19,9 @@ st.set_page_config(
 IA_APPS = {
     "1 - Facturas PDF": app1,
     "2 - Transcripción de Audio": app2,
-    "3 - ChatTDA": app3,
-    "4 - SmartMail": app5
+    "3 - ChatTdA": app3,
+    "4 - SmartMail": app5,
+    "5 - Prueba Steve": app6
 }
 # Diccionario Data Sciencie
 DS_APPS = {
@@ -28,13 +29,13 @@ DS_APPS = {
 }
 # Diccionario WebScraping
 WS_APPS = {
-    "1 - Eventos Relevantes": app6,
-    "2 - Estados Financieros": app6
+    "1 - Eventos Relevantes": app0,
+    "2 - Estados Financieros": app0
 }
 # Diccionario Reporting
 RP_APPS = {
-    "1 - Eventos Relevantes": app6,
-    "2 - Estados Financieros": app6
+    "1 - Eventos Relevantes": app0,
+    "2 - Estados Financieros": app0
 }
 
 def mostrar_inicio():
@@ -42,7 +43,7 @@ def mostrar_inicio():
     # [ INTELIGENCIA ARTIFICIAL] ############################################################################################################
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.header("Apps basados en IA: 🤖")
+        st.header("> Apps basados en IA: 🤖")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         logo = Image.open("img/logotipo.gif")
@@ -85,7 +86,7 @@ def mostrar_inicio():
     # [ DATA SCIENCIE ] ############################################################################################################
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.header("Apps basados en Data Science: 🔬")
+        st.header("> Apps basados en Data Science: 🔬")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -122,7 +123,7 @@ def mostrar_inicio():
 
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.header("Apps basados en WebScraping: 🌐")
+        st.header("> Apps basados en WebScraping: 🌐")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -135,12 +136,12 @@ def mostrar_inicio():
         <p class="small-text1">Extacción de los datos de eventos relevantes de todos los emisores activos para TDA publicados en BMV.com y BIVA.com</p>
         """, unsafe_allow_html=True)
 
-        st.subheader("Estados Financieros ")
-        st.write("Extracción trimestral de los datos contables financieros de la web CNBV.com")
+        st.subheader(" ")
+        st.write("")
 
     with cols[1]:
-        st.subheader(" ")
-        st.write(" ")
+        st.subheader("Estados Financieros ")
+        st.write("Extracción trimestral de los datos contables financieros de la web CNBV.com ")
 
         st.subheader(" ")
         st.markdown("""
@@ -159,7 +160,7 @@ def mostrar_inicio():
 
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.header("Apps basados en Reporting: 📈")
+        st.header("> Apps basados en Reporting: 📈")
         #st.caption("Selecciona una aplicación desde el menú lateral para comenzar.")
     with col2:
         x=None
@@ -203,7 +204,7 @@ def mostrar_inicio():
         text-align: center;
     }
     </style>
-    <p class="small-text2">Para más ayuda, contactar con carpios@tda-sgft.com <br> Versión 1.0.0</p>
+    <p class="small-text2">TdA : Titulización de Activos </p>
     """, unsafe_allow_html=True)
 
     def get_image_base64(path):
@@ -235,6 +236,8 @@ def mostrar_inicio():
         st.markdown("---")
         current_year = datetime.now().year
         st.markdown(f"**© {current_year} - TdA S.A.**")
+    
+    st.sidebar.caption("..... Ver.2.1 .....")
 
 # ----------------------------------
 # LÓGICA PRINCIPAL

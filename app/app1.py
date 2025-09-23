@@ -116,7 +116,9 @@ def main():
     # Selección de carpeta local predeterminada
     folder = "/tmp/facturas_subidas"
 
-    st.sidebar.markdown("---")  # Separador
+
+    st.sidebar.title("🤖 : Facturas PDF")
+
 
     # ---[ BOTON: Selección de Archivos PDF ]--- #
     uploaded_files = st.sidebar.file_uploader(

@@ -60,9 +60,8 @@ def main():
 
     # SIDEBAR
     with st.sidebar:
-        st.title("🧠 ChatTDA v2")
-        st.markdown("---")
-
+        st.title("🤖 : ChatTdA")
+        
         if st.button("🆕 Nuevo chat"):
             st.session_state.messages = []
             st.session_state.chat_counter += 1
@@ -70,18 +69,18 @@ def main():
             st.session_state.file_name = None
             st.rerun()
 
-        model_choice = st.selectbox(
-            "🧠 Modelo:",
-            ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"],
-            index=0
-        )
-
         if st.session_state.file_name:
             st.markdown(f"**📁 Archivo cargado:** `{st.session_state.file_name}`")
             if st.button("❌ Quitar archivo"):
                 st.session_state.file_content = None
                 st.session_state.file_name = None
                 st.rerun()
+
+        model_choice = st.selectbox(
+            "🧠 Modelo:",
+            ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"],
+            index=0
+        )
 
         st.markdown("""
         **💡 Tips de uso:**
