@@ -4,34 +4,32 @@ import streamlit as st
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
-    st.caption("no usar está página por favor.. ")
 
-    
+    import streamlit as st
     import PyPDF2
     import ollama
-    import pandas as pd
-    from pathlib import Path
+    import time
 
-    # -------------------------------------
-    # CONFIGURACIÓN
-    # -------------------------------------
-    st.set_page_config(page_title="Análisis de Fideicomisos", layout="wide")
-    MODEL = "jobautomation/OpenEuroLLM-Spanish"
+    # CONFIG
+    #st.set_page_config(page_title="📄 Contratos por bloques con IA", layout="wide")
+    MODEL = "gpt-oss:20b"  #  jobautomation/OpenEuroLLM-Spanish | gpt-oss:20b
 
-    # -------------------------------------
+    # ---------------------------
     # FUNCIONES
-    # -------------------------------------
+    # ---------------------------
 
-    def cargar_pdf(path, max_paginas=250):
-        #pdf_file = open(path, 'rb')
-        pdf_file = path  # UploadedFile ya es un objeto de tipo archivo
-        reader = PyPDF2.PdfReader(pdf_file)
+    def cargar_pdf_por_rango(uploaded_file, pag_inicio, pag_fin):
+        reader = PyPDF2.PdfReader(uploaded_file)
         contenido_paginas = []
 
-        for i, page in enumerate(reader.pages[:max_paginas]):
-            text = page.extract_text()
-            if text:
-                contenido_paginas.append((i + 1, text))
+        total_paginas = len(reader.pages)
+        pag_inicio = max(1, pag_inicio)
+        pag_fin = min(total_paginas, pag_fin)
+
+        for i in range(pag_inicio - 1, pag_fin):
+            texto = reader.pages[i].extract_text()
+            if texto:
+                contenido_paginas.append((i + 1, texto))
 
         return contenido_paginas
 
@@ -43,70 +41,124 @@ def main():
             bloques.append((bloque[0][0], bloque[-1][0], texto_bloque))
         return bloques
 
-    def preguntar_al_modelo(prompt):
-        response = ollama.chat(
-            model=MODEL,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        return response['message']['content']
+    def preguntar_a_bloque(texto_bloque, pregunta):
+        prompt = f"""
+    Estás leyendo un contrato legal. A continuación tienes un bloque de texto (extraído del contrato). 
 
-    # -------------------------------------
-    # APP PRINCIPAL
-    # -------------------------------------
+    Texto:
+    {texto_bloque}
 
-    st.title("🔍 Análisis de Contrato: Reservas de Fideicomisos")
-    uploaded_file = st.file_uploader("📄 Sube tu contrato en PDF", type=["pdf"])
+    Pregunta:
+    {pregunta}
 
-    if uploaded_file:
-        st.info("Procesando el PDF... puede tardar unos segundos.")
-        contenido = cargar_pdf(uploaded_file)
-        bloques = dividir_en_bloques(contenido, tamaño_bloque=10)
-
-        resultados_resumen = []
-        formulas_extraidas = []
-
-        # Paso por bloques
-        with st.spinner("Analizando por bloques..."):
-            for inicio, fin, bloque in bloques:
-                pregunta = f"""
-    Tengo un contrato legal. Quiero que busques en el siguiente texto todos los artículos o secciones que hagan referencia a cualquier tipo de "reserva de fideicomisos".
-
-    Para cada artículo encontrado, devuélveme:
-    1. El número o nombre del artículo
-    2. La página (si la menciono en el texto que te doy)
-    3. Un resumen en 1 sola frase de qué trata ese artículo
-
-    Además, si el artículo contiene una fórmula o ecuación:
-    - Extrae la fórmula exacta (en texto o símbolos)
-    - Explica el significado de cada variable o constante
-    - Devuélvelo en una tabla con columnas: Artículo, Fórmula, Variable, Definición
-
-    Aquí tienes el texto (de la página {inicio} a {fin}):
-
-    {bloque}
+    Devuelve solo la respuesta relevante al bloque, indicando la página/artículo si aplica.
     """
-                respuesta = preguntar_al_modelo(pregunta)
-                resultados_resumen.append(respuesta)
+        respuesta = ""
+        try:
+            response = ollama.chat(
+                model=MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                stream=True
+            )
+            for chunk in response:
+                chunk_text = chunk.get('message', {}).get('content', '')
+                respuesta += chunk_text
+            return respuesta
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
 
-        # Mostrar resultados combinados
-        st.subheader("📌 Resultados resumidos por bloque")
-        for i, resultado in enumerate(resultados_resumen):
-            st.markdown(f"### 🔹 Bloque {i+1}")
-            st.markdown(resultados_resumen[i])
+    # ---------------------------
+    # SESIONES
+    # ---------------------------
 
-        # (Opcional) Guardar en archivo
-        guardar = st.checkbox("💾 Guardar resultado completo en archivo")
+    if "contenido_pdf" not in st.session_state:
+        st.session_state.contenido_pdf = []
 
-        if guardar:
-            full_output = "\n\n---\n\n".join(resultados_resumen)
-            with open("resumen_fideicomisos.txt", "w", encoding="utf-8") as f:
-                f.write(full_output)
-            st.success("✅ Resultado guardado como 'resumen_fideicomisos.txt'")
+    if "bloques" not in st.session_state:
+        st.session_state.bloques = []
+
+    if "chat_hist" not in st.session_state:
+        st.session_state.chat_hist = []
+
+    # ---------------------------
+    # SIDEBAR CONFIGURACIÓN
+    # ---------------------------
+
+    st.sidebar.title("🤖 : Contratos PDF")
+
+    uploaded_file = st.sidebar.file_uploader("📎 Sube el PDF del contrato", type=["pdf"])
+
+    pag_inicio = st.sidebar.number_input("📄 Página de inicio", min_value=1, value=1, step=1)
+    pag_fin = st.sidebar.number_input("📄 Página final", min_value=1, value=10, step=1)
+    tam_bloque = st.sidebar.number_input("📦 Tamaño del bloque", min_value=1, value=2, step=1)
+
+    cargar_btn = st.sidebar.button("📥 Cargar PDF y dividir en bloques")
+
+    if st.sidebar.button("🔄 Nuevo análisis"):
+        st.session_state.contenido_pdf = []
+        st.session_state.bloques = []
+        st.session_state.chat_hist = []
+        st.rerun()
 
 
+    # ---------------------------
+    # PROCESAMIENTO DEL PDF
+    # ---------------------------
 
+    st.title("🤖 Visor de Contratos Dividido por Bloques 📚")
+    st.caption("Carga por rango, analiza por bloques, y pregunta por IA sin superar el límite de contexto.")
 
+    if uploaded_file and cargar_btn:
+        with st.spinner("🔄 Procesando archivo..."):
+            contenido = cargar_pdf_por_rango(uploaded_file, pag_inicio, pag_fin)
+            bloques = dividir_en_bloques(contenido, tamaño_bloque=tam_bloque)
 
+            st.session_state.contenido_pdf = contenido
+            st.session_state.bloques = bloques
+            st.session_state.chat_hist = []
 
-if __name__ == "__main__":
-    main()
+        st.success(f"✅ {len(bloques)} bloques creados (Páginas {pag_inicio}-{pag_fin})")
+
+    # ---------------------------
+    # MOSTRAR BLOQUES
+    # ---------------------------
+
+    if st.session_state.bloques:
+        st.subheader("📦 Bloques del contrato")
+        for idx, (inicio, fin, bloque_texto) in enumerate(st.session_state.bloques):
+            with st.expander(f"📚 Bloque {idx + 1} (Páginas {inicio}-{fin})", expanded=False):
+                st.markdown(bloque_texto)
+
+    # ---------------------------
+    # MODO CHAT POR BLOQUES
+    # ---------------------------
+
+    if st.session_state.bloques:
+        st.markdown("---")
+        st.subheader("💬 Pregunta al contrato (procesando bloque por bloque)")
+
+        # Mostrar historial
+        for msg in st.session_state.chat_hist:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+        pregunta = st.chat_input("¿Qué quieres preguntar sobre el contrato?")
+
+        if pregunta:
+            with st.chat_message("user"):
+                st.markdown(pregunta)
+            st.session_state.chat_hist.append({"role": "user", "content": pregunta})
+
+            resumen_respuestas = ""
+
+            with st.chat_message("assistant"):
+                status = st.status("🤖 Analizando bloques...", expanded=False)
+                for idx, (pag_ini, pag_fin, texto_bloque) in enumerate(st.session_state.bloques):
+                    st.markdown(f"🔎 **Bloque {idx+1}** (Páginas {pag_ini}-{pag_fin})")
+                    with st.spinner(f"Consultando bloque {idx + 1}..."):
+                        respuesta = preguntar_a_bloque(texto_bloque, pregunta)
+                        st.markdown(respuesta)
+                        resumen_respuestas += f"🧩 Bloque {idx+1} (Pág. {pag_ini}-{pag_fin}):\n{respuesta}\n\n"
+                status.update(label="✅ Consulta completada", state="complete")
+
+            st.session_state.chat_hist.append({"role": "assistant", "content": resumen_respuestas})

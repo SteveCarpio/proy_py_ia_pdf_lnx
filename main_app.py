@@ -21,7 +21,7 @@ IA_APPS = {
     "2 - Transcripción de Audio": app2,
     "3 - ChatTdA": app3,
     "4 - SmartMail": app5,
-    "5 - Prueba Steve": app6
+    "5 - Contratos PDF": app6
 }
 # Diccionario Data Sciencie
 DS_APPS = {
@@ -141,7 +141,7 @@ def mostrar_inicio():
 
     with cols[1]:
         st.subheader("Estados Financieros ")
-        st.write("Extracción trimestral de los datos contables financieros de la web CNBV.com ")
+        st.write("Extracción de los datos Financieros para todas las Claves Pizarra publicadas en la CNBV.com")
 
         st.subheader(" ")
         st.markdown("""
@@ -178,7 +178,7 @@ def mostrar_inicio():
 
     with cols[1]:
         st.subheader("Estados Financieros")
-        st.write("Total de los datos trimestrales de los datos financieros de la web CNBV.com")
+        st.write("Informe de los datos Financieros de todas las Claves Pizarra publicadas en la CNBV.com.")
 
         st.subheader(" ")
         st.markdown("""
