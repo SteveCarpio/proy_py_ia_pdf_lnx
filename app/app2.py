@@ -327,7 +327,7 @@ def main():
                 if client_ip:
                     access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
                     with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                        f.write(f"{access_time} > {client_ip} > Pag2 > IA_Transcripcion_Audio({seleccion}) >> /tmp/transcripcion_audio/{nombre_audio}_* \n")
+                        f.write(f"{access_time} > {client_ip} > APPS_IA > Transcripcion_Audio > {seleccion} > /tmp/transcripcion_audio/{nombre_audio}_* \n")
 
 
             st.success(f"¡ Audio procesado y transcrito correctamente ! : {access_time}")

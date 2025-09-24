@@ -21,8 +21,15 @@ def main():
     # PASO 3: Procesar Modelo Numpy #############################################################################################
     if st.sidebar.button("Procesar Modelo"):
         if df is not None:
-            sTv_paso3(df, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2)
-
+            access_inicio = dt.now().strftime("%H:%M:%S")
+            cont = sTv_paso3(df, num_Simulaciones, importe_Fijado, diferencia_Menor, diferencia_Stop, file_name1, file_name2)
+            # Obtener IP del cliente si está disponible
+            client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+            if client_ip:
+                access_time = dt.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
+                #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+                with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                    f.write(f"{access_time} > {client_ip} > APPS_DS > Cuadrator > {importe_Fijado}|{num_Simulaciones}|{diferencia_Menor}|{diferencia_Stop} > {cont} \n")
         else:
             st.warning("No existe un DataFrame de entrada")
 

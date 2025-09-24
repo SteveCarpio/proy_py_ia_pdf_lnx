@@ -151,6 +151,9 @@ def main():
                 st.code(message["content"], language="markdown")
 
     # INPUT DEL USUARIO
+
+    access_inicio = datetime.now().strftime("%H:%M:%S")
+
     if prompt := st.chat_input("Escribe tu pregunta..."):
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -193,6 +196,16 @@ def main():
 
                 end_time = time.time()
                 status.update(label=f"✅ Respuesta generada en {end_time - start_time:.2f} segundos", state="complete")
+
+
+                # Obtener IP del cliente si está disponible
+                client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+                if client_ip:
+                    access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
+                    #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
+                    with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                        f.write(f"{access_time} > {client_ip} > APPS_IA > ChatTdA > {model_choice} > {prompt}\n")
+
 
             except Exception as e:
                 st.error(f"❌ Error al generar respuesta: {str(e)}")

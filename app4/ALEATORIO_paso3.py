@@ -54,7 +54,8 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
 
     # Crear un marcador de texto para mostrar el progreso numérico
     status_text = st.empty()
-
+    
+    cont = 0
 
     # Bucle que nos servirá para Lanzar las N Simulaciones 
     for i in range(1 , num_Simulaciones + 1):
@@ -69,6 +70,7 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
 
         # Evaluo... 
         if importe_Fijado - int(suma) < diferencia_Menor:
+            cont = cont + 1
             time.sleep(0.5)   #   CREO que como va con el reloj si hago un sleep lo mismo tengo mas posibilidades.
             sw=1
             # Convierto el Array.Numpy "ar_Resultado" en un DataFrame
@@ -91,11 +93,12 @@ def sTv_paso3(df3, num_Simulaciones, importe_Fijado, diferencia_Menor, diferenci
     minutos = int(tiempo_total // 60)
     segundos = int(tiempo_total % 60)
     if sw == 0:
-        st.warning(f"¡ No hubo resultados con los valores introducidos ! - Tiempo de ejecución {minutos}:{segundos}")
+        st.warning(f"¡ No hubo resultados con los valores introducidos ! - Tiempo de ejecución {minutos}min {segundos}seg")
     else:
-        st.success(f"¡ Proceso Finalizado ! - Tiempo de ejecución {minutos}:{segundos}")
+        st.success(f"¡ Proceso Finalizado ! - Tiempo de ejecución {minutos}min {segundos}seg")
  
     # Liberar memoria de los objetos
     del ar_tmp, ar_Resultado, df3
+    return cont
 
     
