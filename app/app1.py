@@ -283,7 +283,7 @@ def main():
             access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
             #st.write(f"Acceso desde IP local: {client_ip} a las {access_time}")
             with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                f.write(f"{access_time} > {client_ip} > APPS_IA > Facturas_PDF > > {total_pdfs} \n")
+                f.write(f"{access_time} > {client_ip} > APPS_IA > Facturas_PDF > none > {total_pdfs} \n")
 
         st.success(f"¡ Facturas procesadas correctamente ! : {access_time}")
 

@@ -124,7 +124,7 @@ def main():
             if client_ip:
                 access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
                 with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
-                    f.write(f"{access_time} > {client_ip} > APPS_IA > Contratos PDF > {uploaded_file.name} > {pag_inicio}|{pag_fin}|{tam_bloque} \n")
+                    f.write(f"{access_time} > {client_ip} > APPS_IA > Contratos_PDF > {uploaded_file.name} > {pag_inicio}|{pag_fin}|{tam_bloque} \n")
 
         st.success(f"✅ {len(bloques)} bloques creados (Páginas {pag_inicio}-{pag_fin})")
 
