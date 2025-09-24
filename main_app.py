@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app0, app1, app2, app3, app4, app5, app6
+from app import app0, app1, app2, app3, app4, app5, app6, app7
 import gc
 
 # Configuración
@@ -34,7 +34,7 @@ WS_APPS = {
 }
 # Diccionario Reporting
 RP_APPS = {
-    "1 - Eventos Relevantes": app0,
+    "1 - Eventos Relevantes": app7,
     "2 - Estados Financieros": app0
 }
 
