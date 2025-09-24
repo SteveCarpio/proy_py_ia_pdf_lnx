@@ -3,12 +3,14 @@ import imaplib
 import email
 from email.header import decode_header
 import ollama
+from datetime import datetime
 
 # CONFIGURACIÓN DEL MODELO
 OLLAMA_MODEL = "gpt-oss:20b" #  "gpt-oss:20b"  # "llama3:instruct"
 
 # FUNCIÓN: Conectar a Zimbra via IMAP
-@st.cache_resource
+#@st.cache_resource   # lo quito porque a veces da error de timeout
+
 def conectar_imap(usuario, password, servidor, puerto=993):
     mail = imaplib.IMAP4_SSL(servidor, puerto)
     mail.login(usuario, password)
@@ -111,7 +113,10 @@ def main():
         if carpeta == "TODAS LAS CARPETAS":
             filtro_sidebar = st.text_input("🔍 Filtro previo (buscar en asunto, remitente o cuerpo):", key="filtro_sidebar")
 
+        access_inicio = datetime.now().strftime("%H:%M:%S")
+
         if st.button("🔄 Conectar y Cargar Correos"):
+
             if usuario and password and servidor:
                 try:
                     mail = conectar_imap(usuario, password, servidor)
@@ -139,6 +144,14 @@ def main():
 
                     st.session_state["correos"] = correos_totales
                     st.success("✅ Correos cargados correctamente.")
+
+                    # Obtener IP del cliente si está disponible
+                    client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+                    if client_ip:
+                        access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
+                        with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                            f.write(f"{access_time} > {client_ip} > APPS_IA > SmartMail > {usuario} > {cantidad}|{carpeta} \n")
+
                 except Exception as e:
                     st.error(f"❌ Error al conectar: {e}")
             else:
@@ -249,6 +262,7 @@ def main():
                         respuesta = preguntar_a_ollama(prompt)
                         st.success("📣 Respuesta:")
                         st.write(respuesta)
+
         else:
             st.warning("⚠️ No hay correos que coincidan con el filtro.")
 

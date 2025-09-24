@@ -1,14 +1,14 @@
 import streamlit as st
+#from datetime import datetime
 
 # ----------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
-
-    import streamlit as st
     import PyPDF2
     import ollama
     import time
+    from datetime import datetime
 
     # CONFIG
     #st.set_page_config(page_title="📄 Contratos por bloques con IA", layout="wide")
@@ -108,6 +108,8 @@ def main():
     st.title("🤖 Visor de Contratos Dividido por Bloques 📚")
     st.caption("Carga por rango, analiza por bloques, y pregunta por IA sin superar el límite de contexto.")
 
+    access_inicio = datetime.now().strftime("%H:%M:%S")
+
     if uploaded_file and cargar_btn:
         with st.spinner("🔄 Procesando archivo..."):
             contenido = cargar_pdf_por_rango(uploaded_file, pag_inicio, pag_fin)
@@ -116,6 +118,13 @@ def main():
             st.session_state.contenido_pdf = contenido
             st.session_state.bloques = bloques
             st.session_state.chat_hist = []
+        
+        # Obtener IP del cliente si está disponible
+            client_ip = st.context.ip_address  # solo disponible en v1.45.0+
+            if client_ip:
+                access_time = datetime.now().strftime(f"%Y-%m-%d > {access_inicio} > %H:%M:%S")
+                with open("/home/robot/Python/x_log/streamlit_ip.log", "a") as f:
+                    f.write(f"{access_time} > {client_ip} > APPS_IA > Contratos PDF > {uploaded_file.name} > {pag_inicio}|{pag_fin}|{tam_bloque} \n")
 
         st.success(f"✅ {len(bloques)} bloques creados (Páginas {pag_inicio}-{pag_fin})")
 
