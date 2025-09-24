@@ -10,7 +10,7 @@ import gc
 
 # Configuración
 st.set_page_config(
-    page_title="Portal Python (TdA)",
+    page_title="Portal Python TdA",
     page_icon="💼",
     layout="wide"
 )
@@ -70,10 +70,10 @@ def mostrar_inicio():
         st.subheader("Transcripción de Audio ")
         st.write("IA para convertir audio a texto con resumen automático.")
 
-        st.subheader("  ")
+        st.subheader("Contratos PDF")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1"> </p>
+        <p class="small-text1">Carga por rango, analiza por bloques, y pregunta por IA sin superar el límite de contexto.</p>
         """, unsafe_allow_html=True)
 
     with cols[2]:
@@ -223,7 +223,7 @@ def mostrar_inicio():
     )
 
     with st.sidebar.expander("ℹ️ Info"):
-        st.markdown("""
+        st.caption("""
         - Agregar la IP http://10.10.30.7:8501/ como ruta de confianza
         - El puerto 8501 debe estar habilitado.
         - Seleccione una Aplicación.
@@ -237,7 +237,9 @@ def mostrar_inicio():
         current_year = datetime.now().year
         st.markdown(f"**© {current_year} - TdA S.A.**")
     
-    st.sidebar.caption("..... Ver.2.1 .....")
+    client_ip = st.context.ip_address
+    st.sidebar.caption(f"Portal Python TdA Ver: 2.1 - Connect from: {client_ip}")
+    
 
 # ----------------------------------
 # LÓGICA PRINCIPAL
