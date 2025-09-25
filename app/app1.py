@@ -117,7 +117,7 @@ def main():
     folder = "/tmp/facturas_subidas"
 
 
-    st.sidebar.title("🤖 : Facturas PDF")
+    st.sidebar.subheader("🤖 : Facturas PDF")
 
 
     # ---[ BOTON: Selección de Archivos PDF ]--- #

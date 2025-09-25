@@ -11,7 +11,7 @@ def main():
     st.title("🔬 Simulador de Números Aleatorios ")  # 🗂️ 📄  🤖
     st.caption("Se ejecutarán varios modelos de simulación de números aleatorios usando matrices multidimensionales (Numpy y Pandas) y técnicas de Data Science.")
     
-    st.sidebar.title("🔬 : Cuadrator")
+    st.sidebar.subheader("🔬 : Cuadrator")
 
     # PASO 0: Solicitar Datos y Valores de entrada ##############################################################################
     importe_Fijado, num_Simulaciones, diferencia_Menor, diferencia_Stop, df, file_name1, file_name2 = sTv_paso0()

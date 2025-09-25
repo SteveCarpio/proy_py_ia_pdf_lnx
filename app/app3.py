@@ -44,7 +44,6 @@ def resumir_contenido(texto):
 # ----------------------------------------
 
 def main():
-    st.set_page_config(page_title="ChatTDA v2", layout="wide")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -60,7 +59,7 @@ def main():
 
     # SIDEBAR
     with st.sidebar:
-        st.title("🤖 : ChatTdA")
+        st.subheader("🤖 : ChatTdA")
         
         if st.button("🆕 Nuevo chat"):
             st.session_state.messages = []

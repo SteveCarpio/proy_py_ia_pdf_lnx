@@ -5,7 +5,7 @@ import streamlit as st
 # ----------------------------------------
 def main():
     st.title("Pruebas. --")
-    st.caption("no usar está página por favor.. ")
+    st.subheader("no usar está página por favor.. ")
 
 
 

@@ -87,7 +87,7 @@ def main():
     st.title("📬 SmartMail: Análisis Inteligente de Correos")
     st.caption("Conéctate a tu cuenta de correo, explora todas tus carpetas, filtra mensajes por palabras clave y aplica inteligencia artificial para resumir, extraer información o responder preguntas sobre un correo específico o sobre todos los correos filtrados.")
     
-    st.sidebar.title("🤖 : SmartMail")
+    st.sidebar.subheader("🤖 : SmartMail")
     
     with st.sidebar:
         #st.header("🔐 Configuración IMAP")

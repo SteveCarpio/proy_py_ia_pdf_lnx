@@ -9,8 +9,9 @@ def main():
     from app.appOra import get_oracle_connection
     from datetime import datetime, timedelta
 
-    st.set_page_config(page_title="Eventos Relevantes", layout="wide")
-    st.title("📋 Reporte de Eventos Relevantes")
+    st.title("📈 Reporte de Eventos Relevantes")
+    st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico")
+    st.sidebar.subheader("📈 : Eventos Relevantes")
 
     # Cargar datos desde Oracle
     @st.cache_data(show_spinner="Cargando datos desde Oracle...")
@@ -20,6 +21,9 @@ def main():
             df = pd.read_sql(query, conn)
         return df
 
+    if st.sidebar.button("🔄 Recargar datos"):
+        st.cache_data.clear()
+
     # ✅ Cargar y convertir fechas antes de cualquier filtrado
     df = load_data()
 
@@ -28,13 +32,13 @@ def main():
             df[col] = pd.to_datetime(df[col])
 
     # ====== SIDEBAR: FILTROS ======
-    st.sidebar.header("🔎 Filtros")
+    #st.sidebar.header("🔎 Filtros")
 
     # --- Filtro 1: FPROCESO (input de fecha manual corregido) ---
     if "FPROCESO" in df.columns:
         fproc_min = df["FPROCESO"].min().date()
         fproc_max = df["FPROCESO"].max().date()
-        st.sidebar.subheader("🗓️ Rango de FPROCESO")
+        #st.sidebar.subheader("🗓️ Rango de FPROCESO")
         fproc_inicio = st.sidebar.date_input("Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_inicio")
         fproc_fin = st.sidebar.date_input("Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_fin")
 

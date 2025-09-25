@@ -84,7 +84,7 @@ def main():
     # SIDEBAR CONFIGURACIÓN
     # ---------------------------
 
-    st.sidebar.title("🤖 : Contratos PDF")
+    st.sidebar.subheader("🤖 : Contratos PDF")
 
     uploaded_file = st.sidebar.file_uploader("📎 Sube el PDF del contrato", type=["pdf"])
 
