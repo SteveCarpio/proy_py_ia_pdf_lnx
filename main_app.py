@@ -29,8 +29,8 @@ DS_APPS = {
 }
 # Diccionario WebScraping
 WS_APPS = {
-    "1 - Eventos Relevantes": app0,
-    "2 - Estados Financieros": app0
+    "1 - Eventos Relevantes.": app0,
+    "2 - Estados Financieros.": app0
 }
 # Diccionario Reporting
 RP_APPS = {
