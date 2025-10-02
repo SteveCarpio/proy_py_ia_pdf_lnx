@@ -74,10 +74,11 @@ def main():
                 st.session_state.file_content = None
                 st.session_state.file_name = None
                 st.rerun()
-
+        
+        # ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"]
         model_choice = st.selectbox(
             "🧠 Modelo:",
-            ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"],
+            ["tda-llama3", "tda-gpt20b", "codellama", "deepseek-coder"],
             index=0
         )
 
