@@ -72,7 +72,7 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    st.title("📁 Gestor de Proyectos")
+    st.title(f"📁 Gestor de Proyectos: [{username}]")
     agrupamiento = st.radio("Agrupar por:", ["Prioridad", "Estado"], horizontal=True)
 
     proyectos_raw = db.obtener_proyectos(usuario, rol)
@@ -87,7 +87,7 @@ def main():
             "prioridad": row[5],
             "fecha_inicio": row[6],
             "fecha_fin": row[7],
-            "creado_por": row[8]
+            "asignado_a": row[8]  # anteriormente:  creado_por
         })
 
     claves = PRIORIDADES if agrupamiento == "Prioridad" else ESTADOS
@@ -103,7 +103,7 @@ def main():
                 st.markdown(f"**Descripción:** {proyecto['descripcion']}")
                 st.markdown(f"**Responsable:** {proyecto['responsable']}")
                 st.markdown(f"**Fechas:** {proyecto['fecha_inicio']} → {proyecto['fecha_fin']}")
-                st.markdown(f"**Creado por:** `{proyecto['creado_por']}`")
+                st.markdown(f"**Asignado a:** `{proyecto['asignado_a']}`")  # anteriormente:  creado_por
 
                 nuevo_estado = st.selectbox(
                     "Actualizar estado",
@@ -147,6 +147,14 @@ def main():
             prioridad = st.selectbox("Prioridad", PRIORIDADES)
             fecha_inicio = st.date_input("Fecha de inicio")
             fecha_fin = st.date_input("Fecha de fin")
+
+            # Solo el admin puede asignar el proyecto a otro usuario
+            if rol == "admin":
+                usuarios_disponibles = db.obtener_usuarios()
+                creado_por = st.selectbox("Asignar a usuario", usuarios_disponibles)
+            else:
+                creado_por = usuario
+
             guardar = st.form_submit_button("Guardar proyecto")
 
             if guardar:
@@ -157,13 +165,16 @@ def main():
                         nombre, descripcion, responsable, estado, prioridad,
                         fecha_inicio.strftime("%Y-%m-%d"),
                         fecha_fin.strftime("%Y-%m-%d"),
-                        usuario
+                        creado_por
                     )
                     st.success("✅ Proyecto creado")
                     st.rerun()
 
+    
+
+
     # Tabla con listado completo
-    with st.expander("📊 Ver todos los proyectos (tabla)"):
+    with st.expander("📊 Ver todos los proyectos"):
         estado_tabla = st.selectbox("Estado", ["Todos"] + ESTADOS, key="estado_tabla")
         prioridad_tabla = st.selectbox("Prioridad", ["Todos"] + PRIORIDADES, key="prioridad_tabla")
 

@@ -35,8 +35,12 @@ WS_APPS = {
 # Diccionario Reporting
 RP_APPS = {
     "1 - Eventos Relevantes": app7,
-    "2 - Estados Financieros": app0,
-    "3 - Personal": app8
+    "2 - Estados Financieros": app0
+}
+
+# Gestor de Proyectos
+GP_APPS = {
+    "1 - DEV VBA-PYTHON-VBA": app8
 }
 
 def mostrar_inicio():
@@ -281,7 +285,14 @@ with st.sidebar.expander("📈 Reporting"):
     for name in RP_APPS:
         if st.button(name, key=f"btn_rp_{name}"):
             st.session_state.selected_app_key = name
-            st.rerun()            
+            st.rerun()
+
+# Botones para Gestor de Proyectos
+with st.sidebar.expander("📁 Gestor Proyectos"):
+    for name in GP_APPS:
+        if st.button(name, key=f"btn_rp_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()       
 
 
 # Mostrar la app seleccionada
@@ -294,6 +305,8 @@ if st.session_state.selected_app_key:
         RP_APPS[st.session_state.selected_app_key].main()
     elif st.session_state.selected_app_key in WS_APPS:
         WS_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in GP_APPS:
+        GP_APPS[st.session_state.selected_app_key].main()
 
     # Limpia GarbageCollector    
     gc.collect()

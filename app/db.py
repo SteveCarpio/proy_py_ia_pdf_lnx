@@ -54,7 +54,7 @@ def crear_usuarios_por_defecto():
     if not obtener_usuario("admin"):
         crear_usuario("admin", "admin123", "admin")
     if not obtener_usuario("Steve"):
-        crear_usuario("Steve", "user123", "user")
+        crear_usuario("Steve", "Webmaster1", "user")
     if not obtener_usuario("LuisRF"):
         crear_usuario("LuisRF", "user123", "user")
 
