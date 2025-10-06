@@ -30,9 +30,7 @@ def main():
     rol = st.session_state["rol"]
     st.sidebar.markdown(f"👤 Usuario: `{usuario}` | Rol: `{rol}`")
 
-    # ===============================
-    # 📤 Exportar proyectos a Excel
-    # ===============================
+    # Exportar proyectos
     st.sidebar.title("📤 Exportar proyectos")
     filtro_estado = st.sidebar.selectbox("Filtrar por estado", ["Todos"] + ESTADOS)
     filtro_prioridad = st.sidebar.selectbox("Filtrar por prioridad", ["Todos"] + PRIORIDADES)
@@ -79,26 +77,22 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    # ===============================
-    # 📁 Listado principal
-    # ===============================
+    # Proyectos agrupados
     st.title(f"📁 Gestor de Proyectos: [{username}]")
     agrupamiento = st.radio("Agrupar por:", ["Prioridad", "Estado"], horizontal=True)
 
     proyectos_raw = db.obtener_proyectos(usuario, rol)
-    proyectos = []
-    for row in proyectos_raw:
-        proyectos.append({
-            "id": row[0],
-            "nombre": row[1],
-            "descripcion": row[2],
-            "responsable": row[3],
-            "estado": row[4],
-            "prioridad": row[5],
-            "fecha_inicio": row[6],
-            "fecha_fin": row[7],
-            "asignado_a": row[8]
-        })
+    proyectos = [{
+        "id": row[0],
+        "nombre": row[1],
+        "descripcion": row[2],
+        "responsable": row[3],
+        "estado": row[4],
+        "prioridad": row[5],
+        "fecha_inicio": row[6],
+        "fecha_fin": row[7],
+        "asignado_a": row[8]
+    } for row in proyectos_raw]
 
     claves = PRIORIDADES if agrupamiento == "Prioridad" else ESTADOS
     clave_field = "prioridad" if agrupamiento == "Prioridad" else "estado"
@@ -115,7 +109,7 @@ def main():
                 st.markdown(f"**Fechas:** {proyecto['fecha_inicio']} → {proyecto['fecha_fin']}")
                 st.markdown(f"**Asignado a:** `{proyecto['asignado_a']}`")
 
-                # ======= Actualizar estado =======
+                # Cambiar estado
                 nuevo_estado = st.selectbox(
                     "Actualizar estado",
                     ESTADOS,
@@ -127,34 +121,35 @@ def main():
                     st.success("✅ Estado actualizado")
                     st.rerun()
 
-                # ======= Editar proyecto =======
-                with st.expander(f"✏️ Editar proyecto {proyecto['nombre']}", expanded=False):
+                # Editar proyecto
+                with st.expander(f"✏️ Editar proyecto {proyecto['nombre']}"):
                     nuevo_nombre = st.text_input("Nombre", value=proyecto["nombre"], key=f"edit_nombre_{proyecto['id']}")
-                    nueva_descripcion = st.text_area("Descripción", value=proyecto["descripcion"], key=f"edit_desc_{proyecto['id']}")
-                    nuevo_responsable = st.text_input("Responsable", value=proyecto["responsable"], key=f"edit_resp_{proyecto['id']}")
-                    nueva_prioridad = st.selectbox("Prioridad", PRIORIDADES, index=PRIORIDADES.index(proyecto["prioridad"]), key=f"edit_prio_{proyecto['id']}")
-                    nueva_fecha_inicio = st.date_input("Inicio", pd.to_datetime(proyecto["fecha_inicio"]), key=f"edit_ini_{proyecto['id']}")
-                    nueva_fecha_fin = st.date_input("Fin", pd.to_datetime(proyecto["fecha_fin"]), key=f"edit_fin_{proyecto['id']}")
+                    nueva_desc = st.text_area("Descripción", value=proyecto["descripcion"], key=f"edit_desc_{proyecto['id']}")
+                    nuevo_resp = st.text_input("Responsable", value=proyecto["responsable"], key=f"edit_resp_{proyecto['id']}")
+                    nueva_prio = st.selectbox("Prioridad", PRIORIDADES, index=PRIORIDADES.index(proyecto["prioridad"]), key=f"edit_prio_{proyecto['id']}")
+                    nueva_ini = st.date_input("Inicio", pd.to_datetime(proyecto["fecha_inicio"]), key=f"edit_ini_{proyecto['id']}")
+                    nueva_fin = st.date_input("Fin", pd.to_datetime(proyecto["fecha_fin"]), key=f"edit_fin_{proyecto['id']}")
 
                     if st.button("💾 Guardar cambios", key=f"save_edit_{proyecto['id']}"):
-                        db.actualizar_proyecto(
-                            proyecto["id"],
-                            nuevo_nombre,
-                            nueva_descripcion,
-                            nuevo_responsable,
-                            nuevo_estado,  # conserva el valor actualizado
-                            nueva_prioridad,
-                            nueva_fecha_inicio.strftime("%Y-%m-%d"),
-                            nueva_fecha_fin.strftime("%Y-%m-%d")
-                        )
+                        db.actualizar_proyecto(proyecto["id"], nuevo_nombre, nueva_desc, nuevo_resp,
+                                               nuevo_estado, nueva_prio,
+                                               nueva_ini.strftime("%Y-%m-%d"), nueva_fin.strftime("%Y-%m-%d"))
                         st.success("✅ Proyecto actualizado.")
                         st.rerun()
 
-                # ======= Comentarios =======
+                # Comentarios
                 st.markdown("**Comentarios:**")
                 comentarios = db.obtener_comentarios(proyecto["id"])
-                for autor, texto, fecha in comentarios:
-                    st.markdown(f"- {fecha} [{autor}]: {texto}")
+                for autor, texto, fecha, cid in comentarios:
+                    cols = st.columns([8, 1])
+                    with cols[0]:
+                        st.markdown(f"- {fecha} [{autor}]: {texto}")
+                    if rol == "admin":
+                        with cols[1]:
+                            if st.button("🗑️", key=f"delcom_{cid}", help="Eliminar comentario"):
+                                db.eliminar_comentario(cid)
+                                st.success("🗑️ Comentario eliminado.")
+                                st.rerun()
 
                 with st.form(f"form_comentario_{proyecto['id']}"):
                     autor = st.text_input("Tu nombre", value=usuario, key=f"autor_{proyecto['id']}")
@@ -163,35 +158,30 @@ def main():
                     if enviar and autor and texto:
                         db.agregar_comentario(proyecto["id"], autor, texto, datetime.now().strftime("%Y-%m-%d"))
                         st.success("💬 Comentario guardado")
+                        st.session_state[f"autor_{proyecto['id']}"] = ""
+                        st.session_state[f"texto_{proyecto['id']}"] = ""
                         st.rerun()
 
-                # ======= Eliminar proyecto =======
+                # Eliminar proyecto (confirmado)
                 if rol == "admin":
-                    del_key = f"del_{proyecto['id']}"
-
                     if st.button("🗑️ Eliminar proyecto", key=f"delbtn_{proyecto['id']}"):
                         st.session_state["confirmar_eliminacion"] = proyecto["id"]
-                        st.warning(f"⚠️ Confirma la eliminación del proyecto: '{proyecto['nombre']}'")
 
                     if st.session_state.get("confirmar_eliminacion") == proyecto["id"]:
+                        st.warning(f"⚠️ Confirma la eliminación de '{proyecto['nombre']}'")
                         col1, col2 = st.columns(2)
                         with col1:
-                            if st.button("✅ Confirmar eliminación", key=f"confirmar_{proyecto['id']}"):
+                            if st.button("✅ Confirmar", key=f"conf_{proyecto['id']}"):
                                 db.eliminar_proyecto(proyecto["id"])
                                 st.success("✅ Proyecto eliminado.")
                                 st.session_state["confirmar_eliminacion"] = None
                                 st.rerun()
                         with col2:
-                            if st.button("❌ Cancelar", key=f"cancelar_{proyecto['id']}"):
+                            if st.button("❌ Cancelar", key=f"canc_{proyecto['id']}"):
                                 st.session_state["confirmar_eliminacion"] = None
-                                st.info("❎ Eliminación cancelada.")
                                 st.rerun()
 
-  
-
-    # ===============================
-    # ➕ Añadir nuevo proyecto
-    # ===============================
+    # Nuevo proyecto
     with st.expander("➕ Añadir nuevo proyecto"):
         with st.form("nuevo_proyecto_form"):
             nombre = st.text_input("Nombre del proyecto")
@@ -209,23 +199,20 @@ def main():
                 creado_por = usuario
 
             guardar = st.form_submit_button("Guardar proyecto")
-
             if guardar:
                 if not nombre or not descripcion or not responsable:
                     st.error("❌ Completa todos los campos obligatorios.")
                 else:
-                    db.agregar_proyecto(
-                        nombre, descripcion, responsable, estado, prioridad,
-                        fecha_inicio.strftime("%Y-%m-%d"),
-                        fecha_fin.strftime("%Y-%m-%d"),
-                        creado_por
-                    )
+                    db.agregar_proyecto(nombre, descripcion, responsable, estado, prioridad,
+                                        fecha_inicio.strftime("%Y-%m-%d"), fecha_fin.strftime("%Y-%m-%d"),
+                                        creado_por)
                     st.success("✅ Proyecto creado")
+                    for key in ["Nombre del proyecto", "Descripción", "Responsable"]:
+                        if key in st.session_state:
+                            st.session_state[key] = ""
                     st.rerun()
 
-    # ===============================
-    # 📊 Tabla general de proyectos
-    # ===============================
+    # Tabla completa
     with st.expander("📊 Ver todos los proyectos"):
         estado_tabla = st.selectbox("Estado", ["Todos"] + ESTADOS, key="estado_tabla")
         prioridad_tabla = st.selectbox("Prioridad", ["Todos"] + PRIORIDADES, key="prioridad_tabla")
@@ -253,8 +240,7 @@ def main():
         if not df.empty:
             st.dataframe(df.drop(columns=["ID"]), use_container_width=True)
         else:
-            st.info("No hay proyectos con esos filtros.")
-
+            st.info("No hay proyectos para mostrar.")
 
 if __name__ == "__main__":
     main()

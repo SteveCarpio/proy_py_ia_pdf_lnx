@@ -65,7 +65,7 @@ def crear_usuario(username, password, rol="user"):
         cursor.execute("INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)", (username, password, rol))
         conn.commit()
     except sqlite3.IntegrityError:
-        pass  # usuario ya existe
+        pass
     conn.close()
 
 def validar_usuario(username, password):
@@ -75,7 +75,7 @@ def validar_usuario(username, password):
     user = cursor.fetchone()
     conn.close()
     if user:
-        return user[0]  # rol
+        return user[0]
     return None
 
 def obtener_usuario(username):
@@ -86,7 +86,10 @@ def obtener_usuario(username):
     conn.close()
     return user
 
-# Proyectos
+# -------------------------
+# PROYECTOS
+# -------------------------
+
 def agregar_proyecto(nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, creado_por):
     conn = conectar()
     cursor = conn.cursor()
@@ -115,6 +118,17 @@ def actualizar_estado(proyecto_id, nuevo_estado):
     conn.commit()
     conn.close()
 
+def actualizar_proyecto(id, nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE proyectos
+        SET nombre = ?, descripcion = ?, responsable = ?, estado = ?, prioridad = ?, fecha_inicio = ?, fecha_fin = ?
+        WHERE id = ?
+    """, (nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, id))
+    conn.commit()
+    conn.close()
+
 def eliminar_proyecto(proyecto_id):
     conn = conectar()
     cursor = conn.cursor()
@@ -122,7 +136,10 @@ def eliminar_proyecto(proyecto_id):
     conn.commit()
     conn.close()
 
-# Comentarios
+# -------------------------
+# COMENTARIOS
+# -------------------------
+
 def agregar_comentario(proyecto_id, autor, texto, fecha):
     conn = conectar()
     cursor = conn.cursor()
@@ -133,38 +150,20 @@ def agregar_comentario(proyecto_id, autor, texto, fecha):
     conn.commit()
     conn.close()
 
+def eliminar_comentario(comentario_id):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM comentarios WHERE id = ?", (comentario_id,))
+    conn.commit()
+    conn.close()
+
 def obtener_comentarios(proyecto_id):
     conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("SELECT autor, texto, fecha FROM comentarios WHERE proyecto_id = ?", (proyecto_id,))
+    cursor.execute("SELECT autor, texto, fecha, id FROM comentarios WHERE proyecto_id = ?", (proyecto_id,))
     comentarios = cursor.fetchall()
     conn.close()
     return comentarios
-
-def obtener_todos_comentarios(usuario, rol):
-    conn = conectar()
-    cursor = conn.cursor()
-    if rol == "admin":
-        cursor.execute("SELECT proyecto_id, autor, texto, fecha FROM comentarios")
-    else:
-        cursor.execute("""
-            SELECT c.proyecto_id, c.autor, c.texto, c.fecha
-            FROM comentarios c
-            JOIN proyectos p ON c.proyecto_id = p.id
-            WHERE p.creado_por = ?
-        """, (usuario,))
-    comentarios = cursor.fetchall()
-    conn.close()
-    return comentarios
-
-
-def obtener_usuarios():
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute("SELECT username FROM usuarios")
-    usuarios = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return usuarios
 
 def obtener_todos_comentarios(usuario, rol, incluir_nombre=False):
     conn = conectar()
@@ -197,13 +196,10 @@ def obtener_todos_comentarios(usuario, rol, incluir_nombre=False):
     conn.close()
     return comentarios
 
-def actualizar_proyecto(id, nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin):
+def obtener_usuarios():
     conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE proyectos
-        SET nombre = ?, descripcion = ?, responsable = ?, estado = ?, prioridad = ?, fecha_inicio = ?, fecha_fin = ?
-        WHERE id = ?
-    """, (nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, id))
-    conn.commit()
+    cursor.execute("SELECT username FROM usuarios")
+    usuarios = [row[0] for row in cursor.fetchall()]
     conn.close()
+    return usuarios
