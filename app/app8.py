@@ -140,16 +140,32 @@ def main():
                 # Comentarios
                 st.markdown("**Comentarios:**")
                 comentarios = db.obtener_comentarios(proyecto["id"])
+
                 for autor, texto, fecha, cid in comentarios:
                     cols = st.columns([8, 1])
                     with cols[0]:
                         st.markdown(f"- {fecha} [{autor}]: {texto}")
+
+                    # Solo admin puede eliminar comentarios
                     if rol == "admin":
                         with cols[1]:
                             if st.button("🗑️", key=f"delcom_{cid}", help="Eliminar comentario"):
-                                db.eliminar_comentario(cid)
-                                st.success("🗑️ Comentario eliminado.")
-                                st.rerun()
+                                st.session_state["confirmar_eliminacion_comentario"] = cid
+
+                        # Si este comentario está marcado para confirmar eliminación
+                        if st.session_state.get("confirmar_eliminacion_comentario") == cid:
+                            st.warning(f"⚠️ ¿Eliminar comentario de **{autor}** del {fecha}?")
+                            c1, c2 = st.columns(2)
+                            with c1:
+                                if st.button("✅ Confirmar", key=f"conf_com_{cid}"):
+                                    db.eliminar_comentario(cid)
+                                    st.success("🗑️ Comentario eliminado.")
+                                    st.session_state["confirmar_eliminacion_comentario"] = None
+                                    st.rerun()
+                            with c2:
+                                if st.button("❌ Cancelar", key=f"cancel_com_{cid}"):
+                                    st.session_state["confirmar_eliminacion_comentario"] = None
+                                    st.rerun()
 
                 with st.form(f"form_comentario_{proyecto['id']}"):
                     autor = st.text_input("Tu nombre", value=usuario, key=f"autor_{proyecto['id']}")
@@ -158,9 +174,11 @@ def main():
                     if enviar and autor and texto:
                         db.agregar_comentario(proyecto["id"], autor, texto, datetime.now().strftime("%Y-%m-%d"))
                         st.success("💬 Comentario guardado")
-                        st.session_state[f"autor_{proyecto['id']}"] = ""
-                        st.session_state[f"texto_{proyecto['id']}"] = ""
+                        
+                        st.session_state.pop(f"autor_{proyecto['id']}", None)
+                        st.session_state.pop(f"texto_{proyecto['id']}", None)
                         st.rerun()
+
 
                 # Eliminar proyecto (confirmado)
                 if rol == "admin":
