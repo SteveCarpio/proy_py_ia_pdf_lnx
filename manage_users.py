@@ -1,14 +1,14 @@
 # Crear un nuevo usuario
-# python manage_users.py crear Steve user123 user
+# python3 manage_users.py crear Nuevo nuevo123 user
 
 # Cambiar contraseña
-# python manage_users.py cambiar_pass Steve nueva_clave
+# python3 manage_users.py cambiar_pass Steve nueva_clave
 
 # Eliminar usuario
-# python manage_users.py eliminar Steve
+# python3 manage_users.py eliminar Steve
 
 # Ver usuarios
-# python manage_users.py listar
+# python3 manage_users.py listar
 
 
 
@@ -71,14 +71,14 @@ def cambiar_password(username, nueva_password):
 def listar_usuarios():
     conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("SELECT username, rol FROM usuarios")
+    cursor.execute("SELECT username, rol, password FROM usuarios")
     rows = cursor.fetchall()
     if not rows:
         print("⚠️ No hay usuarios registrados.")
     else:
         print("👥 Usuarios registrados:")
-        for username, rol in rows:
-            print(f"  - {username} ({rol})")
+        for username, rol, password in rows:
+            print(f"  - {username}/{password} ({rol})")
     conn.close()
 
 if __name__ == "__main__":

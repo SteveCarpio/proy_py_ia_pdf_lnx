@@ -3,6 +3,7 @@ from datetime import datetime
 from app import db
 import pandas as pd
 from io import BytesIO
+import plotly.express as px
 
 # ---------------------------------
 # Constantes de Estados y Prioridades
@@ -94,6 +95,7 @@ def main():
     # Visualización de proyectos agrupados
     # ---------------------------------
     st.title(f"📁 Gestor de Proyectos: [{usuario}]")
+
     agrupamiento = st.radio("Agrupar por:", ["Prioridad", "Estado"], horizontal=True)
 
     proyectos_raw = db.obtener_proyectos(usuario, rol)
@@ -284,8 +286,30 @@ def main():
         df = pd.DataFrame(proyectos_tabla)
         if not df.empty:
             st.dataframe(df.drop(columns=["ID"]), use_container_width=True)
+
+            # Gráfico de Barras
+            df_agg = df.groupby(['Estado', 'Prioridad']).size().reset_index(name='Número de Proyectos')
+            fig3 = px.bar(
+                df_agg,
+                x='Estado',
+                y='Número de Proyectos',   # <- eje Y con tu nombre
+                color='Prioridad',
+                barmode='stack',
+                title='Número de Proyectos (Prioridad vs Estado)'
+            )
+            st.plotly_chart(fig3, use_container_width=True)
         else:
             st.info("No hay proyectos con esos filtros.")
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     main()
