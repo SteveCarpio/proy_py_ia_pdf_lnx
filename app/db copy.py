@@ -5,14 +5,11 @@ DB_PATH = "data/proyectos.db"
 def conectar():
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
-# -------------------------------
-# Creación de tablas
-# -------------------------------
 def crear_tablas():
     conn = conectar()
     cursor = conn.cursor()
 
-    # Tabla usuarios
+    # Tabla de usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +19,7 @@ def crear_tablas():
         )
     ''')
 
-    # Tabla proyectos
+    # Tabla de proyectos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS proyectos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +34,7 @@ def crear_tablas():
         )
     ''')
 
-    # Tabla comentarios
+    # Tabla de comentarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS comentarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,9 +50,6 @@ def crear_tablas():
     conn.close()
     crear_usuarios_por_defecto()
 
-# -------------------------------
-# Usuarios por defecto
-# -------------------------------
 def crear_usuarios_por_defecto():
     if not obtener_usuario("admin"):
         crear_usuario("admin", "admin123", "admin")
@@ -80,7 +74,9 @@ def validar_usuario(username, password):
     cursor.execute("SELECT rol FROM usuarios WHERE username = ? AND password = ?", (username, password))
     user = cursor.fetchone()
     conn.close()
-    return user[0] if user else None
+    if user:
+        return user[0]
+    return None
 
 def obtener_usuario(username):
     conn = conectar()
@@ -90,17 +86,10 @@ def obtener_usuario(username):
     conn.close()
     return user
 
-def obtener_usuarios():
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute("SELECT username FROM usuarios")
-    usuarios = [row[0] for row in cursor.fetchall()]
-    conn.close()
-    return usuarios
+# -------------------------
+# PROYECTOS
+# -------------------------
 
-# -------------------------------
-# Proyectos
-# -------------------------------
 def agregar_proyecto(nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, creado_por):
     conn = conectar()
     cursor = conn.cursor()
@@ -129,14 +118,14 @@ def actualizar_estado(proyecto_id, nuevo_estado):
     conn.commit()
     conn.close()
 
-def actualizar_proyecto(proyecto_id, nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin):
+def actualizar_proyecto(id, nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin):
     conn = conectar()
     cursor = conn.cursor()
-    cursor.execute('''
+    cursor.execute("""
         UPDATE proyectos
         SET nombre = ?, descripcion = ?, responsable = ?, estado = ?, prioridad = ?, fecha_inicio = ?, fecha_fin = ?
         WHERE id = ?
-    ''', (nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, proyecto_id))
+    """, (nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, id))
     conn.commit()
     conn.close()
 
@@ -144,13 +133,13 @@ def eliminar_proyecto(proyecto_id):
     conn = conectar()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM proyectos WHERE id = ?", (proyecto_id,))
-    cursor.execute("DELETE FROM comentarios WHERE proyecto_id = ?", (proyecto_id,))
     conn.commit()
     conn.close()
 
-# -------------------------------
-# Comentarios
-# -------------------------------
+# -------------------------
+# COMENTARIOS
+# -------------------------
+
 def agregar_comentario(proyecto_id, autor, texto, fecha):
     conn = conectar()
     cursor = conn.cursor()
@@ -158,6 +147,13 @@ def agregar_comentario(proyecto_id, autor, texto, fecha):
         INSERT INTO comentarios (proyecto_id, autor, texto, fecha)
         VALUES (?, ?, ?, ?)
     ''', (proyecto_id, autor, texto, fecha))
+    conn.commit()
+    conn.close()
+
+def eliminar_comentario(comentario_id):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM comentarios WHERE id = ?", (comentario_id,))
     conn.commit()
     conn.close()
 
@@ -169,40 +165,41 @@ def obtener_comentarios(proyecto_id):
     conn.close()
     return comentarios
 
-def eliminar_comentario(comentario_id):
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM comentarios WHERE id = ?", (comentario_id,))
-    conn.commit()
-    conn.close()
-
 def obtener_todos_comentarios(usuario, rol, incluir_nombre=False):
     conn = conectar()
     cursor = conn.cursor()
     if rol == "admin":
         if incluir_nombre:
-            cursor.execute('''
+            cursor.execute("""
                 SELECT c.proyecto_id, p.nombre, c.autor, c.texto, c.fecha
                 FROM comentarios c
                 JOIN proyectos p ON c.proyecto_id = p.id
-            ''')
+            """)
         else:
             cursor.execute("SELECT proyecto_id, autor, texto, fecha FROM comentarios")
     else:
         if incluir_nombre:
-            cursor.execute('''
+            cursor.execute("""
                 SELECT c.proyecto_id, p.nombre, c.autor, c.texto, c.fecha
                 FROM comentarios c
                 JOIN proyectos p ON c.proyecto_id = p.id
                 WHERE p.creado_por = ?
-            ''', (usuario,))
+            """, (usuario,))
         else:
-            cursor.execute('''
+            cursor.execute("""
                 SELECT c.proyecto_id, c.autor, c.texto, c.fecha
                 FROM comentarios c
                 JOIN proyectos p ON c.proyecto_id = p.id
                 WHERE p.creado_por = ?
-            ''', (usuario,))
+            """, (usuario,))
     comentarios = cursor.fetchall()
     conn.close()
     return comentarios
+
+def obtener_usuarios():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM usuarios")
+    usuarios = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return usuarios
