@@ -196,3 +196,14 @@ def obtener_todos_comentarios(usuario, rol, incluir_nombre=False):
     comentarios = cursor.fetchall()
     conn.close()
     return comentarios
+
+def actualizar_proyecto(id, nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE proyectos
+        SET nombre = ?, descripcion = ?, responsable = ?, estado = ?, prioridad = ?, fecha_inicio = ?, fecha_fin = ?
+        WHERE id = ?
+    """, (nombre, descripcion, responsable, estado, prioridad, fecha_inicio, fecha_fin, id))
+    conn.commit()
+    conn.close()
