@@ -6,8 +6,9 @@ from dateutil.relativedelta import relativedelta
 
 # === CONFIGURACIÓN ===
 # Carpeta donde están los Excel
-CARPETA_EXCEL = r"C:\mis documentos\entrada"
-CARPETA_SALIDA = r"C:\mis documentos\salida"
+CARPETA_EXCEL = "/home/tu_usuario/entrada"
+CARPETA_SALIDA = "/home/tu_usuario/salida"
+
 
 # Aseguramos que exista la carpeta de salida
 os.makedirs(CARPETA_SALIDA, exist_ok=True)
