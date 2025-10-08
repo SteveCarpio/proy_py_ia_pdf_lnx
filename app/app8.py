@@ -16,7 +16,6 @@ def main():
     # Inicializar base de datos y página
     # ---------------------------------
     db.crear_tablas()
-    st.set_page_config(page_title="Gestor de Proyectos", layout="wide")
 
     # ---------------------------------
     # Sidebar: Login
@@ -278,6 +277,8 @@ def main():
             responsable = st.text_input("Responsable")
             estado = st.selectbox("Estado", ESTADOS)
             prioridad = st.selectbox("Prioridad", PRIORIDADES)
+            fecha_inicio = st.date_input("Fecha de inicio")
+            fecha_fin = st.date_input("Fecha de fin")
 
             if rol == "admin":
                 creado_por = st.selectbox("Asignar a usuario", usuarios_disponibles)
