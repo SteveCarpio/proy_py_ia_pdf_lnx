@@ -11,7 +11,8 @@ df_excel = pd.read_excel(ruta_excel, header=None, dtype=str)
 df_excel = df_excel.fillna('')
 
 # Crea una lista y variables de apoyo
-filas_bono = []
+filas_bono1 = []
+filas_bono2 = []
 bonoX1, bonoX2, isinX1, isinX2, taaX1, taaX2, taaX3, taaX4, taaX5, taaX6 = "", "", "", "", "", "", "", "", "",""
 
 # Recorro cada fila
@@ -29,13 +30,13 @@ for idx, fila in df_excel.iterrows():
         taaX4 = float(df_excel.iloc[idx + 7, 10]) * 100
         taaX5 = float(df_excel.iloc[idx + 7, 12]) * 100
         taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
-        filas_bono.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
+        filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
         if var_l != "":
-            filas_bono.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
+            filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
     
 
-
-
+    ############## Creo la LISTA [ TABLA_BOBO ]
+    
 
     # Fin del Bucle
     if var_b == 'Escenarios de flujos futuros de los bonos unitarios':
@@ -44,6 +45,6 @@ for idx, fila in df_excel.iterrows():
 
 ############### RESULTADO ############################################
 # Creo la tabla de BONOS en un DataFrame
-df_bono = pd.DataFrame(filas_bono, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
+df_bono = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
 print(df_bono)
 print(len(df_bono))
