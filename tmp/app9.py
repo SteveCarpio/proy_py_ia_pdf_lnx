@@ -12,11 +12,11 @@ tipoExcel = "TDACAM9_INFFLUJOS_ES_202509.xls"
 if "TDACAM9_INFFLUJOS_ES" in tipoExcel:
     dic_nomBono = [
         {'BONO': 'Bono-A1','NUM_BONOS': 100},
-        {'BONO': 'Bono-A2','NUM_BONOS': 200},
-        {'BONO': 'Bono-A3','NUM_BONOS': 300},
-        {'BONO': 'Bono-B','NUM_BONOS': 400},
-        {'BONO': 'Bono-C','NUM_BONOS': 500},
-        {'BONO': 'Bono-D','NUM_BONOS': 600}
+        {'BONO': 'Bono-A2','NUM_BONOS': 100},
+        {'BONO': 'Bono-A3','NUM_BONOS': 100},
+        {'BONO': 'Bono-B','NUM_BONOS': 100},
+        {'BONO': 'Bono-C','NUM_BONOS': 100},
+        {'BONO': 'Bono-D','NUM_BONOS': 100}
     ]
     df_numBono = pd.DataFrame(dic_nomBono)
 
@@ -77,7 +77,8 @@ for idx, fila in df_excel.iterrows():
     else:
         contBlancos = 0
 
-############### RESULTADO1 ############################################
+############### FASE 1 - Tratamiento de los datos de Bonos ############################################
+
 ### TRATAMIENTO DATAFRAME: BONO1
 df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
 df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
@@ -103,7 +104,8 @@ df_union1 = df_union1.reindex(columns=['N0', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS
 
 
 
-############### RESULTADO2 ############################################
+############### FASE 2 - Crear Toales ############################################
+
 ### AGRUPAR BONOS Y SUMAR TOTALES
 df_bono2_totales = df_bono2.groupby('BONO')[['AP_1', 'AP_2', 'AP_3']].sum().reset_index()
 
@@ -113,8 +115,6 @@ df_bono2_totales.rename(columns={'AP_1': 'T_AP_1', 'AP_2': 'T_AP_2', 'AP_3': 'T_
 ### AGREGAR RESULTADO 2 AL DF PRINCIPAL
 df_principal1 = pd.merge(df_bono2_totales, df_union1, on='BONO')
 
-
-
 ### CREP COLUMNA N1
 df_principal1['N1'] = df_principal1.index.map(lambda x: x + 1)
 
@@ -122,7 +122,7 @@ df_principal1['N1'] = df_principal1.index.map(lambda x: x + 1)
 df_principal1 = df_principal1.reindex(columns=['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'AP_1', 'IB_1', 'T_AP_1', 'TAA_2', 'AP_2', 'IB_2', 'T_AP_2', 'TAA_3', 'AP_3', 'IB_3', 'T_AP_3'])
 
 
-############### RESULTADO3 ############################################
+############### FASE 3 - Desagrupar grupos de Importes 1, 2 y 3 y agruparos en una sola tabla ############################################
 
 # Columnas fijas que no cambian
 cols_fijas = ['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO']
@@ -195,19 +195,19 @@ filasx = filas1 + filas2 + filas3
 # Creamos el nuevo DataFrame
 df_principal2 = pd.DataFrame(filasx)
 
-
 # Ordenamos el dataframe por campo2 y luego por campo3
 df_principal3 = df_principal2.copy() # es necesario hacerlo en un copia previa
 df_principal3 = df_principal3.sort_values(by=['N0', 'N2', 'N3'])
 
-### CREP COLUMNA N1, es necesario resetear el valro de registro
+### CREP COLUMNA N1, es necesario resetear el valor de registro
 df_principal3 = df_principal3.reset_index(drop=True)
 df_principal3['N4'] = df_principal3.index + 1
 
 ### ORDENO COLUMNAS DE SALIDA
 df_principal3 = df_principal3.reindex(columns=['N0', 'N1', 'N2', 'N3', 'N4', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA', 'AP', 'IB', 'T_AP'])
 
-### CREO LA COLUMNA N4 - INTBRUTO - Campos TOTALES:  TT1, TT2
+############### FASE 4 - Creo columnas N4, trato el campo INT_BRUTO y campos TT de salida ############################################
+
 filas4 = []
 cont2 = 0
 sw = 1
@@ -260,6 +260,40 @@ df_principal4 = pd.DataFrame(filas4)
 ### ELIMINO CAMPOS NO NECESARIOS
 df_principal5 = df_principal4.drop(['N1', 'N3'], axis=1).copy()
 
-############### RESULTADO5 ############################################
-print(df_principal5.head(20))
-df_principal5.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
+### REDONDEO DE COLUMNAS
+df_principal5['TT1'] = df_principal5['TT1'].round(2) 
+df_principal5['TT2'] = df_principal5['TT2'].round(2)
+
+############### FASE 5 - Eliminamos registros con ultimo valor a CERO ############################################
+
+filas5 = []
+v_tt1 = 1
+
+for _, fila5 in df_principal5.iterrows():
+
+    if v_tt1 > 0:
+        filas5.append({
+            'N0': fila5['N0'],
+            'N2': fila5['N2'],
+            'N4': fila5['N4'],
+            'BONO': fila5['BONO'],
+            'FECHA': fila5['FECHA'],
+            'ISIN': fila5['ISIN'],
+            'NUM_BONOS': fila5['NUM_BONOS'],
+            'INT_BRUTO': fila5['INT_BRUTO'],
+            'TAA': fila5['TAA'],
+            'AP': fila5['AP'],
+            'IB': fila5['IB'],
+            'T_AP': fila5['T_AP'],
+            'TT1': fila5['TT1'],
+            'TT2': fila5['TT2']
+        })
+
+    v_n2 = int(fila5['N2'])
+    v_tt1 = int(fila5['TT1'])
+
+df_principal6 = pd.DataFrame(filas5)
+
+
+print(df_principal6.head(20))
+df_principal6.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
