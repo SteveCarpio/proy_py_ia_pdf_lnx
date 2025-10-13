@@ -121,18 +121,14 @@ df_principal1['N1'] = df_principal1.index.map(lambda x: x + 1)
 ### ORDENAR CAMPOS
 df_principal1 = df_principal1.reindex(columns=['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'AP_1', 'IB_1', 'T_AP_1', 'TAA_2', 'AP_2', 'IB_2', 'T_AP_2', 'TAA_3', 'AP_3', 'IB_3', 'T_AP_3'])
 
-#print("\n--- RESULTADO 2 ---")
 
 ############### RESULTADO3 ############################################
 
-#print("\n--- RESULTADO 3 ---")
 # Columnas fijas que no cambian
 cols_fijas = ['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO']
 
 # Detectamos automáticamente los grupos (_1, _2, _3, etc.)
 grupos = sorted({col.split('_')[-1] for col in df_principal1.columns if '_' in col and col.split('_')[-1].isdigit()}, key=int)
-
-#print(grupos)
 
 # Lista donde iremos guardando las filas transformadas
 filas1 = []
@@ -254,8 +250,8 @@ for _, fila4 in df_principal3.iterrows():
         'AP': fila4['AP'],
         'IB': fila4['IB'],
         'T_AP': fila4['T_AP'],
-        'TT1': TT1,
-        'TT2': TT2
+        'TT1': float(TT1),
+        'TT2': float(TT2)
     })
     sw = fila4['N2']
 # Creo el dataframe
