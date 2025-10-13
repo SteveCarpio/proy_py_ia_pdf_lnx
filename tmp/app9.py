@@ -268,10 +268,10 @@ df_principal5['TT2'] = df_principal5['TT2'].round(2)
 
 filas5 = []
 v_tt1 = 1
-
+v_n4 = 1
 for _, fila5 in df_principal5.iterrows():
 
-    if v_tt1 > 0:
+    if v_tt1 > 0 or v_n4 == 1:
         filas5.append({
             'N0': fila5['N0'],
             'N2': fila5['N2'],
@@ -290,6 +290,7 @@ for _, fila5 in df_principal5.iterrows():
         })
 
     v_n2 = int(fila5['N2'])
+    v_n4 = int(fila5['N4'])
     v_tt1 = int(fila5['TT1'])
 
 df_principal6 = pd.DataFrame(filas5)
