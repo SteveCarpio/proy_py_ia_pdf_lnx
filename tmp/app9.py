@@ -1,6 +1,8 @@
 import pandas as pd
 import datetime
-#import re
+import re
+
+pd.set_option('display.max_rows', None) 
 
 # Ruta al archivo Excel en tu servidor
 ruta_excel = "/home/robot/Python/proy_py_ia_pdf_lnx/excel/TDACAM9_INFFLUJOS_ES_202509.xls"
@@ -50,9 +52,7 @@ for idx, fila in df_excel.iterrows():
         if var_l != "":
                 filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
     
-
     ############## Creo la LISTA [ TABLA_BONO ]
-
     # Leo la variable Bono
     if "Bono" in var_i:
         bonoX = var_i.strip()
@@ -72,24 +72,20 @@ for idx, fila in df_excel.iterrows():
     else:
         contBlancos = 0
 
-
 ############### RESULTADO1 ############################################
 ### TRATAMIENTO DATAFRAME: BONO1
 df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
 df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
+df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
 
 ### TRATAMIENTO DATAFRAME: BONO2
 df_bono2 = pd.DataFrame(filas_bono2, columns=['BONO', 'FECHA', 'AP_1', 'IB_1', 'AP_2', 'IB_2', 'AP_3', 'IB_3'])
 
 ### UNION DATAFRAME BONO1 y BONO2
 df_union1 = pd.merge(df_bono1_union, df_bono2, on='BONO')
-df_union1 = df_union1.reindex(columns=['BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'TAA_1', 'AP_1', 'IB_1', 'TAA_2', 'AP_2', 'IB_2', 'TAA_3', 'AP_3', 'IB_3'])
-
-#print("--- RESULTADO 1 ---")
-#print(df_union1.head(20))
+df_union1 = df_union1.reindex(columns=['N0', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'TAA_1', 'AP_1', 'IB_1', 'TAA_2', 'AP_2', 'IB_2', 'TAA_3', 'AP_3', 'IB_3'])
 
 ############### RESULTADO2 ############################################
-
 ### AGRUPAR BONOS Y SUMAR TOTALES
 df_bono2_totales = df_bono2.groupby('BONO')[['AP_1', 'AP_2', 'AP_3']].sum().reset_index()
 
@@ -99,50 +95,98 @@ df_bono2_totales.rename(columns={'AP_1': 'T_AP_1', 'AP_2': 'T_AP_2', 'AP_3': 'T_
 ### AGREGAR RESULTADO 2 AL DF PRINCIPAL
 df_principal1 = pd.merge(df_bono2_totales, df_union1, on='BONO')
 
+### CREP COLUMNA N1
+df_principal1['N1'] = df_principal1.index.map(lambda x: x + 1)
+
 ### ORDENAR CAMPOS
-df_principal1 = df_principal1.reindex(columns=['BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'TAA_1', 'AP_1', 'IB_1', 'T_AP_1', 'TAA_2', 'AP_2', 'IB_2', 'T_AP_2', 'TAA_3', 'AP_3', 'IB_3', 'T_AP_3'])
+df_principal1 = df_principal1.reindex(columns=['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'TAA_1', 'AP_1', 'IB_1', 'T_AP_1', 'TAA_2', 'AP_2', 'IB_2', 'T_AP_2', 'TAA_3', 'AP_3', 'IB_3', 'T_AP_3'])
 
 print("\n--- RESULTADO 2 ---")
-print(df_bono2_totales)
-print(df_principal1)
-pd.set_option('display.max_rows', None) 
+print(df_principal1.head(5))
+
 
 ############### RESULTADO3 ############################################
 
 print("\n--- RESULTADO 3 ---")
-#df_resultado3_1 = df_principal1.copy()     # copia del DataFrame original
-#df_resultado3_1['AP'] = (df_resultado3_1['campo1'] - df_resultado3_1['campo2']) * df_resultado3_1['campo3']
-
-import pandas as pd
-
 # Columnas fijas que no cambian
-cols_fijas = ['BONO', 'FECHA', 'ISIN', 'NUM_BONOS']
+cols_fijas = ['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS']
 
 # Detectamos automáticamente los grupos (_1, _2, _3, etc.)
-grupos = sorted({col.split('_')[-1] for col in df_principal1.columns if '_' in col and col.split('_')[-1].isdigit()},
-                key=int)
+grupos = sorted({col.split('_')[-1] for col in df_principal1.columns if '_' in col and col.split('_')[-1].isdigit()}, key=int)
+
+#print(grupos)
 
 # Lista donde iremos guardando las filas transformadas
-filas = []
+filas1 = []
+filas2 = []
+filas3 = []
+filasx = []
+cont = 0
 
 # Recorremos cada fila del DF original
 for _, fila in df_principal1.iterrows():
-    for i in grupos:
-        filas.append({
-            'BONO': fila['BONO'],
-            'FECHA': fila['FECHA'],
-            'ISIN': fila['ISIN'],
-            'NUM_BONOS': fila['NUM_BONOS'],
-            'TAA': fila[f'TAA_{i}'],
-            'AP': fila[f'AP_{i}'],
-            'IB': fila[f'IB_{i}'],
-            'T_AP': fila[f'T_AP_{i}']
-        })
+    cont = cont + 1
+    filas1.append({
+        'N0': fila['N0'],
+        'N1': fila['N1'],
+        'N2': 1,
+        'N3': cont,
+        'BONO': fila['BONO'],
+        'FECHA': fila['FECHA'],
+        'ISIN': fila['ISIN'],
+        'NUM_BONOS': fila['NUM_BONOS'],
+        'TAA': fila[f'TAA_1'],
+        'AP': fila[f'AP_1'],
+        'IB': fila[f'IB_1'],
+        'T_AP': fila[f'T_AP_1']
+    })
 
+    filas2.append({
+        'N0': fila['N0'],
+        'N1': fila['N1'],
+        'N2': 2,
+        'N3': cont,
+        'BONO': fila['BONO'],
+        'FECHA': fila['FECHA'],
+        'ISIN': fila['ISIN'],
+        'NUM_BONOS': fila['NUM_BONOS'],
+        'TAA': fila[f'TAA_2'],
+        'AP': fila[f'AP_2'],
+        'IB': fila[f'IB_2'],
+        'T_AP': fila[f'T_AP_2']
+    })
+    filas3.append({
+        'N0': fila['N0'],
+        'N1': fila['N1'],
+        'N2': 3,
+        'N3': cont,
+        'BONO': fila['BONO'],
+        'FECHA': fila['FECHA'],
+        'ISIN': fila['ISIN'],
+        'NUM_BONOS': fila['NUM_BONOS'],
+        'TAA': fila[f'TAA_3'],
+        'AP': fila[f'AP_3'],
+        'IB': fila[f'IB_3'],
+        'T_AP': fila[f'T_AP_3']
+    })
+    
+filasx = filas1 + filas2 + filas3
+    
 # Creamos el nuevo DataFrame
-df_principal2 = pd.DataFrame(filas)
+df_principal2 = pd.DataFrame(filasx)
 
-# Reordenamos para mantener el orden por BONO y por grupo (TAA_1, TAA_2, TAA_3)
-df_principal2 = df_principal2.sort_values(by=['BONO','TAA','FECHA']).reset_index(drop=True)
+# Ordenamos el dataframe por campo2 y luego por campo3
+df_principal3 = df_principal2.copy() # es necesario hacerlo en un copia previa
+df_principal3 = df_principal3.sort_values(by=['N0', 'N2', 'N3'])
 
-print(df_principal2.head(200))
+### CREP COLUMNA N1, es necesario resetear el valro de registro
+df_principal3 = df_principal3.reset_index(drop=True)
+df_principal3['N4'] = df_principal3.index + 1
+
+### ORDENO COLUMNAS DE SALIDA
+df_principal3 = df_principal3.reindex(columns=['N0', 'N1', 'N2', 'N3', 'N4', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'TAA', 'AP', 'IB', 'T_AP'])
+
+
+
+print(df_principal3)
+df_principal3.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
