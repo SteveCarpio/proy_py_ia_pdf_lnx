@@ -1,7 +1,9 @@
 import pandas as pd
 import datetime
 import re
+from pandas.tseries.offsets import MonthEnd, MonthBegin, BMonthBegin, DateOffset
 
+# Mostrar todas las filas y columnas
 pd.set_option('display.max_rows', None) 
 
 # Ruta al archivo Excel en tu servidor
@@ -85,7 +87,6 @@ df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
 df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
 
 
-
 ### TRATAMIENTO DATAFRAME: BONO2
 df_bono2 = pd.DataFrame(filas_bono2, columns=['BONO', 'FECHA', 'AP_1', 'IB_1', 'AP_2', 'IB_2', 'AP_3', 'IB_3'])
 
@@ -96,12 +97,9 @@ df_bono3 = pd.DataFrame(filas_bono3, columns=['BONO', 'INT_BRUTO'])
 ### UNION BONO1 y BONO3: Agregar a la tabla bono1 el campo Ineres Bruto
 df_bono3_union = pd.merge(df_bono3, df_bono1_union, on='BONO')
 
-
-
 ### UNION DATAFRAME BONO1 y BONO2
 df_union1 = pd.merge(df_bono3_union, df_bono2, on='BONO')
 df_union1 = df_union1.reindex(columns=['N0', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'AP_1', 'IB_1', 'TAA_2', 'AP_2', 'IB_2', 'TAA_3', 'AP_3', 'IB_3'])
-
 
 
 ############### FASE 2 - Crear Toales ############################################
@@ -265,17 +263,13 @@ df_principal5['TT1'] = df_principal5['TT1'].round(2)
 df_principal5['TT2'] = df_principal5['TT2'].round(2)
 
 ############### FASE 5 - Eliminamos registros con ultimo valor a CERO ############################################
-
 filas5 = []
 G = 1
 cont5 = 0
 
 for _, fila5 in df_principal5.iterrows():
-
     cont5 = cont5 + 1
-
     if int(fila5['N2']) == G:
-
         filas5.append({
             'N0': fila5['N0'],
             'N2': fila5['N2'],
@@ -303,10 +297,145 @@ for _, fila5 in df_principal5.iterrows():
         
 df_principal6 = pd.DataFrame(filas5)
 
-############### FASE 6 - Insertamos la ultima FECHA y creamos la columna CALL_DATE ############################################
+############### FASE 6 - Creamos la columna CALL_DATE y FIRST_DATE ############################################
+# CALL_DATE:  es el ultimo valor de FECHA
+# FIRST_DATE: es el primer valor de FECHA
 
-df_calldate = df_principal6.loc[df_principal6.groupby(['N2', 'BONO'])['N4'].idxmax(), ['N2', 'N4', 'BONO', 'FECHA']]
+# Me quedo con la Fecha Maxima y Minima agrupando N2, BONO N4
+df_calldate_max = df_principal6.loc[df_principal6.groupby(['N2', 'BONO'])['N4'].idxmax(), ['N2', 'N4', 'BONO', 'FECHA']]
+df_calldate_min = df_principal6.loc[df_principal6.groupby(['N2', 'BONO'])['N4'].idxmin(), ['N2', 'N4', 'BONO', 'FECHA']]
+
+# Renombra campo
+df_calldate_max = df_calldate_max.rename(columns={'FECHA': 'CALL_DATE'})
+df_calldate_min = df_calldate_min.rename(columns={'FECHA': 'FIRST_DATE'})
+
+# Creamos una copia para no alterar df_principal6
+df_principal7 = df_principal6.copy()
+
+# Hacemos merge (left join) 
+df_principal7 = df_principal7.merge(
+    df_calldate_max[['N2', 'BONO', 'CALL_DATE']],   # solo campos necesarios
+    on=['N2', 'BONO'],
+    how='left',                                 # mantiene todo df_principal6
+    suffixes=('', '_nuevo')                     # evita conflictos si ya existe FECHA
+)
+
+# Hacemos merge (left join) 
+df_principal7 = df_principal7.merge(
+    df_calldate_min[['N2', 'BONO', 'FIRST_DATE']],   # solo campos necesarios
+    on=['N2', 'BONO'],
+    how='left',                                 # mantiene todo df_principal6
+    suffixes=('', '_nuevo')                     # evita conflictos si ya existe FECHA
+)
+
+############### FASE 7 - Crear el campo DATED_DATE  ############################################
+# Será un campo calculado, teniendo en cuenta el campo FECHA, restamos 3 
+# meses atrás, si cae en sábado o domingo pillamos el 1º día hábil
+
+# Creamos una copia para no alterar df_principal
+df_principal8 = df_principal7.copy()
+
+# Convertir FECHA a datetime temporalmente (sin modificar la columna original)
+fechas_dt = pd.to_datetime(df_principal8['FECHA'], format='%d/%m/%Y')
+
+# Restar 3 meses
+fechas_menos_3m = fechas_dt - pd.DateOffset(months=3)
+
+# Ajustar al primer día hábil del mes resultante
+# Si el primer día del mes es sábado o domingo, lo mueve al lunes siguiente
+primer_dia_habil = fechas_menos_3m.dt.to_period('M').dt.to_timestamp()  # primer día del mes
+primer_dia_habil = primer_dia_habil.apply(lambda d: d + pd.offsets.BDay(0) if d.weekday() < 5 else d + pd.offsets.BDay(1))
+
+# Convertir al formato dd/mm/yyyy
+df_principal8['DATED_DATE'] = primer_dia_habil.dt.strftime('%d/%m/%Y')
+
+############### FASE 8 - Agregamos un registro nuevo: Sera un reg CALCULADO en la posición 0 ############################################
+filas8 = []
+for _, fila8 in df_principal8.iterrows():
+    if fila8['N4'] == 1:
+        v_TT1 = fila8['T_AP'] * fila8['NUM_BONOS']
+        filas8.append({
+            'N0': fila8['N0'],
+            'N2': fila8['N2'],
+            'N4': 0,
+            'BONO': fila8['BONO'],
+            'FECHA': fila8['DATED_DATE'],
+            'ISIN': fila8['ISIN'],
+            'NUM_BONOS': fila8['NUM_BONOS'],
+            'INT_BRUTO': fila8['INT_BRUTO'],
+            'TAA': fila8['TAA'],
+            'AP': fila8['AP'],
+            'IB': fila8['IB'],
+            'T_AP': fila8['T_AP'],
+            'TT1': v_TT1,
+            'TT2': 0,
+            'CALL_DATE': fila8['CALL_DATE'],
+            'FIRST_DATE': fila8['FIRST_DATE'],
+            'DATED_DATE': fila8['DATED_DATE']
+        })
+    filas8.append({
+            'N0': fila8['N0'],
+            'N2': fila8['N2'],
+            'N4': fila8['N4'],
+            'BONO': fila8['BONO'],
+            'FECHA': fila8['FECHA'],
+            'ISIN': fila8['ISIN'],
+            'NUM_BONOS': fila8['NUM_BONOS'],
+            'INT_BRUTO': fila8['INT_BRUTO'],
+            'TAA': fila8['TAA'],
+            'AP': fila8['AP'],
+            'IB': fila8['IB'],
+            'T_AP': fila8['T_AP'],
+            'TT1': fila8['TT1'],
+            'TT2': fila8['TT2'],
+            'CALL_DATE': fila8['CALL_DATE'],
+            'FIRST_DATE': fila8['FIRST_DATE'],
+            'DATED_DATE': fila8['DATED_DATE']
+    }) 
+df_principal9 = pd.DataFrame(filas8)
+
+############### RESULTADO ############################################
+print(df_principal9.head(25))
+df_principal9.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
 
 
-print(df_calldate.head(20))
-df_calldate.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
+############### FASE 9 - Construir la SALIDA a fichero EXCEL ############################################
+
+# Abrir el archivo una sola vez en modo escritura
+with open("/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.txt", "w", encoding="utf-8") as f:
+    l01 = f"mccf version: 1.0\n"
+    l02 = f"sender: Titulización de Activos\n"
+    l03 = f"phone: +34 917020808\n"
+    l04 = f"autorelease: replace\n"
+    f.write(l01)
+    f.write(l02)
+    f.write(l03)
+    f.write(l04)
+
+    for _, fila9 in df_principal9.iterrows():
+        if fila9['N4'] == 0:
+            l05 = f"new flow:\n"                        #FIJO
+            l06 = f"cusip: {fila9['ISIN']}\n"
+            l07 = f"prepay speed: {fila9['TAA']}\n"
+            l08 = f"prepay type: CPR\n"                 #FIJO
+            l09 = f"first payment date: {fila9['FIRST_DATE']}\n"
+            l10 = f"dated date: {fila9['DATED_DATE']}\n"
+            l11 = f"frequency: 04\n"                    #FIJO
+            l12 = f"call date: {fila9['CALL_DATE']}\n"
+            l13 = f"assumed collateral: no\n"           #FIJO
+            l14 = f"vectors: balances interests\n"      #FIJO
+            l15 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
+            f.write(l05)
+            f.write(l06)
+            f.write(l07)
+            f.write(l08)
+            f.write(l09)
+            f.write(l10)
+            f.write(l11)
+            f.write(l12)
+            f.write(l13)
+            f.write(l14)
+            f.write(l15)
+        else:
+            l16 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
+            f.write(l16)
