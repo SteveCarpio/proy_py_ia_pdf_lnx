@@ -267,11 +267,15 @@ df_principal5['TT2'] = df_principal5['TT2'].round(2)
 ############### FASE 5 - Eliminamos registros con ultimo valor a CERO ############################################
 
 filas5 = []
-v_tt1 = 1
-v_n4 = 1
+G = 1
+cont5 = 0
+
 for _, fila5 in df_principal5.iterrows():
 
-    if v_tt1 > 0 or v_n4 == 1:
+    cont5 = cont5 + 1
+
+    if int(fila5['N2']) == G:
+
         filas5.append({
             'N0': fila5['N0'],
             'N2': fila5['N2'],
@@ -289,12 +293,20 @@ for _, fila5 in df_principal5.iterrows():
             'TT2': fila5['TT2']
         })
 
-    v_n2 = int(fila5['N2'])
-    v_n4 = int(fila5['N4'])
-    v_tt1 = int(fila5['TT1'])
-
+        if int(fila5['TT1']) == 0:
+            if int(fila5['N2']) == 1:
+                G = 2
+            if int(fila5['N2']) == 2:
+                G = 3
+            if int(fila5['N2']) == 3:
+                G = 1
+        
 df_principal6 = pd.DataFrame(filas5)
 
+############### FASE 6 - Insertamos la ultima FECHA y creamos la columna CALL_DATE ############################################
 
-print(df_principal6.head(20))
-df_principal6.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
+df_calldate = df_principal6.loc[df_principal6.groupby(['N2', 'BONO'])['N4'].idxmax(), ['N2', 'N4', 'BONO', 'FECHA']]
+
+
+print(df_calldate.head(20))
+df_calldate.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
