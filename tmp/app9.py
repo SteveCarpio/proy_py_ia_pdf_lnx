@@ -1,17 +1,28 @@
 import pandas as pd
 import datetime
 import re
+import sys
+#from datetime import datetime
 from pandas.tseries.offsets import MonthEnd, MonthBegin, BMonthBegin, DateOffset
 
 # Mostrar todas las filas y columnas
 pd.set_option('display.max_rows', None) 
 
-# Ruta al archivo Excel en tu servidor
-ruta_excel = "/home/robot/Python/proy_py_ia_pdf_lnx/excel/TDACAM9_INFFLUJOS_ES_202509.xls"
+# Nombre del Fichero Excel
+file_excel1="TDACAM9_INFFLUJOS_ES_202509.xls"      #   OK
+file_excel2="TDAPENEDES1_INFFLUJOS_ES_202509.xls"  #   NO es igual
+file_excel3="TDACAM6_INFFLUJOS_ES_202509.xls"      #   OK, Borre una columna que estaba fuera de la columna O, aunque eso ya esta soluciondo  
+file_excel4="TDACAM11_INFFLUJOS_ES_201709_v3.xls"  #   OK, Borre columnas
 
-tipoExcel = "TDACAM9_INFFLUJOS_ES_202509.xls"
+file_excel5="TDACAM4_INFFLUJOS_ES_202509.xls"      #   
+file_excel6="SABADELL5_INFFLUJOS_ES_202509.xls"    #   
 
-if "TDACAM9_INFFLUJOS_ES" in tipoExcel:
+# Ruta del Fichero Excel
+file_excel = file_excel1
+
+
+# Creo diccionario según el tipo de file de entrada
+if "TDACAM9_INFFLUJOS_ES" in file_excel:
     dic_nomBono = [
         {'BONO': 'Bono-A1','NUM_BONOS': 100},
         {'BONO': 'Bono-A2','NUM_BONOS': 100},
@@ -22,9 +33,33 @@ if "TDACAM9_INFFLUJOS_ES" in tipoExcel:
     ]
     df_numBono = pd.DataFrame(dic_nomBono)
 
+if "TDACAM6_INFFLUJOS_ES" in file_excel:
+    dic_nomBono = [
+        {'BONO': 'Bono-A3','NUM_BONOS': 100},
+        {'BONO': 'Bono-B','NUM_BONOS': 100}
+    ]
+    df_numBono = pd.DataFrame(dic_nomBono)
+
+if "TDACAM11_INFFLUJOS_ES" in file_excel:
+    dic_nomBono = [
+        {'BONO': 'Bono-A1','NUM_BONOS': 100},
+        {'BONO': 'Bono-A2','NUM_BONOS': 100},
+        {'BONO': 'Bono-A3','NUM_BONOS': 100},
+        {'BONO': 'Bono-A4','NUM_BONOS': 100},
+        {'BONO': 'Bono-B','NUM_BONOS': 100},
+        {'BONO': 'Bono-C','NUM_BONOS': 100},
+        {'BONO': 'Bono-D','NUM_BONOS': 100}
+    ]
+    df_numBono = pd.DataFrame(dic_nomBono)
+
+
+# Ruta del Fichero Excel
+ruta_excel = f"/home/robot/Python/proy_py_ia_pdf_lnx/excel/{file_excel}"
 
 # Lee el archivo sin encabezados
 df_excel = pd.read_excel(ruta_excel, header=None, dtype=str)
+#df_excel = pd.read_excel(ruta_excel, header=None, dtype=str, usecols="A:O")  # Lee solo columnas A a O
+#df_excel  = pd.read_excel(ruta_excel, header=None, dtype=str, usecols=range(15))
 
 # Reemplaza NaN por cadena vacía en todo el DataFrame
 df_excel = df_excel.fillna('')
@@ -39,6 +74,7 @@ bonoX = ""
 contBlancos = 0
 # Recorro cada fila
 for idx, fila in df_excel.iterrows():
+    #print(f"{idx}:{fila} ")
     # Agrego cada valor de cada celda en una variable
     var_a, var_b, var_c, var_d, var_e, var_f, var_g, var_h, var_i, var_j, var_k, var_l, var_m = str(fila[0]), str(fila[1]), str(fila[2]), str(fila[3]), str(fila[4]), str(fila[5]), str(fila[6]), str(fila[7]), str(fila[8]), str(fila[9]), str(fila[10]), str(fila[11]), str(fila[12])
 
@@ -49,9 +85,17 @@ for idx, fila in df_excel.iterrows():
         taaX1 = float(df_excel.iloc[idx + 7, 3]) * 100
         taaX2 = float(df_excel.iloc[idx + 7, 5]) * 100
         taaX3 = float(df_excel.iloc[idx + 7, 7]) * 100
-        taaX4 = float(df_excel.iloc[idx + 7, 10]) * 100
-        taaX5 = float(df_excel.iloc[idx + 7, 12]) * 100
-        taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
+
+        #taaX4 = float(df_excel.iloc[idx + 7, 10]) * 100
+        #taaX5 = float(df_excel.iloc[idx + 7, 12]) * 100
+        #taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
+        valor4 = df_excel.iloc[idx + 7, 10]
+        taaX4 = float(valor4) * 100 if str(valor4).strip() != "" else 0.0
+        valor5 = df_excel.iloc[idx + 7, 12]
+        taaX5 = float(valor5) * 100 if str(valor5).strip() != "" else 0.0
+        valor6 = df_excel.iloc[idx + 7, 14]
+        taaX6 = float(valor6) * 100 if str(valor6).strip() != "" else 0.0
+
         filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
         if var_l != "":
                 filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
@@ -62,14 +106,14 @@ for idx, fila in df_excel.iterrows():
         bonoX = var_i.strip()
 
     if bonoX != "":
-        if var_c.strip() != "" and var_c.strip() != "Fecha" and var_c.strip() != "Total" and var_c.strip() != "00:00:00" and var_d != "(*)":
-            #print(f'{idx} : {bonoX} - {var_c} - {var_d} - {var_f} : {var_h} - {var_j} : {var_k} - {var_m} ')
+        if var_c.strip() != "" and var_c.strip() != "Fecha" and var_c.strip() != "Total" and var_c.strip() != "00:00:00" and var_d != "(*)" and re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", var_c):
             var_c2 = datetime.datetime.strptime(var_c, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
             filas_bono2.append([bonoX, var_c2, round(float(var_d),2), round(float(var_f),2), round(float(var_h),2), round(float(var_j),2), round(float(var_k),2), round(float(var_m),2)])
+            #print(f'{idx} : {bonoX} - {var_c} - {var_d} - {var_f} : {var_h} - {var_j} : {var_k} - {var_m} ')  
 
     if var_d == "(*)":
         filas_bono3.append([bonoX, var_f])
-
+    
     # ------- Fin del Bucle -------
     if var_c == "":
         contBlancos = contBlancos + 1
@@ -79,16 +123,19 @@ for idx, fila in df_excel.iterrows():
     else:
         contBlancos = 0
 
+
+
 ############### FASE 1 - Tratamiento de los datos de Bonos ############################################
 
 ### TRATAMIENTO DATAFRAME: BONO1
 df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
 df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
 df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
-
+print(df_bono1_union)
 
 ### TRATAMIENTO DATAFRAME: BONO2
 df_bono2 = pd.DataFrame(filas_bono2, columns=['BONO', 'FECHA', 'AP_1', 'IB_1', 'AP_2', 'IB_2', 'AP_3', 'IB_3'])
+print(df_bono2.head(10))
 
 ### TRATAMIENTO DATAFRAME: BONO3 --> INTERES BRUTO
 df_bono3 = pd.DataFrame(filas_bono3, columns=['BONO', 'INT_BRUTO'])
@@ -395,7 +442,7 @@ for _, fila8 in df_principal8.iterrows():
 df_principal9 = pd.DataFrame(filas8)
 
 ############### RESULTADO ############################################
-print(df_principal9.head(25))
+print(df_principal9.head(10))
 df_principal9.to_excel('/home/robot/Python/proy_py_ia_pdf_lnx/tmp/a_R3.xlsx', sheet_name='hoja1', index=False)
 
 
