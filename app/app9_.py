@@ -569,10 +569,9 @@ def main():
 
                     st.success("✅ Resultado Excel: Datos Procesados")
 
-                    with st.expander("📄 Ver el resumen de los datos procesados"):
+                    with st.expander("📄 Datos procesados"):
                         st.write(df_principal9)
-                    
-                    '''
+
                     # Crear buffer en memoria
                     output = io.BytesIO()
                     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -586,9 +585,8 @@ def main():
                         file_name=f"{file_name_sin_extension}_SALIDA.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
-                    '''
 
-                    st.success("✅ Resultado Txt: Flujos Bloomberg")
+                    #st.success("✅ Resultado Txt: Flujos Bloomberg")
                     
                     # Guardar contenido del TXT en session_state
                     try:
@@ -603,18 +601,39 @@ def main():
             # ================================================
             # MOSTRAR Y DESCARGAR RESULTADOS
             # ================================================
+            '''
             if "contenido_txt" in st.session_state:
                 # Mostrar en expander
-                with st.expander("📄 Ver el contenido del fichero que se cargará en los flujos de Bloomberg"):
+                with st.expander("📄 Ver contenido del archivo TXT"):
                     st.text_area("Contenido del archivo:", st.session_state["contenido_txt"], height=300)
 
                 # Botón de descarga
                 st.download_button(
-                    label=f"💾 Descargar Flujos Bloomberg: {file_name_sin_extension}.txt",
+                    label="💾 Descargar resultado como TXT",
                     data=st.session_state["contenido_txt"],
                     file_name=st.session_state["file_name_salida"],
                     mime="text/plain"
                 )
+            '''
+            # ===========================
+            # MOSTRAR RESULTADOS
+            # ===========================
+            if st.session_state.get("proceso_completado"):
+                st.success("✅ Proceso completado")  # Mensaje de éxito
+
+                # Mostrar contenido TXT
+                with st.expander("📄 Ver contenido del archivo TXT"):
+                    st.text_area("Contenido del archivo:", st.session_state["contenido_txt"], height=300)
+
+                # Botón de descarga
+                st.download_button(
+                    label="💾 Descargar resultado como TXT",
+                    data=st.session_state["contenido_txt"],
+                    file_name=st.session_state["file_name_salida"],
+                    mime="text/plain"
+                )
+
+
 
 if __name__ == "__main__":
 

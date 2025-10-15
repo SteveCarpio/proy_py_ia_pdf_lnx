@@ -47,12 +47,17 @@ def main():
     # ================================================
 
     ##########################
-    def procesar_datos2(df_excel: pd.DataFrame, dic_nomBono_actualizado: list):
+    def procesar_datos2(df_excel: pd.DataFrame, dic_nomBono_actualizado: list, file_name_sin_extension: str):
         import datetime
         import re
         from pandas.tseries.offsets import MonthEnd, MonthBegin, BMonthBegin, DateOffset
 
-        # Crea el dataFrame de numBonos
+        st.success("✅ Procesando datos...")
+        
+        #st.write(f"Filas en Excel: {len(df_excel)}")
+        #st.write("Diccionario recibido...:")
+        #st.json(dic_nomBono_actualizado)
+
         df_numBono = pd.DataFrame(dic_nomBono_actualizado)
 
         # Reemplaza NaN por cadena vacía en todo el DataFrame
@@ -482,8 +487,6 @@ def main():
                     l16 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
                     f.write(l16)
         
-
-        '''
         # Mostrar DataFrame resultado
         with st.expander("📄 Datos procesados"):
             st.write(df_principal9)
@@ -501,9 +504,9 @@ def main():
             file_name=f"{file_name_sin_extension}_SALIDA.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-        '''
 
-        return rutaSalida, fileSalida, df_principal9
+
+        return rutaSalida, fileSalida
 
 
     # ================================================
@@ -565,30 +568,8 @@ def main():
             if st.sidebar.button("🔄 Procesar datos"):
                 if df_excel is not None:
                     # Procesar el archivo
-                    rutaSalida, fileSalida, df_principal9 = procesar_datos2(df_excel, dic_nomBono_actualizado)
-
-                    st.success("✅ Resultado Excel: Datos Procesados")
-
-                    with st.expander("📄 Ver el resumen de los datos procesados"):
-                        st.write(df_principal9)
-                    
-                    '''
-                    # Crear buffer en memoria
-                    output = io.BytesIO()
-                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                        df_principal9.to_excel(writer, index=False, sheet_name="Sheet1")
-                    output.seek(0)
-
-                    # Botón de descarga como Excel
-                    st.download_button(
-                        label="💾 Descargar Excel",
-                        data=output,
-                        file_name=f"{file_name_sin_extension}_SALIDA.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                    '''
-
-                    st.success("✅ Resultado Txt: Flujos Bloomberg")
+                    rutaSalida, fileSalida = procesar_datos2(df_excel, dic_nomBono_actualizado, file_name_sin_extension)
+                    st.success("✅ Proceso completado")
                     
                     # Guardar contenido del TXT en session_state
                     try:
@@ -605,12 +586,12 @@ def main():
             # ================================================
             if "contenido_txt" in st.session_state:
                 # Mostrar en expander
-                with st.expander("📄 Ver el contenido del fichero que se cargará en los flujos de Bloomberg"):
+                with st.expander("📄 Ver contenido del archivo TXT"):
                     st.text_area("Contenido del archivo:", st.session_state["contenido_txt"], height=300)
 
                 # Botón de descarga
                 st.download_button(
-                    label=f"💾 Descargar Flujos Bloomberg: {file_name_sin_extension}.txt",
+                    label="💾 Descargar resultado como TXT",
                     data=st.session_state["contenido_txt"],
                     file_name=st.session_state["file_name_salida"],
                     mime="text/plain"
