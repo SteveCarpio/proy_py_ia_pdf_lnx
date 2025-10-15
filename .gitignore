@@ -16,3 +16,5 @@ data/
 *.png
 *.mp3
 *.xxx
+*.xls
+*xlsx
