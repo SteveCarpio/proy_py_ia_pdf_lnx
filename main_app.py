@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app0, app1, app2, app3, app4, app5, app6, app7, app8
+from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9
 import gc
 
 # Configuración
@@ -35,7 +35,8 @@ WS_APPS = {
 # Diccionario Reporting
 RP_APPS = {
     "1 - Eventos Relevantes": app7,
-    "2 - Estados Financieros": app0
+    "2 - Estados Financieros": app0,
+    "3 - Flujos Bloomberg": app9
 }
 
 # Gestor de Proyectos
@@ -188,14 +189,14 @@ def mostrar_inicio():
         st.subheader(" ")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1"> </p>
+        <p class="small-text1">  </p>
         """, unsafe_allow_html=True)
 
     with cols[2]:
-        st.subheader(" ")
+        st.subheader("Flujos Bloomberg")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1"> </p>
+        <p class="small-text1">Extrae y procesa los flujos de Sabadell que se encuentran en archivos Excel y los convierte en archivos TXT compatibles con Bloomberg.</p>
         """, unsafe_allow_html=True)
 
     #############################################################################################################
