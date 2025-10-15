@@ -2,7 +2,6 @@ import pandas as pd
 import datetime
 import re
 import sys
-#from datetime import datetime
 from pandas.tseries.offsets import MonthEnd, MonthBegin, BMonthBegin, DateOffset
 
 # Mostrar todas las filas y columnas
@@ -11,16 +10,14 @@ pd.set_option('display.max_rows', None)
 # Nombre del Fichero Excel
 file_excel1="TDACAM9_INFFLUJOS_ES_202509.xls"      #   OK
 file_excel2="TDAPENEDES1_INFFLUJOS_ES_202509.xls"  #   NO es igual
-file_excel3="TDACAM6_INFFLUJOS_ES_202509.xls"      #   OK, Borre una columna que estaba fuera de la columna O, aunque eso ya esta soluciondo  
+file_excel3="TDACAM6_INFFLUJOS_ES_202509.xls"      #   OK, Borre una columna que estaba fuera de la columna O  
 file_excel4="TDACAM11_INFFLUJOS_ES_201709_v3.xls"  #   OK, Borre columnas
-
 file_excel5="TDACAM4_INFFLUJOS_ES_202509_v2.xls"   #   
-
 file_excel6="SABADELL5_INFFLUJOS_ES_202509.xls"    #   
 
 # Ruta del Fichero Excel
-file_excel = file_excel5
-
+file_excel = file_excel1
+ruta_excel = f"/home/robot/Python/proy_py_ia_pdf_lnx/excel/{file_excel}"
 
 # Creo diccionario según el tipo de file de entrada
 if "TDACAM9_INFFLUJOS_ES" in file_excel:
@@ -56,13 +53,12 @@ if "TDACAM11_INFFLUJOS_ES" in file_excel:
 
 if "TDACAM4_INFFLUJOS_ES" in file_excel:
     dic_nomBono = [
-       #{'BONO': 'Bono-A','NUM_BONOS': 100},
         {'BONO': 'Bono-B','NUM_BONOS': 100}
     ]
     df_numBono = pd.DataFrame(dic_nomBono)
 
-# Ruta del Fichero Excel
-ruta_excel = f"/home/robot/Python/proy_py_ia_pdf_lnx/excel/{file_excel}"
+
+############################################################################################################
 
 # Lee el archivo sin encabezados
 df_excel = pd.read_excel(ruta_excel, header=None, dtype=str)

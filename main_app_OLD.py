@@ -250,71 +250,65 @@ def mostrar_inicio():
 # LÓGICA PRINCIPAL
 # ----------------------------------
 
-# Inicializar variable de sesión
+# Inicializar la variable de sesión si no existe
 if "selected_app_key" not in st.session_state:
     st.session_state.selected_app_key = None
 
-# Siempre mostrar botón "Ir a Inicio"
+# Botón para volver al inicio
 if st.sidebar.button("🏠 Ir a Inicio"):
     st.session_state.selected_app_key = None
     st.rerun()
 
-# Si NO hay app seleccionada → mostrar los expanders
-if st.session_state.selected_app_key is None:
+# Botones para IA
+with st.sidebar.expander("🤖 Inteligencia Artificial"):
+    for name in IA_APPS:
+        if st.button(name, key=f"btn_ia_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()
 
-    # Botones para IA
-    with st.sidebar.expander("🤖 Inteligencia Artificial"):
-        for name in IA_APPS:
-            if st.button(name, key=f"btn_ia_{name}"):
-                st.session_state.selected_app_key = name
-                st.rerun()
+# Botones para Data Science
+with st.sidebar.expander("🔬 Data Science"):
+    for name in DS_APPS:
+        if st.button(name, key=f"btn_ds_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()
 
-    # Botones para Data Science
-    with st.sidebar.expander("🔬 Data Science"):
-        for name in DS_APPS:
-            if st.button(name, key=f"btn_ds_{name}"):
-                st.session_state.selected_app_key = name
-                st.rerun()
+# Botones para Web Scraping
+with st.sidebar.expander("🌐 Web Scraping"):
+    for name in WS_APPS:
+        if st.button(name, key=f"btn_ws_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()
 
-    # Botones para Web Scraping
-    with st.sidebar.expander("🌐 Web Scraping"):
-        for name in WS_APPS:
-            if st.button(name, key=f"btn_ws_{name}"):
-                st.session_state.selected_app_key = name
-                st.rerun()
+# Botones para Reporting
+with st.sidebar.expander("📈 Reporting"):
+    for name in RP_APPS:
+        if st.button(name, key=f"btn_rp_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()
 
-    # Botones para Reporting
-    with st.sidebar.expander("📈 Reporting"):
-        for name in RP_APPS:
-            if st.button(name, key=f"btn_rp_{name}"):
-                st.session_state.selected_app_key = name
-                st.rerun()
-
-    # Botones para Gestor de Proyectos
-    with st.sidebar.expander("📁 Gestor Proyectos"):
-        for name in GP_APPS:
-            if st.button(name, key=f"btn_gp_{name}"):
-                st.session_state.selected_app_key = name
-                st.rerun()
+# Botones para Gestor de Proyectos
+with st.sidebar.expander("📁 Gestor Proyectos"):
+    for name in GP_APPS:
+        if st.button(name, key=f"btn_rp_{name}"):
+            st.session_state.selected_app_key = name
+            st.rerun()       
 
 
-# Si hay una app seleccionada → mostrar solo esa app
+# Mostrar la app seleccionada
 if st.session_state.selected_app_key:
-    key = st.session_state.selected_app_key
-    if key in IA_APPS:
-        IA_APPS[key].main()
-    elif key in DS_APPS:
-        DS_APPS[key].main()
-    elif key in RP_APPS:
-        RP_APPS[key].main()
-    elif key in WS_APPS:
-        WS_APPS[key].main()
-    elif key in GP_APPS:
-        GP_APPS[key].main()
+    if st.session_state.selected_app_key in IA_APPS:
+        IA_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in DS_APPS:
+        DS_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in RP_APPS:
+        RP_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in WS_APPS:
+        WS_APPS[st.session_state.selected_app_key].main()
+    elif st.session_state.selected_app_key in GP_APPS:
+        GP_APPS[st.session_state.selected_app_key].main()
 
-    # Limpieza de memoria
+    # Limpia GarbageCollector    
     gc.collect()
-
 else:
-    # Mostrar la página de inicio
     mostrar_inicio()
