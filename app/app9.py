@@ -510,8 +510,10 @@ def main():
     # INTERFAZ STREAMLIT
     # ================================================
 
-    st.title("📊 Flujos Bloomberg")
+    st.title("📈 Carga de flujos de Sabadell para Bloomberg")
     st.caption("Aplicación de automatización que extrae y procesa los flujos de Sabadell que se encuentran en archivos Excel y los convierte en archivos TXT totalmente compatibles con Bloomberg.")
+
+    st.sidebar.subheader("📈 : Flujos Bloomberg")
 
     # Subir fichero
     file_excel = st.sidebar.file_uploader("📁 Sube un fichero Excel", type=["xls", "xlsx"])
