@@ -192,20 +192,34 @@ def main():
             var_a, var_b, var_c, var_d, var_e, var_f, var_g, var_h, var_i, var_j, var_k, var_l, var_m = str(fila[0]), str(fila[1]), str(fila[2]), str(fila[3]), str(fila[4]), str(fila[5]), str(fila[6]), str(fila[7]), str(fila[8]), str(fila[9]), str(fila[10]), str(fila[11]), str(fila[12])
 
             ############## Creo la LISTA de [ BONOS ] 
-            if "Bono" in var_e:
+            #if "Bono" in var_e:
+            if "Bono" in var_e or "Serie" in var_e: 
                 isinX1 = df_excel.iloc[idx + 3, 3]
                 isinX2 = df_excel.iloc[idx + 3, 10]
-                taaX1 = float(df_excel.iloc[idx + 7, 3]) * 100
-                taaX2 = float(df_excel.iloc[idx + 7, 5]) * 100
-                taaX3 = float(df_excel.iloc[idx + 7, 7]) * 100
 
+                
+                #taaX1 = float(df_excel.iloc[idx + 7, 3]) * 100
+                #taaX2 = float(df_excel.iloc[idx + 7, 5]) * 100
+                #taaX3 = float(df_excel.iloc[idx + 7, 7]) * 100
                 #taaX4 = float(df_excel.iloc[idx + 7, 10]) * 100
                 #taaX5 = float(df_excel.iloc[idx + 7, 12]) * 100
                 #taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
+
+                valor1 = df_excel.iloc[idx + 7, 3]
+                taaX1 = float(valor1) * 100 if str(valor1).strip() != "" else 0.0
+
+                valor2 = df_excel.iloc[idx + 7, 5]
+                taaX2 = float(valor2) * 100 if str(valor2).strip() != "" else 0.0
+
+                valor3 = df_excel.iloc[idx + 7, 7]
+                taaX3 = float(valor3) * 100 if str(valor3).strip() != "" else 0.0
+
                 valor4 = df_excel.iloc[idx + 7, 10]
                 taaX4 = float(valor4) * 100 if str(valor4).strip() != "" else 0.0
+                
                 valor5 = df_excel.iloc[idx + 7, 12]
                 taaX5 = float(valor5) * 100 if str(valor5).strip() != "" else 0.0
+                
                 valor6 = df_excel.iloc[idx + 7, 14]
                 taaX6 = float(valor6) * 100 if str(valor6).strip() != "" else 0.0
 
@@ -215,7 +229,8 @@ def main():
             
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
-            if "Bono" in var_i:
+            #if "Bono" in var_i:
+            if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
 
             if bonoX != "":
