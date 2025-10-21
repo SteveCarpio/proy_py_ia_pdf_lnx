@@ -3,6 +3,7 @@ import streamlit as st
 def main():
     import pandas as pd
     import io
+    import sys
 
     list_flujos = [
         'ParaQueEmpieceDesdeEl_01',
@@ -33,9 +34,9 @@ def main():
 
         if list_flujos[1] in file_name:
             dic_nomBono = [
-                {'BONO': 'Bono-B','NUM_BONOS': 100},
-                {'BONO': 'Bono-C','NUM_BONOS': 200},
-                {'BONO': 'Bono-D','NUM_BONOS': 300}
+                {'BONO': 'Bono B','NUM_BONOS': 100},
+                {'BONO': 'Bono C','NUM_BONOS': 200},
+                {'BONO': 'Bono D','NUM_BONOS': 300}
             ]
 
         elif list_flujos[2] in file_name:
@@ -192,8 +193,8 @@ def main():
             var_a, var_b, var_c, var_d, var_e, var_f, var_g, var_h, var_i, var_j, var_k, var_l, var_m = str(fila[0]), str(fila[1]), str(fila[2]), str(fila[3]), str(fila[4]), str(fila[5]), str(fila[6]), str(fila[7]), str(fila[8]), str(fila[9]), str(fila[10]), str(fila[11]), str(fila[12])
 
             ############## Creo la LISTA de [ BONOS ] 
-            #if "Bono" in var_e:
-            if "Bono" in var_e or "Serie" in var_e: 
+            if "Bono" in var_e:
+            #if "Bono" in var_e or "Serie" in var_e: 
                 isinX1 = df_excel.iloc[idx + 3, 3]
                 isinX2 = df_excel.iloc[idx + 3, 10]
 
@@ -226,21 +227,23 @@ def main():
                 filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
                 if var_l != "":
                         filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
-            
+                #st.write(filas_bono1)     #  DEBUG
+
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
-            #if "Bono" in var_i:
-            if "Bono" in var_i or "Serie" in var_i:
+            if "Bono" in var_i:
+            #if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
 
             if bonoX != "":
                 if var_c.strip() != "" and var_c.strip() != "Fecha" and var_c.strip() != "Total" and var_c.strip() != "00:00:00" and var_d != "(*)" and re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", var_c):
                     var_c2 = datetime.datetime.strptime(var_c, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
                     filas_bono2.append([bonoX, var_c2, round(float(var_d),2), round(float(var_f),2), round(float(var_h),2), round(float(var_j),2), round(float(var_k),2), round(float(var_m),2)])
-                    #print(f'{idx} : {bonoX} - {var_c} - {var_d} - {var_f} : {var_h} - {var_j} : {var_k} - {var_m} ')  
+                    #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} - {var_f} | {var_h} - {var_j} | {var_k} - {var_m} ')        #  DEBUG
 
             if var_d == "(*)":
                 filas_bono3.append([bonoX, var_f])
+                #st.write(filas_bono3)     #  DEBUG
             
             # ------- Fin del Bucle -------
             if var_c == "":
@@ -255,9 +258,10 @@ def main():
 
         ### TRATAMIENTO DATAFRAME: BONO1
         df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
+        #st.write(filas_bono1)       #  DEBUG
         df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
         df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
-        print(df_bono1_union)
+        #st.write(df_bono1_union)    #  DEBUG
 
         ### TRATAMIENTO DATAFRAME: BONO2
         df_bono2 = pd.DataFrame(filas_bono2, columns=['BONO', 'FECHA', 'AP_1', 'IB_1', 'AP_2', 'IB_2', 'AP_3', 'IB_3'])
@@ -688,6 +692,7 @@ def main():
 
             # Tabla editable
             st.caption(f"*** Opcional: Edita el campo (NUM_BONOS) si es necesario para tratar el fichero: {file_name_sin_extension}.xls")
+            st.caption(f"*** Importante: Comprobar que el nombre del campo BONO este igual en el excel, ejm: '**Bono A**' no es igual que '**Bono-A**'")
             edited_df = st.data_editor(
                 df_nomBono,
                 num_rows="fixed",
