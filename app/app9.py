@@ -1,28 +1,29 @@
 import streamlit as st
 
 def main():
+    import plotly.express as px
     import pandas as pd
     import io
     import sys
 
     list_flujos = [
         'ParaQueEmpieceDesdeEl_01',
-        'FTPYMETDACAM4_INFFLUJOS_ES',     # 01 - (Bono-B   , Bono-C   , Bono-D                                                    )
-        'PENEDESFTGENCAT1_INFFLUJOS_ES',  # 02 - (Bono-C                                                                          )
-        'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          )
-        'SABADELL5_INFFLUJOS_ES',         # 04 - (Bono-A   , Bono-B                                                               )
-        'SCFAUTOS_INFFLUJOS_ES',          # 05 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      )
-        'SCFAUTOS_2_INFFLUJOS_ES',        # 06 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      )
-        'TDA26_INFFLUJOS_ES',             # 07 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C)
-        'TDA29_INFFLUJOS_ES',             # 08 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               )
-        'TDACAM4_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               )
-        'TDACAM5_INFFLUJOS_ES',           # 10 - (Bono-A   , Bono-B                                                               )
-        'TDACAM6_INFFLUJOS_ES',           # 11 - (Bono-A3  , Bono-B                                                               )
-        'TDACAM7_INFFLUJOS_ES',           # 12 - (Bono-A2  , Bono-A3  , Bono-B                                                    )
-        'TDACAM8_INFFLUJOS_ES',           # 13 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          )
-        'TDACAM9_INFFLUJOS_ES',           # 14 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      )
-        'TDACAM11_INFFLUJOS_ES',          # 15 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-A4 , Bono-B  , Bono-C  , Bono-D            )
-        'TDAPENEDES1_INFFLUJOS_ES'        # 16 - (Bono-A   , Bono-B   , Bono-C                                                    )
+        'FTPYMETDACAM4_INFFLUJOS_ES',     # 01 - (Bono-B   , Bono-C   , Bono-D                                                    ) pyme_cam4_web0925.xls
+        'PENEDESFTGENCAT1_INFFLUJOS_ES',  # 02 - (Bono-C                                                                          ) PENEDES FTGENCAT 1_web0925.xls
+        'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          ) CAIXA_PENEDES_PYMES1_web0925.xls
+        'SABADELL5_INFFLUJOS_ES',         # 04 - (Bono-A   , Bono-B                                                               ) SABADELL5_web0925.xls
+        'SCFAUTOS_INFFLUJOS_ES',          # 05 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) SCFAUTOS_web0925.xls 
+        'SCFAUTOS_2_INFFLUJOS_ES',        # 06 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) 
+        'TDA26_INFFLUJOS_ES',             # 07 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) 
+        'TDA29_INFFLUJOS_ES',             # 08 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) 
+        'TDACAM4_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               ) 
+        'TDACAM5_INFFLUJOS_ES',           # 10 - (Bono-A   , Bono-B                                                               ) 
+        'TDACAM6_INFFLUJOS_ES',           # 11 - (Bono-A3  , Bono-B                                                               ) 
+        'TDACAM7_INFFLUJOS_ES',           # 12 - (Bono-A2  , Bono-A3  , Bono-B                                                    ) 
+        'TDACAM8_INFFLUJOS_ES',           # 13 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          ) 
+        'TDACAM9_INFFLUJOS_ES',           # 14 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      ) 
+        'TDACAM11_INFFLUJOS_ES',          # 15 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-A4 , Bono-B  , Bono-C  , Bono-D            ) 
+        'TDAPENEDES1_INFFLUJOS_ES'        # 16 - (Bono-A   , Bono-B   , Bono-C                                                    ) 
         ]
 
     # ================================================
@@ -51,8 +52,8 @@ def main():
 
         elif list_flujos[4] in file_name:
             dic_nomBono = [
-                {'BONO': 'Bono A','NUM_BONOS': 100},
-                {'BONO': 'Bono B','NUM_BONOS': 200}
+                {'BONO': 'Bono-A','NUM_BONOS': 100},
+                {'BONO': 'Bono-B','NUM_BONOS': 200}
             ]
 
         elif list_flujos[5] in file_name:
@@ -188,17 +189,19 @@ def main():
         contBlancos = 0
         # Recorro cada fila
         for idx, fila in df_excel.iterrows():
-            #print(f"{idx}:{fila} ")
+            #st.write(f"{idx}:{fila}XXX")     #  DEBUG
             # Agrego cada valor de cada celda en una variable
             var_a, var_b, var_c, var_d, var_e, var_f, var_g, var_h, var_i, var_j, var_k, var_l, var_m = str(fila[0]), str(fila[1]), str(fila[2]), str(fila[3]), str(fila[4]), str(fila[5]), str(fila[6]), str(fila[7]), str(fila[8]), str(fila[9]), str(fila[10]), str(fila[11]), str(fila[12])
+            #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
 
             ############## Creo la LISTA de [ BONOS ] 
             if "Bono" in var_e:
             #if "Bono" in var_e or "Serie" in var_e: 
+                #st.write(f'{idx} : {var_e} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
+
                 isinX1 = df_excel.iloc[idx + 3, 3]
                 isinX2 = df_excel.iloc[idx + 3, 10]
 
-                
                 #taaX1 = float(df_excel.iloc[idx + 7, 3]) * 100
                 #taaX2 = float(df_excel.iloc[idx + 7, 5]) * 100
                 #taaX3 = float(df_excel.iloc[idx + 7, 7]) * 100
@@ -207,22 +210,22 @@ def main():
                 #taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
 
                 valor1 = df_excel.iloc[idx + 7, 3]
-                taaX1 = float(valor1) * 100 if str(valor1).strip() != "" else 0.0
+                taaX1 = float(valor1) * 100 if str(valor1).strip() not in ("", "-") else 0.0
 
                 valor2 = df_excel.iloc[idx + 7, 5]
-                taaX2 = float(valor2) * 100 if str(valor2).strip() != "" else 0.0
+                taaX2 = float(valor2) * 100 if str(valor2).strip() not in ("", "-") else 0.0
 
                 valor3 = df_excel.iloc[idx + 7, 7]
-                taaX3 = float(valor3) * 100 if str(valor3).strip() != "" else 0.0
+                taaX3 = float(valor3) * 100 if str(valor3).strip() not in ("", "-") else 0.0
 
                 valor4 = df_excel.iloc[idx + 7, 10]
-                taaX4 = float(valor4) * 100 if str(valor4).strip() != "" else 0.0
+                taaX4 = float(valor4) * 100 if str(valor4).strip() not in ("", "-") else 0.0
                 
                 valor5 = df_excel.iloc[idx + 7, 12]
-                taaX5 = float(valor5) * 100 if str(valor5).strip() != "" else 0.0
+                taaX5 = float(valor5) * 100 if str(valor5).strip() not in ("", "-") else 0.0
                 
                 valor6 = df_excel.iloc[idx + 7, 14]
-                taaX6 = float(valor6) * 100 if str(valor6).strip() != "" else 0.0
+                taaX6 = float(valor6) * 100 if str(valor6).strip() not in ("", "-") else 0.0
 
                 filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
                 if var_l != "":
@@ -234,8 +237,10 @@ def main():
             if "Bono" in var_i:
             #if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
+                #st.write(bonoX)   #  DEBUG
 
             if bonoX != "":
+                #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
                 if var_c.strip() != "" and var_c.strip() != "Fecha" and var_c.strip() != "Total" and var_c.strip() != "00:00:00" and var_d != "(*)" and re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", var_c):
                     var_c2 = datetime.datetime.strptime(var_c, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
                     filas_bono2.append([bonoX, var_c2, round(float(var_d),2), round(float(var_f),2), round(float(var_h),2), round(float(var_j),2), round(float(var_k),2), round(float(var_m),2)])
@@ -258,7 +263,6 @@ def main():
 
         ### TRATAMIENTO DATAFRAME: BONO1
         df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
-        #st.write(filas_bono1)       #  DEBUG
         df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
         df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
         #st.write(df_bono1_union)    #  DEBUG
@@ -274,10 +278,11 @@ def main():
         ### UNION BONO1 y BONO3: Agregar a la tabla bono1 el campo Ineres Bruto
         df_bono3_union = pd.merge(df_bono3, df_bono1_union, on='BONO')
 
+        #st.write(df_bono3_union.to_html(index=False), unsafe_allow_html=True)
+
         ### UNION DATAFRAME BONO1 y BONO2
         df_union1 = pd.merge(df_bono3_union, df_bono2, on='BONO')
         df_union1 = df_union1.reindex(columns=['N0', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'AP_1', 'IB_1', 'TAA_2', 'AP_2', 'IB_2', 'TAA_3', 'AP_3', 'IB_3'])
-
 
         ############### FASE 2 - Crear Toales ############################################
 
@@ -296,6 +301,9 @@ def main():
         ### ORDENAR CAMPOS
         df_principal1 = df_principal1.reindex(columns=['N0', 'N1', 'BONO', 'FECHA', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'AP_1', 'IB_1', 'T_AP_1', 'TAA_2', 'AP_2', 'IB_2', 'T_AP_2', 'TAA_3', 'AP_3', 'IB_3', 'T_AP_3'])
 
+        ### CREAR TABLA y GRAFICO PARA PRESENTARLA SOLO EN STREAMLIT
+        df_cuadro_bonos = pd.merge(df_bono2_totales, df_bono3_union, on='BONO')
+        df_cuadro_bonos = df_cuadro_bonos.reindex(columns=['BONO', 'ISIN', 'NUM_BONOS', 'INT_BRUTO', 'TAA_1', 'T_AP_1', 'TAA_2', 'T_AP_2', 'TAA_3', 'T_AP_3'])
 
         ############### FASE 3 - Desagrupar grupos de Importes 1, 2 y 3 y agruparos en una sola tabla ############################################
 
@@ -641,7 +649,7 @@ def main():
         )
         '''
 
-        return rutaSalida, fileSalida, df_principal9
+        return rutaSalida, fileSalida, df_principal9, df_cuadro_bonos
 
 
     # ================================================
@@ -657,6 +665,7 @@ def main():
     file_excel = st.sidebar.file_uploader("📁 Sube un fichero Excel", type=["xls", "xlsx"])
 
     # Mostrar lista de Excel Activos
+    st.info(" Carga de parámetros")
     with st.expander("📄 Lista de ficheros excel de 'Flujos' activos en la Aplicación:"):
         df_lstFlujos = pd.DataFrame(list_flujos, columns=['Excel'])
         df_lstFlujos.drop(index=0, inplace=True)   # Borrra el primer registro
@@ -691,13 +700,14 @@ def main():
                 df_nomBono = df_nomBono[~df_nomBono["BONO"].isin(bonos_to_remove)]
 
             # Tabla editable
-            st.caption(f"*** Opcional: Edita el campo (NUM_BONOS) si es necesario para tratar el fichero: {file_name_sin_extension}.xls")
-            st.caption(f"*** Importante: Comprobar que el nombre del campo BONO este igual en el excel, ejm: '**Bono A**' no es igual que '**Bono-A**'")
-            edited_df = st.data_editor(
-                df_nomBono,
-                num_rows="fixed",
-                key="editor_nomBono"
-            )
+            #st.caption(f"*** Opcional: Edita el campo (NUM_BONOS) si es necesario para tratar el fichero: {file_name_sin_extension}.xls")
+            #st.caption(f"*** Importante: Comprobar que el nombre del campo BONO este igual en el excel, ejm: '**Bono A**' no es igual que '**Bono-A**'")
+            with st.expander("📄 Modificar Número de Bonos"):
+                edited_df = st.data_editor(
+                    df_nomBono,
+                    num_rows="fixed",
+                    key="editor_nomBono"
+                )
 
             dic_nomBono_actualizado = edited_df.to_dict(orient="records")
 
@@ -714,29 +724,34 @@ def main():
             if st.sidebar.button("🔄 Procesar datos"):
                 if df_excel is not None:
                     # Procesar el archivo
-                    rutaSalida, fileSalida, df_principal9 = procesar_datos2(df_excel, dic_nomBono_actualizado)
+                    rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
 
+                    ####################################
                     st.success("✅ Resultado Excel: Datos Procesados")
 
+                    df = df_cuadro_bonos
+                    fig = px.bar(df, x='BONO', y=['T_AP_1', 'T_AP_2', 'T_AP_3'], barmode='group')
+                    fig.update_layout(height=400)
+
+                    col1, col2 = st.columns([1, 1])
+
+                    with col1:
+                        # caja con align-items:center para centrar verticalmente
+                        st.markdown(
+                            f"""<div style="height:400px; display:flex; align-items:center;">
+                                    <div style="width:100%;">{df.to_html(index=False)}</div>
+                                </div>""",
+                            unsafe_allow_html=True,
+                        )
+
+                    with col2:
+                        st.plotly_chart(fig, use_container_width=True)
+                
                     with st.expander("📄 Ver el resumen de los datos procesados"):
                         st.write(df_principal9)
-                    
-                    '''
-                    # Crear buffer en memoria
-                    output = io.BytesIO()
-                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                        df_principal9.to_excel(writer, index=False, sheet_name="Sheet1")
-                    output.seek(0)
 
-                    # Botón de descarga como Excel
-                    st.download_button(
-                        label="💾 Descargar Excel",
-                        data=output,
-                        file_name=f"{file_name_sin_extension}_SALIDA.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                    '''
 
+                    ####################################
                     st.success("✅ Resultado Txt: Flujos Bloomberg")
                     
                     # Guardar contenido del TXT en session_state
@@ -748,6 +763,8 @@ def main():
                         st.error(f"No se pudo leer el archivo generado: {e}")
                 else:
                     st.error("❌ No se ha podido leer el Excel correctamente.")
+
+
 
             # ================================================
             # MOSTRAR Y DESCARGAR RESULTADOS
