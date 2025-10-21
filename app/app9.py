@@ -13,12 +13,12 @@ def main():
         'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          ) CAIXA_PENEDES_PYMES1_web0925.xls
         'SABADELL5_INFFLUJOS_ES',         # 04 - (Bono-A   , Bono-B                                                               ) SABADELL5_web0925.xls
         'SCFAUTOS_INFFLUJOS_ES',          # 05 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) SCFAUTOS_web0925.xls 
-        'SCFAUTOS_2_INFFLUJOS_ES',        # 06 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) 
-        'TDA26_INFFLUJOS_ES',             # 07 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) 
-        'TDA29_INFFLUJOS_ES',             # 08 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) 
-        'TDACAM4_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               ) 
-        'TDACAM5_INFFLUJOS_ES',           # 10 - (Bono-A   , Bono-B                                                               ) 
-        'TDACAM6_INFFLUJOS_ES',           # 11 - (Bono-A3  , Bono-B                                                               ) 
+        'SCFAUTOS_2_INFFLUJOS_ES',        # 06 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) none
+        'TDA26_INFFLUJOS_ES',             # 07 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) TDA26_web0925.xls
+        'TDA29_INFFLUJOS_ES',             # 08 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) tda29_web0925.xls
+        'TDACAM4_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               ) TDACAM4_web1025.xls
+        'TDACAM5_INFFLUJOS_ES',           # 10 - (Bono-A   , Bono-B                                                               ) TDACAM5_web0925.xls
+        'TDACAM6_INFFLUJOS_ES',           # 11 - (Bono-A3  , Bono-B                                                               ) TDACAM6_web0925.xls
         'TDACAM7_INFFLUJOS_ES',           # 12 - (Bono-A2  , Bono-A3  , Bono-B                                                    ) 
         'TDACAM8_INFFLUJOS_ES',           # 13 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          ) 
         'TDACAM9_INFFLUJOS_ES',           # 14 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      ) 
@@ -195,8 +195,8 @@ def main():
             #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
 
             ############## Creo la LISTA de [ BONOS ] 
-            if "Bono" in var_e:
-            #if "Bono" in var_e or "Serie" in var_e: 
+            #if "Bono" in var_e:
+            if "Bono" in var_e or "Serie" in var_e: 
                 #st.write(f'{idx} : {var_e} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
 
                 isinX1 = df_excel.iloc[idx + 3, 3]
@@ -234,8 +234,8 @@ def main():
 
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
-            if "Bono" in var_i:
-            #if "Bono" in var_i or "Serie" in var_i:
+            #if "Bono" in var_i:
+            if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
                 #st.write(bonoX)   #  DEBUG
 
@@ -580,7 +580,7 @@ def main():
         df_principal9 = pd.DataFrame(filas8)
 
         ############### RESULTADO ############################################
-        print(df_principal9.head(10))
+        #print(df_principal9.head(10))
         rutaSalida="/home/robot/Python/proy_py_ia_pdf_lnx/tmp/"
         fileSalida="FLUJOS_BLOOMBERG"
 
@@ -627,27 +627,6 @@ def main():
                 else:
                     l16 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
                     f.write(l16)
-        
-
-        '''
-        # Mostrar DataFrame resultado
-        with st.expander("📄 Datos procesados"):
-            st.write(df_principal9)
-
-        # Crear buffer en memoria
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df_principal9.to_excel(writer, index=False, sheet_name="Sheet1")
-        output.seek(0)
-
-        # Botón de descarga como Excel
-        st.download_button(
-            label="💾 Descargar Excel",
-            data=output,
-            file_name=f"{file_name_sin_extension}_SALIDA.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        '''
 
         return rutaSalida, fileSalida, df_principal9, df_cuadro_bonos
 
@@ -665,7 +644,7 @@ def main():
     file_excel = st.sidebar.file_uploader("📁 Sube un fichero Excel", type=["xls", "xlsx"])
 
     # Mostrar lista de Excel Activos
-    st.info(" Carga de parámetros")
+    #st.info(" Carga de parámetros")
     with st.expander("📄 Lista de ficheros excel de 'Flujos' activos en la Aplicación:"):
         df_lstFlujos = pd.DataFrame(list_flujos, columns=['Excel'])
         df_lstFlujos.drop(index=0, inplace=True)   # Borrra el primer registro
@@ -702,11 +681,16 @@ def main():
             # Tabla editable
             #st.caption(f"*** Opcional: Edita el campo (NUM_BONOS) si es necesario para tratar el fichero: {file_name_sin_extension}.xls")
             #st.caption(f"*** Importante: Comprobar que el nombre del campo BONO este igual en el excel, ejm: '**Bono A**' no es igual que '**Bono-A**'")
-            with st.expander("📄 Modificar Número de Bonos"):
-                edited_df = st.data_editor(
-                    df_nomBono,
-                    num_rows="fixed",
-                    key="editor_nomBono"
+            #with st.sidebar.expander("📄 Modificar Número de Bonos"):
+            #    edited_df = st.data_editor(
+            #        df_nomBono,
+            #        num_rows="fixed",
+            #        key="editor_nomBono"
+            #    )
+            edited_df = st.sidebar.data_editor(
+                df_nomBono,
+                num_rows="fixed",
+                key="editor_nomBono"
                 )
 
             dic_nomBono_actualizado = edited_df.to_dict(orient="records")
@@ -729,22 +713,56 @@ def main():
                     ####################################
                     st.success("✅ Resultado Excel: Datos Procesados")
 
-                    df = df_cuadro_bonos
-                    fig = px.bar(df, x='BONO', y=['T_AP_1', 'T_AP_2', 'T_AP_3'], barmode='group')
-                    fig.update_layout(height=400)
-
                     col1, col2 = st.columns([1, 1])
 
                     with col1:
-                        # caja con align-items:center para centrar verticalmente
-                        st.markdown(
-                            f"""<div style="height:400px; display:flex; align-items:center;">
-                                    <div style="width:100%;">{df.to_html(index=False)}</div>
-                                </div>""",
-                            unsafe_allow_html=True,
+                        st.write("")
+                        st.write("")
+
+                        import streamlit.components.v1 as components
+                        # HTML con estilos CSS (ajusta font-size a lo que necesites)
+                        html = f"""
+                        <style>
+                        table {{
+                            border-collapse: collapse;
+                            font-size: 11px;            /* tamaño de letra */
+                        }}
+                        table th, table td {{
+                            padding: 4px 6px;           /* reduce padding */
+                            border: 2px solid #ddd;
+                        }}
+                        </style>
+                        {df_cuadro_bonos.to_html(index=False, escape=False)}
+                        """
+                        # muestra el HTML dentro de Streamlit (scrolling/height opcional)
+                        components.html(html, height=350, scrolling=True)
+                      
+                    with col2:
+                        # Crear gráfico
+                        fig = px.bar(
+                            df_cuadro_bonos,
+                            x="BONO",
+                            y=["T_AP_1", "T_AP_2", "T_AP_3"],
+                            barmode="group"
                         )
 
-                    with col2:
+                        # Ajustes visuales
+                        fig.update_layout(
+                            height=400,
+                            margin=dict(t=40, b=10, l=40, r=40),  # menos espacio abajo
+                            xaxis_title=None,                     # quitamos título de abajo
+                        )
+
+                        # Mover título del eje X arriba
+                        fig.add_annotation(
+                            text=" ",                   # texto del título
+                            xref="paper", yref="paper",
+                            x=0.5, y=1.1,               # posición arriba centrada
+                            showarrow=False,
+                            font=dict(size=14)
+                        )
+
+                        # Mostrar gráfico alineado arriba
                         st.plotly_chart(fig, use_container_width=True)
                 
                     with st.expander("📄 Ver el resumen de los datos procesados"):
@@ -754,6 +772,7 @@ def main():
                     ####################################
                     st.success("✅ Resultado Txt: Flujos Bloomberg")
                     
+                    '''
                     # Guardar contenido del TXT en session_state
                     try:
                         with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
@@ -761,6 +780,31 @@ def main():
                         st.session_state["file_name_salida"] = f"{file_name_sin_extension}_SALIDA.txt"
                     except Exception as e:
                         st.error(f"No se pudo leer el archivo generado: {e}")
+                    '''
+
+                    try:
+                        with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
+                            contenido = f.read()
+
+                        file_name_salida = f"{file_name_sin_extension}_SALIDA.txt"
+
+                        
+                        with st.expander(f'📄 Ver el file de salida:  {file_name_salida}', expanded=False):
+                            st.code(contenido, language="text")
+
+                        # Botón de descarga
+                        st.sidebar.download_button(
+                            label=f"💾 Descargar File Txt",
+                            data=contenido,
+                            file_name=file_name_salida,
+                            mime="text/plain"
+                        )
+
+
+                    except Exception as e:
+                        st.error(f"No se pudo leer el archivo generado: {e}")
+
+
                 else:
                     st.error("❌ No se ha podido leer el Excel correctamente.")
 
@@ -769,6 +813,7 @@ def main():
             # ================================================
             # MOSTRAR Y DESCARGAR RESULTADOS
             # ================================================
+            '''
             if "contenido_txt" in st.session_state:
                 # Mostrar en expander
                 with st.expander("📄 Ver el contenido del fichero que se cargará en los flujos de Bloomberg"):
@@ -781,6 +826,7 @@ def main():
                     file_name=st.session_state["file_name_salida"],
                     mime="text/plain"
                 )
+            '''
 
 if __name__ == "__main__":
 

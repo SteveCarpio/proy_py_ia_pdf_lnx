@@ -8,6 +8,12 @@ from PIL import Image
 from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9
 import gc
 
+def mantenimiento():
+    st.toast(" Para cualquier duda, contactar con **Steve Carpio**.", icon="💬")
+    st.toast(" La página se recargará automáticamente cuando el servidor esté disponible nuevamente.", icon="🔄")
+    st.toast(" Tiempo estimado de reinicio: 3 minutos.", icon="⏳")
+    st.toast(" El servidor se reiniciará en breve.", icon="🚨")
+
 # Configuración
 st.set_page_config(
     page_title="Portal Python TdA",
