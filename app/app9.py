@@ -5,6 +5,7 @@ def main():
     import pandas as pd
     import io
     import sys
+    import datetime
 
     list_flujos = [
         'ParaQueEmpieceDesdeEl_01',
@@ -601,18 +602,26 @@ def main():
             f.write(l04)
 
             for _, fila9 in df_principal9.iterrows():
+
+                vTT1 = f"{float(fila9['TT1']):.2f}"
+                vTT2 = f"{float(fila9['TT2']):.2f}"
+                vFIRST_DATE = datetime.datetime.strptime(fila9['FIRST_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y')
+                vDATED_DATE = datetime.datetime.strptime(fila9['DATED_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y')
+                vFECHA = datetime.datetime.strptime(fila9['FECHA'], '%d/%m/%Y').strftime('%m/%d/%Y')
+                vTAA = f"{float(fila9['TAA']):.2f}"     # redondea a dos decimales
+
                 if fila9['N4'] == 0:
                     l05 = f"new flow:\n"                        #FIJO
-                    l06 = f"cusip: {fila9['ISIN']}\n"
-                    l07 = f"prepay speed: {fila9['TAA']}\n"
+                    l06 = f"ticker: {fila9['ISIN']}\n"
+                    l07 = f"prepay speed: {vTAA}\n"
                     l08 = f"prepay type: CPR\n"                 #FIJO
-                    l09 = f"first payment date: {fila9['FIRST_DATE']}\n"
-                    l10 = f"dated date: {fila9['DATED_DATE']}\n"
+                    l09 = f"first payment date: {vFIRST_DATE}\n"
+                    l10 = f"dated date: {vDATED_DATE}\n"
                     l11 = f"frequency: 04\n"                    #FIJO
                     l12 = f"call date: {fila9['CALL_DATE']}\n"
                     l13 = f"assumed collateral: no\n"           #FIJO
                     l14 = f"vectors: balances interests\n"      #FIJO
-                    l15 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
+                    l15 = f"{vDATED_DATE} {vTT1} {vTT2}\n"
                     f.write(l05)
                     f.write(l06)
                     f.write(l07)
@@ -625,7 +634,7 @@ def main():
                     f.write(l14)
                     f.write(l15)
                 else:
-                    l16 = f"{fila9['FECHA']}\t{fila9['TT1']}\t{fila9['TT2']}\n"
+                    l16 = f"{vFECHA} {vTT1} {vTT2}\n"
                     f.write(l16)
 
         return rutaSalida, fileSalida, df_principal9, df_cuadro_bonos
