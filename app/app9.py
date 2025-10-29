@@ -602,13 +602,14 @@ def main():
             f.write(l04)
 
             for _, fila9 in df_principal9.iterrows():
-
-                vTT1 = f"{float(fila9['TT1']):.2f}"
-                vTT2 = f"{float(fila9['TT2']):.2f}"
-                vFIRST_DATE = datetime.datetime.strptime(fila9['FIRST_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y')
-                vDATED_DATE = datetime.datetime.strptime(fila9['DATED_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y')
-                vFECHA = datetime.datetime.strptime(fila9['FECHA'], '%d/%m/%Y').strftime('%m/%d/%Y')
-                vTAA = f"{float(fila9['TAA']):.2f}"     # redondea a dos decimales
+                                                                      
+                vTT1 = "0.00" if '-' in f"{fila9['TT1']}" else f"{float(fila9['TT1']):.2f}"                    # si existe simbolo "-" pondrá 0.00 "else" redondea a dos decimales
+                vTT2 = f"{float(fila9['TT2']):.2f}"                                                            # redondea a dos decimales
+                vFIRST_DATE = datetime.datetime.strptime(fila9['FIRST_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y') # cambia de aa/mm/dd a mm/dd/aa
+                vDATED_DATE = datetime.datetime.strptime(fila9['DATED_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y') # cambia de aa/mm/dd a mm/dd/aa
+                vCALL_DATE = datetime.datetime.strptime(fila9['CALL_DATE'], '%d/%m/%Y').strftime('%m/%d/%Y')   # cambia de aa/mm/dd a mm/dd/aa
+                vFECHA = datetime.datetime.strptime(fila9['FECHA'], '%d/%m/%Y').strftime('%m/%d/%Y')           # cambia de aa/mm/dd a mm/dd/aa
+                vTAA = f"{float(fila9['TAA']):.2f}"                                                            # redondea a dos decimales
 
                 if fila9['N4'] == 0:
                     l05 = f"new flow:\n"                        #FIJO
@@ -618,7 +619,7 @@ def main():
                     l09 = f"first payment date: {vFIRST_DATE}\n"
                     l10 = f"dated date: {vDATED_DATE}\n"
                     l11 = f"frequency: 04\n"                    #FIJO
-                    l12 = f"call date: {fila9['CALL_DATE']}\n"
+                    l12 = f"call date: {vCALL_DATE}\n"
                     l13 = f"assumed collateral: no\n"           #FIJO
                     l14 = f"vectors: balances interests\n"      #FIJO
                     l15 = f"{vDATED_DATE} {vTT1} {vTT2}\n"
