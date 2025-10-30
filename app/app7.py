@@ -39,8 +39,8 @@ def main():
         fproc_min = df["FPROCESO"].min().date()
         fproc_max = df["FPROCESO"].max().date()
         #st.sidebar.subheader("🗓️ Rango de FPROCESO")
-        fproc_inicio = st.sidebar.date_input("Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_inicio")
-        fproc_fin = st.sidebar.date_input("Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_fin")
+        fproc_inicio = st.sidebar.date_input("📅 FPROCESO: Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_inicio")
+        fproc_fin = st.sidebar.date_input("📅 FPROCESO: Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_fin")
 
         # ✅ Ajuste para incluir todo el día de la fecha final
         fproc_fin_dt = pd.to_datetime(fproc_fin) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
@@ -89,22 +89,86 @@ def main():
     st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
     #st.dataframe(df, use_container_width=True)
 
-    # 👉 Reordenar columnas y ocultar 'FECHA'
-    columnas_principales = ["N", "FPROCESO", "ORIGEN", "CLAVE", "SECCION"]
-    columnas_ocultas = ["FECHA", "T", "NOTA", "FILTRO"]
+    # Reordenar columnas y mostrar solo las que quiero
+    columnas_principales = ["FECHA", "ORIGEN", "CLAVE", "SECCION", "ASUNTO", "URL", "ARCHIVO"]
 
-    # Asegurar que las columnas existen antes de ordenar
-    columnas_principales = [col for col in columnas_principales if col in df.columns]
-    columnas_ocultas = [col for col in columnas_ocultas if col in df.columns]
+    # Creo un nuevo DF con los campos que quiero y ordenados
+    df_ordenado = df[columnas_principales]
 
-    # Columnas restantes (excluyendo ocultas y principales)
-    columnas_restantes = [col for col in df.columns if col not in columnas_principales + columnas_ocultas]
+    # Formatear campos de salida: 
+    df_ordenado['FECHA'] = df_ordenado['FECHA'].dt.date  # FECHA solo AAAA-MM-DD
 
-    # Nueva ordenación final
-    columnas_ordenadas = columnas_principales + columnas_restantes
 
-    # Mostrar DataFrame con columnas reordenadas y 'FECHA' oculta
-    st.dataframe(df[columnas_ordenadas], use_container_width=True)
+    #st.dataframe(df_ordenado, use_container_width=True)
+
+    ########################
+
+
+
+    def make_link(x):
+        if isinstance(x, str) and "https" in x:
+            return f'<a href="{x}" target="_blank">Click aquí</a> '
+        return x
+
+    df_ordenado["URL"] = df_ordenado["URL"].apply(make_link)
+    df_ordenado["ARCHIVO"] = df_ordenado["ARCHIVO"].apply(make_link)
+
+
+
+    # --- 🎨 CSS personalizado ---
+    st.markdown("""
+    <style>
+    /* Centrar los nombres de las columnas y cambiar color */
+    table thead th {
+        text-align: center !important;
+        background-color: #96C60F;  /* 💡 color de fondo del encabezado */
+        color: white;               /* 💡 color del texto */
+        padding: 8px;
+    }
+
+    /* Ajustar ancho de la columna FECHA */
+    table td:nth-child(1), table th:nth-child(1) {
+        min-width: 20px;           /* más ancho para evitar salto de línea */
+        white-space: nowrap;        /* no dividir en dos líneas */
+    }
+
+    /* Ajustar ancho de la columna URL */
+    table td:nth-child(6), table th:nth-child(6) {
+        min-width: 20px;           /* más ancho para evitar salto de línea */
+        white-space: nowrap;        /* no dividir en dos líneas */
+    }
+
+    /* Ajustar ancho de la columna ARCHIVO */
+    table td:nth-child(7), table th:nth-child(7) {
+        min-width: 20px;           /* más ancho para evitar salto de línea */
+        white-space: nowrap;        /* no dividir en dos líneas */
+    }
+
+    /* Estilo general de la tabla */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    td, th {
+        border: 1px solid #ddd;
+        padding: 6px;
+    }
+    a {
+        color: #1a73e8;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- 💅 Mostrar DataFrame como HTML con enlaces activos ---
+    st.markdown(
+        df_ordenado.to_html(escape=False, index=False),
+        unsafe_allow_html=True
+    )
+
+
 
 
 if __name__ == "__main__":
