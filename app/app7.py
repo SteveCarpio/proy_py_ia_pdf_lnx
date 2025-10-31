@@ -121,26 +121,26 @@ def main():
     /* Centrar los nombres de las columnas y cambiar color */
     table thead th {
         text-align: center !important;
-        background-color: #96C60F;  /* 💡 color de fondo del encabezado */
+        background-color: #ff7518;  /* 💡 color de fondo Multiva */
         color: white;               /* 💡 color del texto */
         padding: 8px;
     }
 
     /* Ajustar ancho de la columna FECHA */
     table td:nth-child(1), table th:nth-child(1) {
-        min-width: 20px;           /* más ancho para evitar salto de línea */
+        min-width: 20px;            /* más ancho para evitar salto de línea */
         white-space: nowrap;        /* no dividir en dos líneas */
     }
 
     /* Ajustar ancho de la columna URL */
     table td:nth-child(6), table th:nth-child(6) {
-        min-width: 20px;           /* más ancho para evitar salto de línea */
+        min-width: 20px;            /* más ancho para evitar salto de línea */
         white-space: nowrap;        /* no dividir en dos líneas */
     }
 
     /* Ajustar ancho de la columna ARCHIVO */
     table td:nth-child(7), table th:nth-child(7) {
-        min-width: 20px;           /* más ancho para evitar salto de línea */
+        min-width: 20px;            /* más ancho para evitar salto de línea */
         white-space: nowrap;        /* no dividir en dos líneas */
     }
 
