@@ -78,7 +78,7 @@ def main():
         # ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"]
         model_choice = st.selectbox(
             "🧠 Modelo:",
-            ["tda-llama3", "tda-gpt20b", "codellama", "deepseek-coder"],
+            ["tda-llama3", "tda-gpt20b", "codellama:34b", "deepseek-coder-v2"], 
             index=0
         )
 

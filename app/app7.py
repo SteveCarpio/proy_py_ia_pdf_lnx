@@ -8,6 +8,7 @@ def main():
     import pandas as pd
     from app.appOra import get_oracle_connection
     from datetime import datetime, timedelta
+    import plotly.express as px
 
     st.title("📈 Reporte de Eventos Relevantes")
     st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico")
@@ -162,13 +163,57 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    # --- 💅 Mostrar DataFrame como HTML con enlaces activos ---
-    st.markdown(
-        df_ordenado.to_html(escape=False, index=False),
-        unsafe_allow_html=True
-    )
+    # Mostrar la TABLA DE DATOS
+    with st.expander("📜 Listado de Datos:"):
+        # --- 💅 Mostrar DataFrame como HTML con enlaces activos ---
+        st.markdown(
+            df_ordenado.to_html(escape=False, index=False),
+            unsafe_allow_html=True
+        )
+
+     # Mostrar la VISUALIZACIONES
+
+    # Df de apoyo
+    df_ordenado['FECHA'] = pd.to_datetime(df_ordenado['FECHA'], format='%Y-%m-%d')    # Convertir la columna 'FECHA' a formato datetime
+    biva_df = df_ordenado[df_ordenado['ORIGEN'] == 'BIVA']                            # df BIVA
+    bmv_df = df_ordenado[df_ordenado['ORIGEN'] == 'BMV']                              # df de BMV
 
 
+    # Contadores
+    num_total = len(df_ordenado)
+    num_biva=len(biva_df)
+    num_bmv=len(bmv_df)
+    origen_counts = df_ordenado['ORIGEN'].value_counts() # Contar los valores únicos en la columna 'ORIGEN'
+
+    # Gráfico de tarta
+    fig_pie = px.pie(origen_counts, names=origen_counts.index, values=origen_counts.values, title=' ')
+
+    # Mostrar EXTENDER
+    with st.expander("📊 Visualizaciones:"):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.metric(label="Número de Evento Filtrados:", value=num_total)
+            st.metric(label="BIVA", value=num_biva)
+            st.metric(label="BMV", value=num_bmv)
+        with col2:
+            st.plotly_chart(fig_pie)
+
+        # Grafico de Lineal
+        biva_fecha_counts = biva_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index() # Agrupar x fecha y contar el -
+        bmv_fecha_counts = bmv_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()   # num de eventos x cada origen
+        biva_fecha_counts.columns = ['FECHA', 'BIVA'] # Renombrar las columnas para claridad 
+        bmv_fecha_counts.columns = ['FECHA', 'BMV']   # Renombrar las columnas para claridad
+        merged_df = pd.merge(biva_fecha_counts,bmv_fecha_counts, on='FECHA') # Combinar los datos de BMV y BIVA por fecha
+        fig = px.bar(merged_df, 
+             x='FECHA', 
+             y=['BIVA', 'BMV'], 
+             title='Número de Eventos Relevantes por Bolsas',
+             labels={'variable': 'Bolsas'})  # Titulo de leyenda
+
+        fig.update_yaxes(title_text=" ")     # Titulo de eje Y
+        fig.update_xaxes(title_text=" ")     # Titulo de eje X
+
+        st.plotly_chart(fig)
 
 
 if __name__ == "__main__":
