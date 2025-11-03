@@ -13,7 +13,9 @@ import pandas as pd
 # 5 https://docs.google.com/forms/d/e/1FAIpQLSdh5fC64K_C14Ff-uUKStv0ChnAxrruUCjnpShrF6qh2VSXkA/viewform
 # 6 https://docs.google.com/forms/d/e/1FAIpQLSfMvfzrvw9fHNpMn0ApZzdGi4nKoxFCFcRAD528W0yLnpJ1cA/viewform
 # 7 https://docs.google.com/forms/d/e/1FAIpQLSeXer3wwpWP5HEvKXJxTQEyMvMWjoyQbY2YH1tn5J43R36txw/viewform
+
 # 8 https://docs.google.com/forms/d/e/1FAIpQLSedtVjzdkbnD0PBLktBYrOfnZBsaM0Rt6GJyzzv6CpbsqDBuw/viewform
+
 
 def main():
 
@@ -133,7 +135,8 @@ def main():
             # Mostrar resultado de todas las respuestas:
             st.write("---")
             st.write(" ")
-            st.write(datos)
+            df = pd.DataFrame(datos, columns=['Índice', 'Respuesta'])
+            st.write(df)
 
 
 
