@@ -30,6 +30,36 @@ def main():
     # ================================================
     # FUNCIONES AUXILIARES
     # ================================================
+    def cargar_estilos():
+        # --- 🎨 CSS personalizado ---
+        st.markdown("""
+        <style>
+        /* Centrar los nombres de las columnas y cambiar color */
+        table thead th {
+            text-align: center !important;
+            background-color: #ff7518;  /* color de fondo Multiva */
+            color: white;               /* color del texto */
+            padding: 8px;
+        }
+
+        /* Estilo general de la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border: 1px solid #ddd;
+            padding: 6px;
+        }
+        a {
+            color: #1a73e8;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
 
     def get_dic_nomBono(file_name: str):
         """Devuelve el diccionario de bonos según el nombre del fichero."""
@@ -188,68 +218,62 @@ def main():
         bonoX1, bonoX2, isinX1, isinX2, taaX1, taaX2, taaX3, taaX4, taaX5, taaX6 = "", "", "", "", "", "", "", "", "",""
         bonoX = ""
         contBlancos = 0
+
         # Recorro cada fila
         for idx, fila in df_excel.iterrows():
-            #st.write(f"{idx}:{fila}XXX")     #  DEBUG
+            #st.write(f"{idx}:{fila}XXX")                                                                                   #  DEBUG
             # Agrego cada valor de cada celda en una variable
             var_a, var_b, var_c, var_d, var_e, var_f, var_g, var_h, var_i, var_j, var_k, var_l, var_m = str(fila[0]), str(fila[1]), str(fila[2]), str(fila[3]), str(fila[4]), str(fila[5]), str(fila[6]), str(fila[7]), str(fila[8]), str(fila[9]), str(fila[10]), str(fila[11]), str(fila[12])
-            #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
+            #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')            #  DEBUG
 
             ############## Creo la LISTA de [ BONOS ] 
-            #if "Bono" in var_e:
             if "Bono" in var_e or "Serie" in var_e: 
                 #st.write(f'{idx} : {var_e} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
-
-                isinX1 = df_excel.iloc[idx + 3, 3]
-                isinX2 = df_excel.iloc[idx + 3, 10]
-
-                #taaX1 = float(df_excel.iloc[idx + 7, 3]) * 100
-                #taaX2 = float(df_excel.iloc[idx + 7, 5]) * 100
-                #taaX3 = float(df_excel.iloc[idx + 7, 7]) * 100
-                #taaX4 = float(df_excel.iloc[idx + 7, 10]) * 100
-                #taaX5 = float(df_excel.iloc[idx + 7, 12]) * 100
-                #taaX6 = float(df_excel.iloc[idx + 7, 14]) * 100
-
-                valor1 = df_excel.iloc[idx + 7, 3]
-                taaX1 = float(valor1) * 100 if str(valor1).strip() not in ("", "-") else 0.0
-
-                valor2 = df_excel.iloc[idx + 7, 5]
-                taaX2 = float(valor2) * 100 if str(valor2).strip() not in ("", "-") else 0.0
-
-                valor3 = df_excel.iloc[idx + 7, 7]
-                taaX3 = float(valor3) * 100 if str(valor3).strip() not in ("", "-") else 0.0
-
-                valor4 = df_excel.iloc[idx + 7, 10]
-                taaX4 = float(valor4) * 100 if str(valor4).strip() not in ("", "-") else 0.0
                 
-                valor5 = df_excel.iloc[idx + 7, 12]
-                taaX5 = float(valor5) * 100 if str(valor5).strip() not in ("", "-") else 0.0
-                
-                valor6 = df_excel.iloc[idx + 7, 14]
-                taaX6 = float(valor6) * 100 if str(valor6).strip() not in ("", "-") else 0.0
+                isinX1 = df_excel.iloc[idx + 3, 3]                                                                          # type: ignore
+                isinX2 = df_excel.iloc[idx + 3, 10]                                                                         # type: ignore
 
-                filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])
+                valor1 = df_excel.iloc[idx + 7, 3]                                                                          # type: ignore                                         
+                taaX1 = float(valor1) * 100 if str(valor1).strip() not in ("", "-") else 0.0                                # type: ignore
+
+                valor2 = df_excel.iloc[idx + 7, 5]                                                                          # type: ignore
+                taaX2 = float(valor2) * 100 if str(valor2).strip() not in ("", "-") else 0.0                                # type: ignore
+
+                valor3 = df_excel.iloc[idx + 7, 7]                                                                          # type: ignore
+                taaX3 = float(valor3) * 100 if str(valor3).strip() not in ("", "-") else 0.0                                # type: ignore
+
+                valor4 = df_excel.iloc[idx + 7, 10]                                                                         # type: ignore
+                taaX4 = float(valor4) * 100 if str(valor4).strip() not in ("", "-") else 0.0                                # type: ignore
+                
+                valor5 = df_excel.iloc[idx + 7, 12]                                                                         # type: ignore
+                taaX5 = float(valor5) * 100 if str(valor5).strip() not in ("", "-") else 0.0                                # type: ignore
+                
+                valor6 = df_excel.iloc[idx + 7, 14]                                                                         # type: ignore
+                taaX6 = float(valor6) * 100 if str(valor6).strip() not in ("", "-") else 0.0                                # type: ignore
+
+                filas_bono1.append([var_e.strip(), isinX1.strip(), taaX1, taaX2, taaX3])                                    # type: ignore
                 if var_l != "":
-                        filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])
-                #st.write(filas_bono1)     #  DEBUG
+                        filas_bono1.append([var_l.strip(), isinX2.strip(), taaX4, taaX5, taaX6])                            # type: ignore
+                
+                #st.write(filas_bono1)                                                                                      #  DEBUG
 
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
             #if "Bono" in var_i:
             if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
-                #st.write(bonoX)   #  DEBUG
+                #st.write(bonoX)                                                                                            #  DEBUG
 
             if bonoX != "":
                 #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} : {var_f} | {var_h} : {var_j} | {var_k} : {var_m} ')        #  DEBUG
                 if var_c.strip() != "" and var_c.strip() != "Fecha" and var_c.strip() != "Total" and var_c.strip() != "00:00:00" and var_d != "(*)" and re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", var_c):
                     var_c2 = datetime.datetime.strptime(var_c, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
                     filas_bono2.append([bonoX, var_c2, round(float(var_d),2), round(float(var_f),2), round(float(var_h),2), round(float(var_j),2), round(float(var_k),2), round(float(var_m),2)])
-                    #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} - {var_f} | {var_h} - {var_j} | {var_k} - {var_m} ')        #  DEBUG
+                    #st.write(f'{idx} : {bonoX} - {var_c} | {var_d} - {var_f} | {var_h} - {var_j} | {var_k} - {var_m} ')     #  DEBUG
 
             if var_d == "(*)":
                 filas_bono3.append([bonoX, var_f])
-                #st.write(filas_bono3)     #  DEBUG
+                #st.write(filas_bono3)                                                                                       #  DEBUG
             
             # ------- Fin del Bucle -------
             if var_c == "":
@@ -266,7 +290,7 @@ def main():
         df_bono1 = pd.DataFrame(filas_bono1, columns=['BONO', 'ISIN', 'TAA_1', 'TAA_2', 'TAA_3'])
         df_bono1_union = pd.merge(df_bono1, df_numBono, on='BONO')
         df_bono1_union['N0'] = df_bono1_union.index.map(lambda x: x + 1)
-        #st.write(df_bono1_union)    #  DEBUG
+        #st.write(df_bono1_union)                                                                                               #  DEBUG
 
         ### TRATAMIENTO DATAFRAME: BONO2
         df_bono2 = pd.DataFrame(filas_bono2, columns=['BONO', 'FECHA', 'AP_1', 'IB_1', 'AP_2', 'IB_2', 'AP_3', 'IB_3'])
@@ -645,23 +669,65 @@ def main():
 
     st.title("📈 Carga de flujos de Sabadell para Bloomberg")
     st.caption("Aplicación de automatización que extrae y procesa los flujos de Sabadell que se encuentran en archivos Excel y los convierte en archivos TXT totalmente compatibles con Bloomberg.")
-
     st.sidebar.subheader("📈 : Flujos Bloomberg")
+    
+    cargar_estilos()
 
-    # Subir fichero
+    ########################################################################
+    #st.write("📄 Lista de ficheros excel de 'Flujos' activos en la Aplicación:")
+
+    nombre_campo="Flujos_Admitidos"
+    col_ano, col_mes, col_xls = st.columns(3)
+
+    df_lstFlujos = pd.DataFrame(list_flujos, columns=[nombre_campo])
+    df_lstFlujos.drop(index=0, inplace=True)   # Borrra el primer registro
+    df_lstFlujos.drop(df_lstFlujos[df_lstFlujos[nombre_campo] == 'SCFAUTOS_2_INFFLUJOS_ES'].index, inplace=True)
+    df_lstFlujos.drop(df_lstFlujos[df_lstFlujos[nombre_campo] == 'TDACAM11_INFFLUJOS_ES'].index, inplace=True)
+    df_lstFlujos.reset_index(drop=True, inplace=True) 
+    df_lstFlujos.index += 1
+
+    op_mes = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    op_ano = ["2025", "2026"]
+    op_xls = df_lstFlujos[nombre_campo].dropna().unique()
+    list_xls = op_xls.tolist()
+
+    with col_ano:
+        opcion_ano = st.selectbox(
+            label="Año",
+            options=op_ano,
+            index=0,                            # Valor inicial (0 = primera opción)
+        )
+
+    with col_mes:
+        opcion_mes = st.selectbox(
+            label="Mes",
+            options=op_mes,
+            index=0,                            # Valor inicial (0 = primera opción)
+        )
+
+    with col_xls:
+        opcion_xls = st.selectbox(
+            label="Xls",
+            options=list_xls,
+            index=0,                            # Valor inicial (0 = primera opción)
+        )
+    
+
+    # Crear campo URL
+    literal = f"/srv/apps/MisCompilados/PROY_PORTAL_PYTHON/APP9/XLS/{opcion_ano}/{opcion_mes}/{opcion_xls}.xlsx"
+
+    st.write(literal)
+
+    #st.markdown(
+    #    df_lstFlujos.to_html(escape=False, index=False),
+    #    unsafe_allow_html=True
+    #)
+
+        
+    ########################################################################
+    
+    # BOTON: Subir fichero EXCEL
     file_excel = st.sidebar.file_uploader("📁 Sube un fichero Excel", type=["xls", "xlsx"])
-
-    # Mostrar lista de Excel Activos
-    #st.info(" Carga de parámetros")
-    with st.expander("📄 Lista de ficheros excel de 'Flujos' activos en la Aplicación:"):
-        df_lstFlujos = pd.DataFrame(list_flujos, columns=['Excel_de_Flujos_Admitidos'])
-        df_lstFlujos.drop(index=0, inplace=True)   # Borrra el primer registro
-        df_lstFlujos.drop(df_lstFlujos[df_lstFlujos['Excel_de_Flujos_Admitidos'] == 'SCFAUTOS_2_INFFLUJOS_ES'].index, inplace=True)
-        df_lstFlujos.drop(df_lstFlujos[df_lstFlujos['Excel_de_Flujos_Admitidos'] == 'TDACAM11_INFFLUJOS_ES'].index, inplace=True)
-        df_lstFlujos.reset_index(drop=True, inplace=True) 
-        df_lstFlujos.index += 1
-        st.table(df_lstFlujos)
-
     if file_excel:
         file_name = file_excel.name
         file_name_sin_extension = file_name.split('.')[0]
