@@ -714,7 +714,7 @@ def main():
     
 
     # Crear campo URL
-    literal = f"/srv/apps/MisCompilados/PROY_PORTAL_PYTHON/APP9/XLS/{opcion_ano}/{opcion_mes}/{opcion_xls}.xlsx"
+    literal = f"/srv/apps/MisCompilados/PROY_PORTAL_PYTHON/APP9/XLS/{opcion_ano}/{opcion_mes}/{opcion_xls}_{opcion_ano}{opcion_mes}.xlsx"
 
     st.write(literal)
 
