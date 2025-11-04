@@ -521,18 +521,16 @@ def main():
         # Creamos una copia para no alterar df_principal
         df_principal8 = df_principal7.copy()
 
-        # Convertir FECHA a datetime temporalmente (sin modificar la columna original)
+        # Creo un nuevo DF "fechas_dt" con el campo FECHA en formato datetime
         fechas_dt = pd.to_datetime(df_principal8['FECHA'], format='%d/%m/%Y')
 
-        # Restar 3 meses
+        # Resto 3 meses al campo FECHA del DF "fechas_dt"
         fechas_menos_3m = fechas_dt - pd.DateOffset(months=3)
 
-        # Ajustar al primer día hábil del mes resultante
-        # Si el primer día del mes es sábado o domingo, lo mueve al lunes siguiente
-        primer_dia_habil = fechas_menos_3m.dt.to_period('M').dt.to_timestamp()  # primer día del mes
-        primer_dia_habil = primer_dia_habil.apply(lambda d: d + pd.offsets.BDay(0) if d.weekday() < 5 else d + pd.offsets.BDay(1))
+        # Si la fecha calculada cae en sábado o domingo, lo mueve al lunes siguiente
+        primer_dia_habil = fechas_menos_3m.apply(lambda d: d + pd.offsets.BDay(0) if d.weekday() < 5 else d + pd.offsets.BDay(1))
 
-        # Convertir al formato dd/mm/yyyy
+        # Creo la columna "DATED_DATE" con formato dd/mm/yyyy
         df_principal8['DATED_DATE'] = primer_dia_habil.dt.strftime('%d/%m/%Y')
 
         ############### FASE 8 - Agregamos un registro nuevo: Sera un reg CALCULADO en la posición 0 #####################
