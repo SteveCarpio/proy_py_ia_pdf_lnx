@@ -706,7 +706,7 @@ def main():
         # Evaluar una Selección minima de AÑO y MES
         anoYmesMinimo1=int(f"{opcion_ano}{opcion_mes}")
         if anoYmesMinimo1 < 202509:
-            st.sidebar.write(f"ℹ️ Año y Mes deben ser **>= 202510**")
+            st.sidebar.write(f"⚠️ Año y Mes deben ser **>= 202510**")
             # DELETE: Vaciar la carpeta temporal de flujos xls
             delete_ficheros(ruta_destino)
         else:
