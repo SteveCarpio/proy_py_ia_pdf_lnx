@@ -10,7 +10,6 @@ def main():
     import pandas as pd
     import plotly.express as px
     from pathlib import Path
-    from dateutil.relativedelta import relativedelta
 
     list_flujos = [
         'ParaQueEmpieceDesdeEl_01',       # 00
@@ -19,6 +18,7 @@ def main():
         'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          ) CAIXA_PENEDES_PYMES1_web0925.xls
         'SABADELL5_INFFLUJOS_ES',         # 04 - (Bono-A   , Bono-B                                                               ) SABADELL5_web0925.xls
         'SCFAUTOS_INFFLUJOS_ES',          # 05 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) SCFAUTOS_web0925.xls 
+        
         'TDA26_INFFLUJOS_ES',             # 06 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) TDA26_web0925.xls
         'TDA29_INFFLUJOS_ES',             # 07 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) tda29_web0925.xls
         'TDACAM4_INFFLUJOS_ES',           # 08 - (Bono-A   , Bono-B                                                               ) TDACAM4_web1025.xls
@@ -27,11 +27,12 @@ def main():
         'TDACAM7_INFFLUJOS_ES',           # 11 - (Bono-A2  , Bono-A3  , Bono-B                                                    ) TDACAM7_web0925.xls
         'TDACAM8_INFFLUJOS_ES',           # 12 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          ) TDACAM8_web0925.xls
         'TDACAM9_INFFLUJOS_ES',           # 13 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      ) TDACAM9_web0925.xls
+        
         'TDAPENEDES1_INFFLUJOS_ES'        # 14 - (Bono-A   , Bono-B   , Bono-C                                                    ) CAIXA_PENEDES1_web0925.xls
         ]
 
     # ================================================
-    # FUNCION CARGA DE ESTILOS
+    # FUNCIONES AUXILIARES
     # ================================================
     def cargar_estilos():
         # --- 🎨 CSS personalizado ---
@@ -63,9 +64,7 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    # ================================================
-    # FUNCION BONOS
-    # ================================================
+
     def get_dic_nomBono(file_name: str):
         """Devuelve el diccionario de bonos según el nombre del fichero."""
 
@@ -181,6 +180,8 @@ def main():
     # ================================================
     # FUNCIÓN DE PROCESAMIENTO
     # ================================================
+
+    ##########################
     def procesar_datos2(df_excel: pd.DataFrame, dic_nomBono_actualizado: list):
         import datetime
         import re
@@ -645,14 +646,9 @@ def main():
         return rutaSalida, fileSalida, df_principal9, df_cuadro_bonos
 
 
-
-
-
-    # ================================================================================================================================================
-    # ================================================================================================================================================
-    #                                                             INTERFAZ STREAMLIT
-    # ================================================================================================================================================
-    # ================================================================================================================================================
+    # ================================================
+    # INTERFAZ STREAMLIT
+    # ================================================
 
     st.title("📈 Carga de flujos de Sabadell para Bloomberg")
     st.caption("Aplicación de automatización que extrae y procesa los flujos de Sabadell y los convierte en archivos compatibles con Bloomberg. (app9.py)")
@@ -663,196 +659,235 @@ def main():
     ########################################################################
     ruta_destino = Path("/srv/apps/MisCompilados/PROY_PORTAL_PYTHON/APP9/XLS/")
 
-    # Inicializo valores por defecto para AÑO y MES, luego RETENGO su valor.
-    hoy=datetime.datetime.now()
-    retrocedo1mes=hoy - relativedelta(months=1)
-    ano_actual=retrocedo1mes.strftime("%Y")
-    mes_actual=retrocedo1mes.strftime("%m")
-    if "selector_ano" not in st.session_state:
-        st.session_state.selector_ano = ano_actual
-    if "selector_mes" not in st.session_state:
-        st.session_state.selector_mes = mes_actual
-
-    # Valores del SelectBox por defecto
-    op_ano = ["2025", "2026"]
+    # Valores del SelectBox
     op_mes = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
-
-    # ========= SELECTBOX: Año y Mes =========
-    col1_ano, col2_mes = st.sidebar.columns(2)
-    opcion_ano = col1_ano.selectbox("Año", op_ano, key="selector_ano")
-    opcion_mes = col2_mes.selectbox("Mes", op_mes, key="selector_mes")
-
-    #opcion_ano = st.sidebar.selectbox(label="Año", options=op_ano, index=0) 
-    #opcion_mes = st.sidebar.selectbox(label="Mes",  options=op_mes, index=0) 
+    op_ano = ["2025", "2026"]
+    opcion_ano = st.sidebar.selectbox(label="Año2", options=op_ano, index=0) 
+    opcion_mes = st.sidebar.selectbox(label="Mes",  options=op_mes, index=0) 
     
-    # ========= BOTON: Cargar Flujos =========
+    # BOTON: Cargar Flujos
     if st.sidebar.button("🔄 Cargar Flujos"):
         ruta_origen = f"/mnt/gestion_fondos/ReportsIW/{opcion_ano}/{opcion_mes}/"
-        nombres_sin_ext = [f.stem for f in ruta_destino.glob("*") if f.is_file()] # Cargo files excel sin extencion
+        
 
-        anoYmesMinimo1=int(f"{opcion_ano}{opcion_mes}")
-        if anoYmesMinimo1 < 202509:
-            st.sidebar.write(f"ℹ️ Año y Mes deben ser >= 202510")
+        nombres_sin_ext = [f.stem for f in ruta_destino.glob("*") if f.is_file()]
+        
+        # DELETE --------
+        for nombre in nombres_sin_ext:
+            try:
+                os.remove(f"{ruta_destino}/{nombre}.xls")
+                st.write(f"✅ Borrado: {ruta_destino}/{nombre}.xls")
+            except Exception as e:
+                st.write(f"❌ Error al borrar {nombre}: {e}")
 
-            # DELETE --------
-            for nombre in nombres_sin_ext:
-                try:
-                    os.remove(f"{ruta_destino}/{nombre}.xls")
-                except Exception as e:
-                    print(f"❌ Error al borrar {nombre}: {e}")
+        # COPY ----------
+        os.makedirs(ruta_destino, exist_ok=True) # Asegurarse de que la carpeta de destino exista
+        # Recorremos la lista y copiamos cada fichero
+        for nombre in list_flujos[1:]:  #  [1:] : para que empiece a leer la lista desde la posición 1 y no 0
+            nombre_completo = f"{nombre}_{opcion_ano}{opcion_mes}.xls"
+            # Construimos la ruta completa del fichero origen y destino
+            src = os.path.join(ruta_origen, nombre_completo)
+            dst = os.path.join(ruta_destino, nombre_completo)
+            try:
+                shutil.copy2(src, dst)   # copy2 conserva la metadata (fecha, permisos)
+            except FileNotFoundError:
+                st.write(f"⚠️  No encontrado: {src}")
+            except PermissionError:
+                st.write(f"⚠️  Permiso denegado: {src}")
+            except Exception as e:
+                st.write(f"❌ Error al copiar {nombre_completo}: {e}")  
+        st.sidebar.write(f"✅ Flujos XLS cargados.")
 
-        else:
-            
-            # DELETE --------
-            for nombre in nombres_sin_ext:
-                try:
-                    os.remove(f"{ruta_destino}/{nombre}.xls")
-                except Exception as e:
-                    st.write(f"❌ Error al borrar {nombre}: {e}")
 
-            # COPY ----------
-            os.makedirs(ruta_destino, exist_ok=True) # Asegurarse de que la carpeta de destino exista
-            # Recorremos la lista y copiamos cada fichero
-            cont_files = 0
-            for nombre in list_flujos[1:]:  #  [1:] : para que empiece a leer la lista desde la posición 1 y no 0
-                cont_files = cont_files + 1
-                nombre_completo = f"{nombre}_{opcion_ano}{opcion_mes}.xls"
-                # Construimos la ruta completa del fichero origen y destino
-                src = os.path.join(ruta_origen, nombre_completo)
-                dst = os.path.join(ruta_destino, nombre_completo)
-                try:
-                    shutil.copy2(src, dst)   # copy2 conserva la metadata (fecha, permisos)
-                    st.write(f"✅ {cont_files}: {nombre_completo}")        
-                except FileNotFoundError:
-                    st.write(f"ℹ️ {cont_files}: {nombre_completo}  -----  *Todavía no se ha publicado el archivo.* ")
-                except PermissionError:
-                    st.write(f"⚠️  Permiso denegado: {src}")
-                except Exception as e:
-                    st.write(f"❌ Error al copiar {nombre_completo}: {e}")  
-            st.sidebar.write(f"✅ Flujos XLS cargados.")
-
-    # ========= SELECTBOX: Files Excel =========
     nombres_sin_ext = [f.stem for f in ruta_destino.glob("*") if f.is_file()]
     nombres_sin_ext.sort()
+
     opcion_xls = st.sidebar.selectbox(label="Xls",  options=nombres_sin_ext, index=0)
-   
-    # ========= BOTON: Cargar Bonos =========
-    dic_nomBono = get_dic_nomBono(opcion_xls)
-    if not dic_nomBono:
-        st.warning("⚠️ No se reconoce el tipo de fichero. No hay diccionario asociado.")
-    else:
-        # Convertir a DataFrame
-        df_nomBono = pd.DataFrame(dic_nomBono)
-        df_nomBono.reset_index(drop=True, inplace=True)
-        df_nomBono.index += 1
 
-        # Permitir eliminar filas
-        bonos_to_remove = st.sidebar.multiselect(
-            "🗑️ Selecciona bonos a eliminar:",
-            options=df_nomBono["BONO"].tolist()
-        )
 
-        if bonos_to_remove:
-            df_nomBono = df_nomBono[~df_nomBono["BONO"].isin(bonos_to_remove)]
+    
 
-        edited_df = st.sidebar.data_editor(
-            df_nomBono,
-            num_rows="fixed",
-            key="editor_nomBono"
+    st.write(opcion_xls)
+
+
+    #####################################################################################################################################
+    ################################################ STV: PUNTO DE CONTROL ##############################################################
+    #####################################################################################################################################
+
+        
+    ########################################################################
+    
+    # BOTON: Cargar Bono
+    file_excel = st.sidebar.file_uploader("📁 Sube un fichero Excel", type=["xls", "xlsx"])
+
+    if file_excel:
+        file_name = file_excel.name
+        file_name_sin_extension = file_name.split('.')[0]
+        #st.sidebar.write(f"**Archivo cargado:** {file_name}")
+        st.write(file_name_sin_extension)
+
+        dic_nomBono = get_dic_nomBono(file_name)
+        
+        if not dic_nomBono:
+            st.warning("⚠️ No se reconoce el tipo de fichero. No hay diccionario asociado.")
+        else:
+            #st.sidebar.subheader("Bonos Activos:")
+            
+            # Convertir a DataFrame
+            df_nomBono = pd.DataFrame(dic_nomBono)
+            df_nomBono.reset_index(drop=True, inplace=True)
+            df_nomBono.index += 1
+
+            # Permitir eliminar filas
+            bonos_to_remove = st.sidebar.multiselect(
+                "🗑️ Selecciona bonos a eliminar:",
+                options=df_nomBono["BONO"].tolist()
             )
 
-        dic_nomBono_actualizado = edited_df.to_dict(orient="records")
-
-        # Leer el Excel
-        try:
-            df_excel = pd.read_excel(f"{ruta_destino}/{opcion_xls}.xls", header=None, dtype=str)
-        except Exception as e:
-            st.error(f"Error al leer el Excel: {e}")
-            df_excel = None
+            if bonos_to_remove:
+                df_nomBono = df_nomBono[~df_nomBono["BONO"].isin(bonos_to_remove)]
 
 
-    
-    # ========= BOTON: Procesar Datos =========
-    
-    if st.sidebar.button("🔄 Procesar datos"):
-        if df_excel is not None:
-            # Procesar el archivo
-            rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
-
-            st.success("✅ Resultado Excel: Datos Procesados")
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.write("")
-                st.write("")
-
-                import streamlit.components.v1 as components
-                # HTML con estilos CSS (ajusta font-size a lo que necesites)
-                html = f"""
-                <style>
-                table {{
-                    border-collapse: collapse;
-                    font-size: 11px;            /* tamaño de letra */
-                }}
-                table th, table td {{
-                    padding: 4px 6px;           /* reduce padding */
-                    border: 2px solid #ddd;
-                }}
-                </style>
-                {df_cuadro_bonos.to_html(index=False, escape=False)}
-                """
-                # muestra el HTML dentro de Streamlit (scrolling/height opcional)
-                components.html(html, height=350, scrolling=True)
-                
-            with col2:
-                # Crear gráfico
-                fig = px.bar(
-                    df_cuadro_bonos,
-                    x="BONO",
-                    y=["T_AP_1", "T_AP_2", "T_AP_3"],
-                    barmode="group"
+            edited_df = st.sidebar.data_editor(
+                df_nomBono,
+                num_rows="fixed",
+                key="editor_nomBono"
                 )
 
-                # Ajustes visuales
-                fig.update_layout(
-                    height=400,
-                    margin=dict(t=40, b=10, l=40, r=40),  # menos espacio abajo
-                    xaxis_title=None,                     # quitamos título de abajo
-                )
+            dic_nomBono_actualizado = edited_df.to_dict(orient="records")
 
-                # Mover título del eje X arriba
-                fig.add_annotation(
-                    text=" ",                   # texto del título
-                    xref="paper", yref="paper",
-                    x=0.5, y=1.1,               # posición arriba centrada
-                    showarrow=False,
-                    font=dict(size=14)
-                )
-
-                # Mostrar gráfico alineado arriba
-                st.plotly_chart(fig, use_container_width=True)
-        
-            with st.expander("📄 Ver el resumen de los datos procesados"):
-                st.write(df_principal9)
-
-            st.success("✅ Resultado Txt: Flujos Bloomberg")
+            # Leer el Excel
             try:
-                with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
-                    contenido = f.read()
-                file_name_salida = f"{opcion_xls}_SALIDA.txt"              
-                with st.expander(f'📄 Ver el file de salida:  {file_name_salida}', expanded=False):
-                    st.code(contenido, language="text")
+                df_excel = pd.read_excel(file_excel, header=None, dtype=str)
+            except Exception as e:
+                st.error(f"Error al leer el Excel: {e}")
+                df_excel = None
+
+            # ================================================
+            # BOTÓN PARA PROCESAR DATOS
+            # ================================================
+            if st.sidebar.button("🔄 Procesar datos"):
+                if df_excel is not None:
+                    # Procesar el archivo
+                    rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
+
+                    ####################################
+                    st.success("✅ Resultado Excel: Datos Procesados")
+
+                    col1, col2 = st.columns([1, 1])
+
+                    with col1:
+                        st.write("")
+                        st.write("")
+
+                        import streamlit.components.v1 as components
+                        # HTML con estilos CSS (ajusta font-size a lo que necesites)
+                        html = f"""
+                        <style>
+                        table {{
+                            border-collapse: collapse;
+                            font-size: 11px;            /* tamaño de letra */
+                        }}
+                        table th, table td {{
+                            padding: 4px 6px;           /* reduce padding */
+                            border: 2px solid #ddd;
+                        }}
+                        </style>
+                        {df_cuadro_bonos.to_html(index=False, escape=False)}
+                        """
+                        # muestra el HTML dentro de Streamlit (scrolling/height opcional)
+                        components.html(html, height=350, scrolling=True)
+                      
+                    with col2:
+                        # Crear gráfico
+                        fig = px.bar(
+                            df_cuadro_bonos,
+                            x="BONO",
+                            y=["T_AP_1", "T_AP_2", "T_AP_3"],
+                            barmode="group"
+                        )
+
+                        # Ajustes visuales
+                        fig.update_layout(
+                            height=400,
+                            margin=dict(t=40, b=10, l=40, r=40),  # menos espacio abajo
+                            xaxis_title=None,                     # quitamos título de abajo
+                        )
+
+                        # Mover título del eje X arriba
+                        fig.add_annotation(
+                            text=" ",                   # texto del título
+                            xref="paper", yref="paper",
+                            x=0.5, y=1.1,               # posición arriba centrada
+                            showarrow=False,
+                            font=dict(size=14)
+                        )
+
+                        # Mostrar gráfico alineado arriba
+                        st.plotly_chart(fig, use_container_width=True)
+                
+                    with st.expander("📄 Ver el resumen de los datos procesados"):
+                        st.write(df_principal9)
+
+
+                    ####################################
+                    st.success("✅ Resultado Txt: Flujos Bloomberg")
+                    
+                    '''
+                    # Guardar contenido del TXT en session_state
+                    try:
+                        with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
+                            st.session_state["contenido_txt"] = f.read()
+                        st.session_state["file_name_salida"] = f"{file_name_sin_extension}_SALIDA.txt"
+                    except Exception as e:
+                        st.error(f"No se pudo leer el archivo generado: {e}")
+                    '''
+
+                    try:
+                        with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
+                            contenido = f.read()
+
+                        file_name_salida = f"{file_name_sin_extension}_SALIDA.txt"
+
+                        
+                        with st.expander(f'📄 Ver el file de salida:  {file_name_salida}', expanded=False):
+                            st.code(contenido, language="text")
+
+                        # Botón de descarga
+                        st.sidebar.download_button(
+                            label=f"💾 Descargar File Txt",
+                            data=contenido,
+                            file_name=file_name_salida,
+                            mime="text/plain"
+                        )
+
+
+                    except Exception as e:
+                        st.error(f"No se pudo leer el archivo generado: {e}")
+
+
+                else:
+                    st.error("❌ No se ha podido leer el Excel correctamente.")
+
+
+
+            # ================================================
+            # MOSTRAR Y DESCARGAR RESULTADOS
+            # ================================================
+            '''
+            if "contenido_txt" in st.session_state:
+                # Mostrar en expander
+                with st.expander("📄 Ver el contenido del fichero que se cargará en los flujos de Bloomberg"):
+                    st.text_area("Contenido del archivo:", st.session_state["contenido_txt"], height=300)
 
                 # Botón de descarga
-                st.sidebar.download_button(
-                    label=f"💾 Descargar File Txt",
-                    data=contenido,
-                    file_name=file_name_salida,
+                st.download_button(
+                    label=f"💾 Descargar Flujos Bloomberg: {file_name_sin_extension}.txt",
+                    data=st.session_state["contenido_txt"],
+                    file_name=st.session_state["file_name_salida"],
                     mime="text/plain"
                 )
-            except Exception as e:
-                st.error(f"No se pudo leer el archivo generado: {e}")
-        else:
-            st.error("❌ No se ha podido leer el Excel correctamente.")
+            '''
 
 if __name__ == "__main__":
 
