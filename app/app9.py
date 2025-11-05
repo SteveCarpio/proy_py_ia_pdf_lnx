@@ -14,17 +14,17 @@ def main():
         'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          ) CAIXA_PENEDES_PYMES1_web0925.xls
         'SABADELL5_INFFLUJOS_ES',         # 04 - (Bono-A   , Bono-B                                                               ) SABADELL5_web0925.xls
         'SCFAUTOS_INFFLUJOS_ES',          # 05 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) SCFAUTOS_web0925.xls 
-        'SCFAUTOS_2_INFFLUJOS_ES',        # 06 - (Bono-A   , Bono-B   , Bono-C  , Bono-D  , Bono-E  , Bono-F                      ) none: sTv este registro se borra más abajo en el DF
-        'TDA26_INFFLUJOS_ES',             # 07 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) TDA26_web0925.xls
-        'TDA29_INFFLUJOS_ES',             # 08 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) tda29_web0925.xls
-        'TDACAM4_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               ) TDACAM4_web1025.xls
-        'TDACAM5_INFFLUJOS_ES',           # 10 - (Bono-A   , Bono-B                                                               ) TDACAM5_web0925.xls
-        'TDACAM6_INFFLUJOS_ES',           # 11 - (Bono-A3  , Bono-B                                                               ) TDACAM6_web0925.xls
-        'TDACAM7_INFFLUJOS_ES',           # 12 - (Bono-A2  , Bono-A3  , Bono-B                                                    ) TDACAM7_web0925.xls
-        'TDACAM8_INFFLUJOS_ES',           # 13 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          ) TDACAM8_web0925.xls
-        'TDACAM9_INFFLUJOS_ES',           # 14 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      ) TDACAM9_web0925.xls
-        'TDACAM11_INFFLUJOS_ES',          # 15 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-A4 , Bono-B  , Bono-C  , Bono-D            ) none: sTv este registro se borra más abajo en el DF
-        'TDAPENEDES1_INFFLUJOS_ES'        # 16 - (Bono-A   , Bono-B   , Bono-C                                                    ) CAIXA_PENEDES1_web0925.xls
+        
+        'TDA26_INFFLUJOS_ES',             # 06 - (Bono 1-A1, Bono 1-A2, Bono 1-B, Bono 1-C, Bono 1-D, Bono 2-A, Bono 2-B, Bono 2-C) TDA26_web0925.xls
+        'TDA29_INFFLUJOS_ES',             # 07 - (Serie-A1 , Serie-A2 , Serie-B , Serie-C , Serie-D                               ) tda29_web0925.xls
+        'TDACAM4_INFFLUJOS_ES',           # 08 - (Bono-A   , Bono-B                                                               ) TDACAM4_web1025.xls
+        'TDACAM5_INFFLUJOS_ES',           # 09 - (Bono-A   , Bono-B                                                               ) TDACAM5_web0925.xls
+        'TDACAM6_INFFLUJOS_ES',           # 10 - (Bono-A3  , Bono-B                                                               ) TDACAM6_web0925.xls
+        'TDACAM7_INFFLUJOS_ES',           # 11 - (Bono-A2  , Bono-A3  , Bono-B                                                    ) TDACAM7_web0925.xls
+        'TDACAM8_INFFLUJOS_ES',           # 12 - (Bono-A   , Bono-B   , Bono-C  , Bono-D                                          ) TDACAM8_web0925.xls
+        'TDACAM9_INFFLUJOS_ES',           # 13 - (Bono-A1  , Bono-A2  , Bono-A3 , Bono-B  , Bono-C  , Bono-D                      ) TDACAM9_web0925.xls
+        
+        'TDAPENEDES1_INFFLUJOS_ES'        # 14 - (Bono-A   , Bono-B   , Bono-C                                                    ) CAIXA_PENEDES1_web0925.xls
         ]
 
     # ================================================
@@ -97,17 +97,7 @@ def main():
                 {'BONO': 'Bono-F','NUM_BONOS': 600}
             ]
         
-        #elif list_flujos[6] in file_name:
-        #    dic_nomBono = [
-        #        {'BONO': 'Bono-A','NUM_BONOS': 100},
-        #        {'BONO': 'Bono-B','NUM_BONOS': 200},
-        #        {'BONO': 'Bono-C','NUM_BONOS': 300},
-        #        {'BONO': 'Bono-D','NUM_BONOS': 400},
-        #        {'BONO': 'Bono-E','NUM_BONOS': 500},
-        #        {'BONO': 'Bono-F','NUM_BONOS': 600}
-        #    ]
-        
-        elif list_flujos[7] in file_name:
+        elif list_flujos[6] in file_name:
             dic_nomBono = [
                 {'BONO': 'Bono 1-A1','NUM_BONOS': 100},
                 {'BONO': 'Bono 1-A2','NUM_BONOS': 200},
@@ -119,13 +109,19 @@ def main():
                 {'BONO': 'Bono 2-C','NUM_BONOS': 800}
             ]
 
-        elif list_flujos[8] in file_name:
+        elif list_flujos[7] in file_name:
             dic_nomBono = [
                 {'BONO': 'Serie-A1','NUM_BONOS': 100},
                 {'BONO': 'Serie-A2','NUM_BONOS': 200},
                 {'BONO': 'Serie-B','NUM_BONOS': 300},
                 {'BONO': 'Serie-C','NUM_BONOS': 400},
                 {'BONO': 'Serie-D','NUM_BONOS': 500}
+            ]
+
+        elif list_flujos[8] in file_name:
+            dic_nomBono = [
+                {'BONO': 'Bono-A','NUM_BONOS': 100},
+                {'BONO': 'Bono-B','NUM_BONOS': 200}
             ]
 
         elif list_flujos[9] in file_name:
@@ -136,24 +132,18 @@ def main():
 
         elif list_flujos[10] in file_name:
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200}
-            ]
-
-        elif list_flujos[11] in file_name:
-            dic_nomBono = [
                 {'BONO': 'Bono-A3','NUM_BONOS': 100},
                 {'BONO': 'Bono-B','NUM_BONOS': 200}
             ]
 
-        elif list_flujos[12] in file_name:
+        elif list_flujos[11] in file_name:
             dic_nomBono = [
                 {'BONO': 'Bono-A2','NUM_BONOS': 100},
                 {'BONO': 'Bono-A3','NUM_BONOS': 200},
                 {'BONO': 'Bono-B','NUM_BONOS': 300}
             ]
 
-        elif list_flujos[13] in file_name:
+        elif list_flujos[12] in file_name:
             dic_nomBono = [
                 {'BONO': 'Bono-A','NUM_BONOS': 100},
                 {'BONO': 'Bono-B','NUM_BONOS': 200},
@@ -161,7 +151,7 @@ def main():
                 {'BONO': 'Bono-D','NUM_BONOS': 400}
             ]
 
-        elif list_flujos[14] in file_name:
+        elif list_flujos[13] in file_name:
             dic_nomBono = [
                 {'BONO': 'Bono-A1','NUM_BONOS': 100},
                 {'BONO': 'Bono-A2','NUM_BONOS': 200},
@@ -171,18 +161,7 @@ def main():
                 {'BONO': 'Bono-D','NUM_BONOS': 600}
             ]
         
-        #elif list_flujos[15] in file_name:
-        #    dic_nomBono = [
-        #        {'BONO': 'Bono-A1','NUM_BONOS': 100},
-        #        {'BONO': 'Bono-A2','NUM_BONOS': 200},
-        #        {'BONO': 'Bono-A3','NUM_BONOS': 300},
-        #        {'BONO': 'Bono-A4','NUM_BONOS': 400},
-        #        {'BONO': 'Bono-B','NUM_BONOS': 500},
-        #        {'BONO': 'Bono-C','NUM_BONOS': 600},
-        #        {'BONO': 'Bono-D','NUM_BONOS': 700}
-        #    ]
-        
-        elif list_flujos[16] in file_name:
+        elif list_flujos[14] in file_name:
             dic_nomBono = [
                 {'BONO': 'Bono-A','NUM_BONOS': 100},
                 {'BONO': 'Bono-B','NUM_BONOS': 200},
@@ -680,9 +659,9 @@ def main():
     col_ano, col_mes, col_xls = st.columns(3)
 
     df_lstFlujos = pd.DataFrame(list_flujos, columns=[nombre_campo])
-    df_lstFlujos.drop(index=0, inplace=True)   # Borrra el primer registro
-    df_lstFlujos.drop(df_lstFlujos[df_lstFlujos[nombre_campo] == 'SCFAUTOS_2_INFFLUJOS_ES'].index, inplace=True)
-    df_lstFlujos.drop(df_lstFlujos[df_lstFlujos[nombre_campo] == 'TDACAM11_INFFLUJOS_ES'].index, inplace=True)
+    df_lstFlujos.drop(index=0, inplace=True)   # Borramos el primer registro que creamos uno a posta que no vale
+    
+    
     df_lstFlujos.reset_index(drop=True, inplace=True) 
     df_lstFlujos.index += 1
 
