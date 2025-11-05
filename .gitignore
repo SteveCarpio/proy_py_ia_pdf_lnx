@@ -5,7 +5,6 @@ venv/
 build/
 dist/
 models/
-data/
 tmp/
 
 # Ignorar files
