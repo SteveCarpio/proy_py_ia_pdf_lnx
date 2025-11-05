@@ -11,7 +11,7 @@ def main():
     import plotly.express as px
 
     st.title("📈 Reporte de Eventos Relevantes")
-    st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico")
+    st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico. (app7.py)")
     st.sidebar.subheader("📈 : Eventos Relevantes")
 
     # Cargar datos desde Oracle

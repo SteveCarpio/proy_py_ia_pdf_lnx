@@ -8,7 +8,7 @@ def main():
     import datetime
 
     list_flujos = [
-        'ParaQueEmpieceDesdeEl_01',
+        'ParaQueEmpieceDesdeEl_01',       # 00
         'FTPYMETDACAM4_INFFLUJOS_ES',     # 01 - (Bono-B   , Bono-C   , Bono-D                                                    ) pyme_cam4_web0925.xls
         'PENEDESFTGENCAT1_INFFLUJOS_ES',  # 02 - (Bono-C                                                                          ) PENEDES FTGENCAT 1_web0925.xls
         'PENEDESPYMES1_INFFLUJOS_ES',     # 03 - (Bono-C                                                                          ) CAIXA_PENEDES_PYMES1_web0925.xls
@@ -668,7 +668,7 @@ def main():
     # ================================================
 
     st.title("📈 Carga de flujos de Sabadell para Bloomberg")
-    st.caption("Aplicación de automatización que extrae y procesa los flujos de Sabadell que se encuentran en archivos Excel y los convierte en archivos TXT totalmente compatibles con Bloomberg.")
+    st.caption("Aplicación de automatización que extrae y procesa los flujos de Sabadell y los convierte en archivos compatibles con Bloomberg. (app9.py)")
     st.sidebar.subheader("📈 : Flujos Bloomberg")
     
     cargar_estilos()
