@@ -1,12 +1,18 @@
 # source venv/bin/activate
-# 🆕 💼 🏛️ 🆕 🗑️ 🟢 📦 📊 🏠 🤖 📈 🔬 🌐
+# 🆕 💼 🏛️ 🗑️ 🟢 📦 📊 🏠 🤖 📈 🔬 🌐 🚨 ⏳ 🔄 ℹ️ 📜 📁 📅 📗 ⚠️ ✅ ❌
 
 import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app0, app1, app2, app3, app4, app5, app6, app7, app8
+from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9
 import gc
+
+def mantenimiento():
+    st.toast(" Para cualquier duda, contactar con **Steve Carpio**.", icon="💬")
+    st.toast(" La página se recargará automáticamente cuando el servidor esté disponible nuevamente.", icon="🔄")
+    st.toast(" Tiempo estimado de reinicio: 3 minutos.", icon="⏳")
+    st.toast(" El servidor se reiniciará en breve.", icon="🚨")
 
 # Configuración
 st.set_page_config(
@@ -35,7 +41,8 @@ WS_APPS = {
 # Diccionario Reporting
 RP_APPS = {
     "1 - Eventos Relevantes": app7,
-    "2 - Estados Financieros": app0
+    "2 - Estados Financieros": app0,
+    "3 - Flujos Bloomberg": app9
 }
 
 # Gestor de Proyectos
@@ -188,14 +195,14 @@ def mostrar_inicio():
         st.subheader(" ")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1"> </p>
+        <p class="small-text1">  </p>
         """, unsafe_allow_html=True)
 
     with cols[2]:
-        st.subheader(" ")
+        st.subheader("Flujos Bloomberg")
         st.markdown("""
         <style> .small-text1 {font-size: 0.5em;color: #8B0000;} </style>
-        <p class="small-text1"> </p>
+        <p class="small-text1">Extrae y procesa los flujos de Sabadell que se encuentran en archivos Excel y los convierte en archivos TXT compatibles con Bloomberg.</p>
         """, unsafe_allow_html=True)
 
     #############################################################################################################
@@ -250,65 +257,71 @@ def mostrar_inicio():
 # LÓGICA PRINCIPAL
 # ----------------------------------
 
-# Inicializar la variable de sesión si no existe
+# Inicializar variable de sesión
 if "selected_app_key" not in st.session_state:
     st.session_state.selected_app_key = None
 
-# Botón para volver al inicio
+# Siempre mostrar botón "Ir a Inicio"
 if st.sidebar.button("🏠 Ir a Inicio"):
     st.session_state.selected_app_key = None
     st.rerun()
 
-# Botones para IA
-with st.sidebar.expander("🤖 Inteligencia Artificial"):
-    for name in IA_APPS:
-        if st.button(name, key=f"btn_ia_{name}"):
-            st.session_state.selected_app_key = name
-            st.rerun()
+# Si NO hay app seleccionada → mostrar los expanders
+if st.session_state.selected_app_key is None:
 
-# Botones para Data Science
-with st.sidebar.expander("🔬 Data Science"):
-    for name in DS_APPS:
-        if st.button(name, key=f"btn_ds_{name}"):
-            st.session_state.selected_app_key = name
-            st.rerun()
+    # Botones para IA
+    with st.sidebar.expander("🤖 Inteligencia Artificial"):
+        for name in IA_APPS:
+            if st.button(name, key=f"btn_ia_{name}"):
+                st.session_state.selected_app_key = name
+                st.rerun()
 
-# Botones para Web Scraping
-with st.sidebar.expander("🌐 Web Scraping"):
-    for name in WS_APPS:
-        if st.button(name, key=f"btn_ws_{name}"):
-            st.session_state.selected_app_key = name
-            st.rerun()
+    # Botones para Data Science
+    with st.sidebar.expander("🔬 Data Science"):
+        for name in DS_APPS:
+            if st.button(name, key=f"btn_ds_{name}"):
+                st.session_state.selected_app_key = name
+                st.rerun()
 
-# Botones para Reporting
-with st.sidebar.expander("📈 Reporting"):
-    for name in RP_APPS:
-        if st.button(name, key=f"btn_rp_{name}"):
-            st.session_state.selected_app_key = name
-            st.rerun()
+    # Botones para Web Scraping
+    with st.sidebar.expander("🌐 Web Scraping"):
+        for name in WS_APPS:
+            if st.button(name, key=f"btn_ws_{name}"):
+                st.session_state.selected_app_key = name
+                st.rerun()
 
-# Botones para Gestor de Proyectos
-with st.sidebar.expander("📁 Gestor Proyectos"):
-    for name in GP_APPS:
-        if st.button(name, key=f"btn_rp_{name}"):
-            st.session_state.selected_app_key = name
-            st.rerun()       
+    # Botones para Reporting
+    with st.sidebar.expander("📈 Reporting"):
+        for name in RP_APPS:
+            if st.button(name, key=f"btn_rp_{name}"):
+                st.session_state.selected_app_key = name
+                st.rerun()
+
+    # Botones para Gestor de Proyectos
+    with st.sidebar.expander("📁 Gestor Proyectos"):
+        for name in GP_APPS:
+            if st.button(name, key=f"btn_gp_{name}"):
+                st.session_state.selected_app_key = name
+                st.rerun()
 
 
-# Mostrar la app seleccionada
+# Si hay una app seleccionada → mostrar solo esa app
 if st.session_state.selected_app_key:
-    if st.session_state.selected_app_key in IA_APPS:
-        IA_APPS[st.session_state.selected_app_key].main()
-    elif st.session_state.selected_app_key in DS_APPS:
-        DS_APPS[st.session_state.selected_app_key].main()
-    elif st.session_state.selected_app_key in RP_APPS:
-        RP_APPS[st.session_state.selected_app_key].main()
-    elif st.session_state.selected_app_key in WS_APPS:
-        WS_APPS[st.session_state.selected_app_key].main()
-    elif st.session_state.selected_app_key in GP_APPS:
-        GP_APPS[st.session_state.selected_app_key].main()
+    key = st.session_state.selected_app_key
+    if key in IA_APPS:
+        IA_APPS[key].main()
+    elif key in DS_APPS:
+        DS_APPS[key].main()
+    elif key in RP_APPS:
+        RP_APPS[key].main()
+    elif key in WS_APPS:
+        WS_APPS[key].main()
+    elif key in GP_APPS:
+        GP_APPS[key].main()
 
-    # Limpia GarbageCollector    
+    # Limpieza de memoria
     gc.collect()
+
 else:
+    # Mostrar la página de inicio
     mostrar_inicio()
