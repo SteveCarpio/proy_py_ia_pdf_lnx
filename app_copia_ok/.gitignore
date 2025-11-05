@@ -1,0 +1,21 @@
+# Ignorar carpetas
+__pycache__/
+.vscode/
+venv/
+build/
+dist/
+models/
+data/
+tmp/
+
+# Ignorar files
+*.pyc
+*.pyo
+*.spec
+*.pdf
+*.PDF
+*.png
+*.mp3
+*.xxx
+*.xls
+*.xlsx
