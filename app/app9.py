@@ -693,13 +693,16 @@ def main():
 
     # ========= SELECTBOX: Año y Mes =========
     col1_ano, col2_mes = st.sidebar.columns(2)
-    opcion_ano = col1_ano.selectbox("Año", op_ano, key="selector_ano", on_change=limpiar_opcion_xls)
-    opcion_mes = col2_mes.selectbox("Mes", op_mes, key="selector_mes", on_change=limpiar_opcion_xls)
+    opcion_ano = col1_ano.selectbox("**📅 Año:**", op_ano, key="selector_ano", on_change=limpiar_opcion_xls)
+    opcion_mes = col2_mes.selectbox("**📅 Mes:**", op_mes, key="selector_mes", on_change=limpiar_opcion_xls)
 
     # ========= BOTON: Cargar Flujos =========
     if st.sidebar.button("🔄 Cargar Flujos"):
         ruta_origen = f"/mnt/gestion_fondos/ReportsIW/{opcion_ano}/{opcion_mes}/"
         
+        # Limpiamos el SelectBox de Opcion_Xls
+        st.session_state.opcion_xls = None
+
         # Evaluar una Selección minima de AÑO y MES
         anoYmesMinimo1=int(f"{opcion_ano}{opcion_mes}")
         if anoYmesMinimo1 < 202509:
@@ -731,10 +734,6 @@ def main():
                 except Exception as e:
                     st.write(f"❌ Error al copiar {nombre_completo}: {e}")  
             
-            #st.sidebar.write(f"✅ Flujos XLS cargados.")   
-        st.session_state.opcion_xls = None
-            
-
     # ========= SELECTBOX: Opcion XLS =========
     # Si entramos por primera vez en la sesión borra archivos y limpia selectbox
     if "opcion_xls" not in st.session_state:
@@ -742,7 +741,7 @@ def main():
         delete_ficheros(ruta_destino)        # borramos todo al inicio
     nombres_sin_ext = [f.stem for f in ruta_destino.glob("*") if f.is_file()]  # seleccionamos todos los files del folder temporal
     nombres_sin_ext.sort()
-    opcion_xls = st.sidebar.selectbox(label="Xls", options=nombres_sin_ext, key="opcion_xls")
+    opcion_xls = st.sidebar.selectbox(label="📗 **Seleccione un fichero excel:**", options=nombres_sin_ext, key="opcion_xls")
 
     # ========= PASO: Cargar Bonos =========
     if opcion_xls is not None:
@@ -757,7 +756,7 @@ def main():
 
             # Permitir eliminar filas
             bonos_to_remove = st.sidebar.multiselect(
-                "🗑️ Selecciona bonos a eliminar:",
+                "🗑️ **Selecciona bonos a eliminar:**",
                 options=df_nomBono["BONO"].tolist()
             )
 
