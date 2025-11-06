@@ -688,7 +688,7 @@ def main():
         st.session_state.selector_mes = mes_actual
 
     # Valores del SelectBox por defecto
-    op_ano = ["2025", "2026"]
+    op_ano = ["2025", "2026", "2027", "2028"]
     op_mes = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
 
     # ========= SELECTBOX: Año y Mes =========
