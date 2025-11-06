@@ -756,7 +756,7 @@ def main():
 
             # Permitir eliminar filas
             bonos_to_remove = st.sidebar.multiselect(
-                "🗑️ **Selecciona bonos a eliminar:**",
+                "🗑️ **Seleccione los bonos a eliminar:**",
                 options=df_nomBono["BONO"].tolist()
             )
 
@@ -782,17 +782,22 @@ def main():
         # ========= BOTON: Procesar Datos =========
         if st.sidebar.button("🔄 Procesar Datos"):
             if df_excel is not None:
-                # Procesar el archivo
+                # FUNCION: Procesar Datos 
                 rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
 
-                st.success("✅ Resultado Excel: Datos Procesados")
+                st.success(f"✅ Resultado Excel: Datos Procesados: ({opcion_xls}.xlsx)")
+                
+                # Mostrar datos del dataframe en un externder
+                with st.expander("📄 Ver tabla con los datos procesados:"):
+                    st.write(df_principal9)
+
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     st.write("")
                     st.write("")
 
                     import streamlit.components.v1 as components
-                    # HTML con estilos CSS (ajusta font-size a lo que necesites)
+                    # HTML con estilos CSS (ajustamos font-size)
                     html = f"""
                     <style>
                     table {{
@@ -810,7 +815,7 @@ def main():
                     components.html(html, height=350, scrolling=True)
                     
                 with col2:
-                    # Crear gráfico
+                    # Defino un gráfico de barras
                     fig = px.bar(
                         df_cuadro_bonos,
                         x="BONO",
@@ -818,14 +823,14 @@ def main():
                         barmode="group"
                     )
 
-                    # Ajustes visuales
+                    # Edito Ajustes visuales
                     fig.update_layout(
                         height=400,
                         margin=dict(t=40, b=10, l=40, r=40),  # menos espacio abajo
                         xaxis_title=None,                     # quitamos título de abajo
                     )
 
-                    # Mover título del eje X arriba
+                    # Edito El título del eje X arriba
                     fig.add_annotation(
                         text=" ",                   # texto del título
                         xref="paper", yref="paper",
@@ -834,24 +839,32 @@ def main():
                         font=dict(size=14)
                     )
 
-                    # Mostrar gráfico alineado arriba
+                    # Mostrar gráfico de Barras alineado arriba
                     st.plotly_chart(fig, use_container_width=True)
             
-                with st.expander("📄 Ver el resumen de los datos procesados"):
-                    st.write(df_principal9)
+                # Mostrar datos del dataframe en un externder
+                #with st.expander("📄 Ver tabla con los datos procesados:"):
+                #    st.write(df_principal9)
 
-                st.success("✅ Resultado Txt: Flujos Bloomberg")
+                # Visualizar datos en formato TXT
+                st.success(f"✅ Resultado Txt: Flujos Bloomberg: ({opcion_xls}.txt)")
                 try:
                     with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
                         contenido = f.read()
-                    file_name_salida = f"{opcion_xls}_SALIDA.txt"              
-                    with st.expander(f'📄 Ver el file de salida:  {file_name_salida}', expanded=False):
+
+                    # Reemplaza LF por CRLF en el contenido para asegurar el formato de Windows.
+                    contenido_crlf = contenido.replace('\n', '\r\n') 
+                    
+                    file_name_salida = f"{opcion_xls}_SALIDA.txt"  
+
+                    # Mostrar datos txt (LF) en un extender
+                    with st.expander(f'📄 Ver el fichero de salida:', expanded=False):
                         st.code(contenido, language="text")
 
                     # Botón de descarga
                     st.sidebar.download_button(
-                        label=f"💾 Descargar File Txt",
-                        data=contenido,
+                        label=f"💾 Descargar File Txt (CRLF)",
+                        data=contenido_crlf,  # Descargará los datos convertidos en CRLF para Windows
                         file_name=file_name_salida,
                         mime="text/plain"
                     )
@@ -859,9 +872,6 @@ def main():
                     st.error(f"No se pudo leer el archivo generado: {e}")
             else:
                 st.error("❌ No se ha podido leer el Excel correctamente.")
-
-
-        
 
 if __name__ == "__main__":
 
