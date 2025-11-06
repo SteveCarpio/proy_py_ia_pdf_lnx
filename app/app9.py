@@ -6,6 +6,7 @@ def main():
     import io
     import os
     import sys
+    import glob
     import shutil
     import datetime
     import pandas as pd
@@ -242,7 +243,6 @@ def main():
 
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
-            #if "Bono" in var_i:
             if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
                 #st.write(bonoX)                                                                                            #  DEBUG
@@ -705,7 +705,7 @@ def main():
 
         # Evaluar una Selección minima de AÑO y MES
         anoYmesMinimo1=int(f"{opcion_ano}{opcion_mes}")
-        if anoYmesMinimo1 < 202509:
+        if anoYmesMinimo1 < 202501:
             st.sidebar.write(f"⚠️ Año y Mes deben ser **>= 202510**")
             # DELETE: Vaciar la carpeta temporal de flujos xls
             delete_ficheros(ruta_destino)
@@ -720,19 +720,31 @@ def main():
             st.write(f"📁 Buscando ficheros de flujos del periodo 📅 {opcion_ano}{opcion_mes}") 
             for nombre in list_flujos[1:]:  #  [1:] : para que empiece a leer la lista desde la posición 1 y no 0
                 cont_files = cont_files + 1
-                nombre_completo = f"{nombre}_{opcion_ano}{opcion_mes}.xls"
-                # Construimos la ruta completa del fichero origen y destino
-                src = os.path.join(ruta_origen, nombre_completo)
-                dst = os.path.join(ruta_destino, nombre_completo)
                 try:
-                    shutil.copy2(src, dst)   # copy2 conserva la metadata (fecha, permisos)
-                    st.write(f"✅ {cont_files}: {nombre_completo}")     
+                    ruta_temporal = Path(f"{ruta_origen}{nombre}_{opcion_ano}{opcion_mes}.xls")
+                    if ruta_temporal.is_file():
+
+                        patron=f"{ruta_origen}{nombre}_{opcion_ano}{opcion_mes}*.xls"
+                        archivos=glob.glob(patron)  # Buscar todos lo que cumplan condicion
+                        cont_files2 = 0
+                        for archivo in archivos:  # recorro el archivo y sus posibles versiones
+                            cont_files2 = cont_files2 + 1
+                            shutil.copy2(archivo, ruta_destino)   # copy2 conserva la metadata (fecha, permisos)
+                            if cont_files2 == 1:   # Si solo tiene 1 versión inprimo normal
+                                st.write(f"✅ {cont_files}: {os.path.basename(archivo)}")
+                            else:                  # Si tiene mas versiones agrego "nueva versión" en rojo 
+                                st.markdown(f"ℹ️ {cont_files}: {os.path.basename(archivo)} - "
+                                    f"<span style='color:#ff5733; '> (nueva versión) </span>",
+                                    unsafe_allow_html=True
+                                )
+                    else:
+                        st.write(f"ℹ️ {cont_files}: {os.path.basename(ruta_temporal)}  -----  *Todavía no se ha publicado el archivo.* ")  
                 except FileNotFoundError:
-                    st.write(f"ℹ️ {cont_files}: {nombre_completo}  -----  *Todavía no se ha publicado el archivo.* ")
+                    st.write(f"ℹ️ {cont_files}: {ruta_temporal}  -----  *Todavía no se ha publicado el archivo.* ")
                 except PermissionError:
-                    st.write(f"⚠️  Permiso denegado: {src}")
+                    st.write(f"⚠️  Permiso denegado: {archivo}")
                 except Exception as e:
-                    st.write(f"❌ Error al copiar {nombre_completo}: {e}")  
+                    st.write(f"❌ Error al copiar {archivo}: {e}")  
             
     # ========= SELECTBOX: Opcion XLS =========
     # Si entramos por primera vez en la sesión borra archivos y limpia selectbox
