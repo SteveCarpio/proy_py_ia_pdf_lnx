@@ -6,6 +6,7 @@ def main():
     import io
     import os
     import sys
+    import glob
     import shutil
     import datetime
     import pandas as pd
@@ -242,7 +243,6 @@ def main():
 
             ############## Creo la LISTA [ TABLA_BONO ]
             # Leo la variable Bono
-            #if "Bono" in var_i:
             if "Bono" in var_i or "Serie" in var_i:
                 bonoX = var_i.strip()
                 #st.write(bonoX)                                                                                            #  DEBUG
@@ -688,7 +688,7 @@ def main():
         st.session_state.selector_mes = mes_actual
 
     # Valores del SelectBox por defecto
-    op_ano = ["2025", "2026"]
+    op_ano = ["2025", "2026", "2027", "2028"]
     op_mes = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
 
     # ========= SELECTBOX: Año y Mes =========
@@ -705,7 +705,7 @@ def main():
 
         # Evaluar una Selección minima de AÑO y MES
         anoYmesMinimo1=int(f"{opcion_ano}{opcion_mes}")
-        if anoYmesMinimo1 < 202509:
+        if anoYmesMinimo1 < 202510:
             st.sidebar.write(f"⚠️ Año y Mes deben ser **>= 202510**")
             # DELETE: Vaciar la carpeta temporal de flujos xls
             delete_ficheros(ruta_destino)
@@ -720,19 +720,31 @@ def main():
             st.write(f"📁 Buscando ficheros de flujos del periodo 📅 {opcion_ano}{opcion_mes}") 
             for nombre in list_flujos[1:]:  #  [1:] : para que empiece a leer la lista desde la posición 1 y no 0
                 cont_files = cont_files + 1
-                nombre_completo = f"{nombre}_{opcion_ano}{opcion_mes}.xls"
-                # Construimos la ruta completa del fichero origen y destino
-                src = os.path.join(ruta_origen, nombre_completo)
-                dst = os.path.join(ruta_destino, nombre_completo)
                 try:
-                    shutil.copy2(src, dst)   # copy2 conserva la metadata (fecha, permisos)
-                    st.write(f"✅ {cont_files}: {nombre_completo}")     
+                    ruta_temporal = Path(f"{ruta_origen}{nombre}_{opcion_ano}{opcion_mes}.xls")
+                    if ruta_temporal.is_file():
+
+                        patron=f"{ruta_origen}{nombre}_{opcion_ano}{opcion_mes}*.xls"
+                        archivos=glob.glob(patron)  # Buscar todos lo que cumplan condicion
+                        cont_files2 = 0
+                        for archivo in archivos:  # recorro el archivo y sus posibles versiones
+                            cont_files2 = cont_files2 + 1
+                            shutil.copy2(archivo, ruta_destino)   # copy2 conserva la metadata (fecha, permisos)
+                            if cont_files2 == 1:   # Si solo tiene 1 versión inprimo normal
+                                st.write(f"✅ {cont_files}: {os.path.basename(archivo)}")
+                            else:                  # Si tiene mas versiones agrego "nueva versión" en rojo 
+                                st.markdown(f"ℹ️ {cont_files}: {os.path.basename(archivo)} - "
+                                    f"<span style='color:#ff5733; '> (nueva versión) </span>",
+                                    unsafe_allow_html=True
+                                )
+                    else:
+                        st.write(f"ℹ️ {cont_files}: {os.path.basename(ruta_temporal)}  -----  *Todavía no se ha publicado el archivo.* ")  
                 except FileNotFoundError:
-                    st.write(f"ℹ️ {cont_files}: {nombre_completo}  -----  *Todavía no se ha publicado el archivo.* ")
+                    st.write(f"ℹ️ {cont_files}: {ruta_temporal}  -----  *Todavía no se ha publicado el archivo.* ")
                 except PermissionError:
-                    st.write(f"⚠️  Permiso denegado: {src}")
+                    st.write(f"⚠️  Permiso denegado: {archivo}")
                 except Exception as e:
-                    st.write(f"❌ Error al copiar {nombre_completo}: {e}")  
+                    st.write(f"❌ Error al copiar {archivo}: {e}")  
             
     # ========= SELECTBOX: Opcion XLS =========
     # Si entramos por primera vez en la sesión borra archivos y limpia selectbox
@@ -756,7 +768,7 @@ def main():
 
             # Permitir eliminar filas
             bonos_to_remove = st.sidebar.multiselect(
-                "🗑️ **Selecciona bonos a eliminar:**",
+                "🗑️ **Seleccione los bonos a eliminar:**",
                 options=df_nomBono["BONO"].tolist()
             )
 
@@ -782,17 +794,22 @@ def main():
         # ========= BOTON: Procesar Datos =========
         if st.sidebar.button("🔄 Procesar Datos"):
             if df_excel is not None:
-                # Procesar el archivo
+                # FUNCION: Procesar Datos 
                 rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
 
-                st.success("✅ Resultado Excel: Datos Procesados")
+                st.success(f"✅ Resultado Excel: Datos Procesados: ({opcion_xls}.xlsx)")
+                
+                # Mostrar datos del dataframe en un externder
+                with st.expander("📄 Ver tabla con los datos procesados:"):
+                    st.write(df_principal9)
+
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     st.write("")
                     st.write("")
 
                     import streamlit.components.v1 as components
-                    # HTML con estilos CSS (ajusta font-size a lo que necesites)
+                    # HTML con estilos CSS (ajustamos font-size)
                     html = f"""
                     <style>
                     table {{
@@ -810,7 +827,7 @@ def main():
                     components.html(html, height=350, scrolling=True)
                     
                 with col2:
-                    # Crear gráfico
+                    # Defino un gráfico de barras
                     fig = px.bar(
                         df_cuadro_bonos,
                         x="BONO",
@@ -818,14 +835,14 @@ def main():
                         barmode="group"
                     )
 
-                    # Ajustes visuales
+                    # Edito Ajustes visuales
                     fig.update_layout(
                         height=400,
                         margin=dict(t=40, b=10, l=40, r=40),  # menos espacio abajo
                         xaxis_title=None,                     # quitamos título de abajo
                     )
 
-                    # Mover título del eje X arriba
+                    # Edito El título del eje X arriba
                     fig.add_annotation(
                         text=" ",                   # texto del título
                         xref="paper", yref="paper",
@@ -834,24 +851,32 @@ def main():
                         font=dict(size=14)
                     )
 
-                    # Mostrar gráfico alineado arriba
+                    # Mostrar gráfico de Barras alineado arriba
                     st.plotly_chart(fig, use_container_width=True)
             
-                with st.expander("📄 Ver el resumen de los datos procesados"):
-                    st.write(df_principal9)
+                # Mostrar datos del dataframe en un externder
+                #with st.expander("📄 Ver tabla con los datos procesados:"):
+                #    st.write(df_principal9)
 
-                st.success("✅ Resultado Txt: Flujos Bloomberg")
+                # Visualizar datos en formato TXT
+                st.success(f"✅ Resultado Txt: Flujos Bloomberg: ({opcion_xls}.txt)")
                 try:
                     with open(f'{rutaSalida}{fileSalida}.txt', "r", encoding="utf-8") as f:
                         contenido = f.read()
-                    file_name_salida = f"{opcion_xls}_SALIDA.txt"              
-                    with st.expander(f'📄 Ver el file de salida:  {file_name_salida}', expanded=False):
+
+                    # Reemplaza LF por CRLF en el contenido para asegurar el formato de Windows.
+                    contenido_crlf = contenido.replace('\n', '\r\n') 
+                    
+                    file_name_salida = f"{opcion_xls}_SALIDA.txt"  
+
+                    # Mostrar datos txt (LF) en un extender
+                    with st.expander(f'📄 Ver el fichero de salida:', expanded=False):
                         st.code(contenido, language="text")
 
                     # Botón de descarga
                     st.sidebar.download_button(
-                        label=f"💾 Descargar File Txt",
-                        data=contenido,
+                        label=f"💾 Descargar File Txt (CRLF)",
+                        data=contenido_crlf,  # Descargará los datos convertidos en CRLF para Windows
                         file_name=file_name_salida,
                         mime="text/plain"
                     )
@@ -859,9 +884,6 @@ def main():
                     st.error(f"No se pudo leer el archivo generado: {e}")
             else:
                 st.error("❌ No se ha podido leer el Excel correctamente.")
-
-
-        
 
 if __name__ == "__main__":
 
