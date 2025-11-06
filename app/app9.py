@@ -71,108 +71,108 @@ def main():
     def get_dic_nomBono(file_name: str):
         """Devuelve el diccionario de bonos según el nombre del fichero."""
 
-        if list_flujos[1] in file_name:
+        if list_flujos[1] in file_name:  # FTPYMETDACAM4_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono B','NUM_BONOS': 100},
-                {'BONO': 'Bono C','NUM_BONOS': 200},
-                {'BONO': 'Bono D','NUM_BONOS': 300}
+                {'BONO': 'Bono B','NUM_BONOS': 9315},
+                {'BONO': 'Bono C','NUM_BONOS': 1270},
+                {'BONO': 'Bono D','NUM_BONOS': 660}
             ]
 
-        elif list_flujos[2] in file_name:
+        elif list_flujos[2] in file_name:  # PENEDESFTGENCAT1_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-C','NUM_BONOS': 100}
+                {'BONO': 'Bono-C','NUM_BONOS': 929}
             ]
 
-        elif list_flujos[3] in file_name:
+        elif list_flujos[3] in file_name:  # PENEDESPYMES1_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-C','NUM_BONOS': 100}
+                {'BONO': 'Bono-C','NUM_BONOS': 194}
             ]
 
-        elif list_flujos[4] in file_name:
+        elif list_flujos[4] in file_name:  # SABADELL5_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200}
+                {'BONO': 'Bono-A','NUM_BONOS': 34300},
+                {'BONO': 'Bono-B','NUM_BONOS': 700}
             ]
 
-        elif list_flujos[5] in file_name:
+        elif list_flujos[5] in file_name:  # SCFAUTOS_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200},
-                {'BONO': 'Bono-C','NUM_BONOS': 300},
-                {'BONO': 'Bono-D','NUM_BONOS': 400},
-                {'BONO': 'Bono-E','NUM_BONOS': 500},
-                {'BONO': 'Bono-F','NUM_BONOS': 600}
+                {'BONO': 'Bono-A','NUM_BONOS': 5523},
+                {'BONO': 'Bono-B','NUM_BONOS': 380},
+                {'BONO': 'Bono-C','NUM_BONOS': 207},
+                {'BONO': 'Bono-D','NUM_BONOS': 200},
+                {'BONO': 'Bono-E','NUM_BONOS': 190},
+                {'BONO': 'Bono-F','NUM_BONOS': 95}
             ]
         
-        elif list_flujos[6] in file_name:
+        elif list_flujos[6] in file_name:  # TDA26_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono 1-A1','NUM_BONOS': 100},
-                {'BONO': 'Bono 1-A2','NUM_BONOS': 200},
-                {'BONO': 'Bono 1-B','NUM_BONOS': 300},
-                {'BONO': 'Bono 1-C','NUM_BONOS': 400},
-                {'BONO': 'Bono 1-D','NUM_BONOS': 500},
-                {'BONO': 'Bono 2-A','NUM_BONOS': 600},
-                {'BONO': 'Bono 2-B','NUM_BONOS': 700},
-                {'BONO': 'Bono 2-C','NUM_BONOS': 800}
+                {'BONO': 'Bono 1-A1','NUM_BONOS': 1650},
+                {'BONO': 'Bono 1-A2','NUM_BONOS': 6364},
+                {'BONO': 'Bono 1-B','NUM_BONOS': 152},
+                {'BONO': 'Bono 1-C','NUM_BONOS': 54},
+                {'BONO': 'Bono 1-D','NUM_BONOS': 62},
+                {'BONO': 'Bono 2-A','NUM_BONOS': 701},
+                {'BONO': 'Bono 2-B','NUM_BONOS': 49},
+                {'BONO': 'Bono 2-C','NUM_BONOS': 19}
             ]
 
-        elif list_flujos[7] in file_name:
+        elif list_flujos[7] in file_name:  # TDA29_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Serie-A1','NUM_BONOS': 100},
-                {'BONO': 'Serie-A2','NUM_BONOS': 200},
-                {'BONO': 'Serie-B','NUM_BONOS': 300},
-                {'BONO': 'Serie-C','NUM_BONOS': 400},
-                {'BONO': 'Serie-D','NUM_BONOS': 500}
+                {'BONO': 'Serie-A1','NUM_BONOS': 3483},
+                {'BONO': 'Serie-A2','NUM_BONOS': 4350},
+                {'BONO': 'Serie-B','NUM_BONOS': 174},
+                {'BONO': 'Serie-C','NUM_BONOS': 93},
+                {'BONO': 'Serie-D','NUM_BONOS': 49}
             ]
 
-        elif list_flujos[8] in file_name:
+        elif list_flujos[8] in file_name:  # TDACAM4_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200}
+                {'BONO': 'Bono-A','NUM_BONOS': 9520},
+                {'BONO': 'Bono-B','NUM_BONOS': 480}
             ]
 
-        elif list_flujos[9] in file_name:
+        elif list_flujos[9] in file_name:  # TDACAM5_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200}
+                {'BONO': 'Bono-A','NUM_BONOS': 19440},
+                {'BONO': 'Bono-B','NUM_BONOS': 560}
             ]
 
-        elif list_flujos[10] in file_name:
+        elif list_flujos[10] in file_name:  # TDACAM6_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A3','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200}
+                {'BONO': 'Bono-A3','NUM_BONOS': 7520},
+                {'BONO': 'Bono-B','NUM_BONOS': 500}
             ]
 
-        elif list_flujos[11] in file_name:
+        elif list_flujos[11] in file_name:  # TDACAM7_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A2','NUM_BONOS': 100},
-                {'BONO': 'Bono-A3','NUM_BONOS': 200},
-                {'BONO': 'Bono-B','NUM_BONOS': 300}
+                {'BONO': 'Bono-A2','NUM_BONOS': 12073},
+                {'BONO': 'Bono-A3','NUM_BONOS': 2000},
+                {'BONO': 'Bono-B','NUM_BONOS': 927}
             ]
 
-        elif list_flujos[12] in file_name:
+        elif list_flujos[12] in file_name:  # TDACAM8_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200},
-                {'BONO': 'Bono-C','NUM_BONOS': 300},
-                {'BONO': 'Bono-D','NUM_BONOS': 400}
+                {'BONO': 'Bono-A','NUM_BONOS': 16354},
+                {'BONO': 'Bono-B','NUM_BONOS': 459},
+                {'BONO': 'Bono-C','NUM_BONOS': 187},
+                {'BONO': 'Bono-D','NUM_BONOS': 128}
             ]
 
-        elif list_flujos[13] in file_name:
+        elif list_flujos[13] in file_name:  # TDACAM9_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A1','NUM_BONOS': 100},
-                {'BONO': 'Bono-A2','NUM_BONOS': 200},
-                {'BONO': 'Bono-A3','NUM_BONOS': 300},
-                {'BONO': 'Bono-B','NUM_BONOS': 400},
-                {'BONO': 'Bono-C','NUM_BONOS': 500},
-                {'BONO': 'Bono-D','NUM_BONOS': 600}
+                {'BONO': 'Bono-A1','NUM_BONOS': 2500},
+                {'BONO': 'Bono-A2','NUM_BONOS': 9435},
+                {'BONO': 'Bono-A3','NUM_BONOS': 2300},
+                {'BONO': 'Bono-B','NUM_BONOS': 480},
+                {'BONO': 'Bono-C','NUM_BONOS': 285},
+                {'BONO': 'Bono-D','NUM_BONOS': 150}
             ]
         
-        elif list_flujos[14] in file_name:
+        elif list_flujos[14] in file_name:  # TDAPENEDES1_INFFLUJOS_ES
             dic_nomBono = [
-                {'BONO': 'Bono-A','NUM_BONOS': 100},
-                {'BONO': 'Bono-B','NUM_BONOS': 200},
-                {'BONO': 'Bono-C','NUM_BONOS': 300}
+                {'BONO': 'Bono-A','NUM_BONOS': 9500},
+                {'BONO': 'Bono-B','NUM_BONOS': 290},
+                {'BONO': 'Bono-C','NUM_BONOS': 210}
             ]
 
         else:
@@ -790,6 +790,16 @@ def main():
                 st.error(f"Error al leer el Excel: {e}")
                 df_excel = None
 
+        # ========= BOTON: Descargar excel de Flujos =========
+        with open(f"{ruta_destino}/{opcion_xls}.xls", "rb") as f:
+            excel_bytes = f.read()
+        st.sidebar.download_button(
+            label="🔎🧐 Revisar Excel Flujos",
+            data=excel_bytes,
+            file_name=os.path.basename(f"{opcion_xls}.xls"),           # nombre que tendrá al descargar
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # MIME para .xlsx
+            use_container_width=True
+        )
     
         # ========= BOTON: Procesar Datos =========
         if st.sidebar.button("🔄 Procesar Datos"):
@@ -884,6 +894,7 @@ def main():
                     st.error(f"No se pudo leer el archivo generado: {e}")
             else:
                 st.error("❌ No se ha podido leer el Excel correctamente.")
+
 
 if __name__ == "__main__":
 
