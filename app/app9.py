@@ -586,15 +586,21 @@ def main():
         df_principal9 = pd.DataFrame(filas8)
 
         ############### RESULTADO ############################################
-        #print(df_principal9.head(10))
         rutaSalida="/home/robot/Python/proy_py_ia_pdf_lnx/tmp/"
         fileSalida="FLUJOS_BLOOMBERG"
-
+        # Exporto a Excel para comprobación, no sirve para el proceso.
         df_principal9.to_excel(f'{rutaSalida}{fileSalida}.xlsx', sheet_name='hoja1', index=False)
 
+        ############### FASE 10 - CLimpieza del Fichero Resultante EXCEL ############################################
 
-        ############### FASE 9 - Construir la SALIDA a fichero EXCEL ############################################
+        # Si las variables "AP, IB, T_AP" vienen a 0 borro el registro
+        df_principal10 = df_principal9.query('AP != 0 and IB != 0 and T_AP != 0').reset_index(drop=True)
+        df_valorescero = df_principal9.query('AP == 0 and IB == 0 and T_AP == 0').reset_index(drop=True)
+        var_valorveros = len(df_valorescero)
 
+
+
+        ############### FASE 11 - Construir la SALIDA a fichero EXCEL ############################################
         # Abrir el archivo una sola vez en modo escritura
         with open(f'{rutaSalida}{fileSalida}.txt', "w", encoding="utf-8") as f:
             l01 = f"mccf version: 1.0\n"
@@ -606,7 +612,7 @@ def main():
             f.write(l03)
             f.write(l04)
 
-            for _, fila9 in df_principal9.iterrows():
+            for _, fila9 in df_principal10.iterrows():
                                                                       
                 vTT1 = "0.00" if '-' in f"{fila9['TT1']}" else f"{float(fila9['TT1']):.2f}"                    # si existe simbolo "-" pondrá 0.00 "else" redondea a dos decimales
                 vTT2 = f"{float(fila9['TT2']):.2f}"                                                            # redondea a dos decimales
@@ -643,7 +649,7 @@ def main():
                     l16 = f"{vFECHA} {vTT1} {vTT2}\n"
                     f.write(l16)
 
-        return rutaSalida, fileSalida, df_principal9, df_cuadro_bonos
+        return rutaSalida, fileSalida, df_principal10, df_cuadro_bonos, var_valorveros
 
     # ============================================================
     # FUNCION DELETE: Borrar fichero de la carpeta temporal de XSL
@@ -805,13 +811,15 @@ def main():
         if st.sidebar.button("🔄 Procesar Datos"):
             if df_excel is not None:
                 # FUNCION: Procesar Datos 
-                rutaSalida, fileSalida, df_principal9, df_cuadro_bonos = procesar_datos2(df_excel, dic_nomBono_actualizado)
+                rutaSalida, fileSalida, df_resultado, df_cuadro_bonos, var_valorveros = procesar_datos2(df_excel, dic_nomBono_actualizado)
 
                 st.success(f"✅ Resultado Excel: Datos Procesados: ({opcion_xls}.xlsx)")
+                if var_valorveros > 0:
+                    st.info("ℹ️ No se ha tenido en cuenta unos del los Bonos por tener totales a CERO. 🔎🧐  Revisar Excel Flujos")
                 
                 # Mostrar datos del dataframe en un externder
                 with st.expander("📄 Ver tabla con los datos procesados:"):
-                    st.write(df_principal9)
+                    st.write(df_resultado)
 
                 col1, col2 = st.columns([1, 1])
                 with col1:
@@ -863,10 +871,6 @@ def main():
 
                     # Mostrar gráfico de Barras alineado arriba
                     st.plotly_chart(fig, use_container_width=True)
-            
-                # Mostrar datos del dataframe en un externder
-                #with st.expander("📄 Ver tabla con los datos procesados:"):
-                #    st.write(df_principal9)
 
                 # Visualizar datos en formato TXT
                 st.success(f"✅ Resultado Txt: Flujos Bloomberg: ({opcion_xls}.txt)")
