@@ -1,32 +1,13 @@
 import streamlit as st
-import pandas as pd
 import sqlite3
+import pandas as pd
 import os
 
 # --------------------------
 # CONFIGURACIÓN GENERAL
 # --------------------------
-st.set_page_config(page_title="Configuración del Sistema", layout="wide")
-os.makedirs("data", exist_ok=True)  # Crear carpeta si no existe
+os.makedirs("data", exist_ok=True)  
 DB_FILE = "data/configuracion.db"
-
-# Usuario y contraseña
-USERS = {"admin": "admin123"}
-
-# --------------------------
-# FUNCIÓN DE LOGIN
-# --------------------------
-def login():
-    st.sidebar.title("🔐 Iniciar sesión")
-    username = st.sidebar.text_input("Usuario")
-    password = st.sidebar.text_input("Contraseña", type="password")
-    if st.sidebar.button("Entrar"):
-        if username in USERS and USERS[username] == password:
-            st.session_state["logged_in"] = True
-            st.session_state["user"] = username
-            st.rerun()
-        else:
-            st.sidebar.error("Usuario o contraseña incorrectos")
 
 # --------------------------
 # BASE DE DATOS
@@ -79,7 +60,9 @@ def delete_record(clave):
 # INTERFAZ PRINCIPAL
 # --------------------------
 def main():
-    st.title("⚙️ Tabla de Configuración del Sistemacccccc")
+    st.title("🌐 WebScraping: Eventos Relevantes")
+    st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
+    st.sidebar.subheader("🌐 : Eventos Relevantes")
 
     df = get_data()
 
@@ -88,8 +71,8 @@ def main():
         if col in df.columns:
             df = df.drop(columns=[col])
 
-
-    st.subheader("Tabla de Configuración")
+    # Titulo para el apartado de BIVA
+    st.subheader("Emisores Activos de: BIVA")
 
     # Añadimos columna de selección
     df["Seleccionar"] = False
@@ -110,38 +93,23 @@ def main():
         }
     )
 
-    # Botón único para borrar registros seleccionados
-    if st.button("🗑️ Eliminar registros seleccionados.."):
-        rows_to_delete = edited_df[edited_df["Seleccionar"] == True]
-        for _, row in rows_to_delete.iterrows():
-            delete_record(row["CLAVE"])
-        st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
-        st.rerun()  # 🔹 recarga la página
-
-    # Guardar cambios
-    if st.button("💾 Guardar cambios"):
+    # BOTÓN: Guardar cambios
+    st.sidebar.info("ℹ️ Después de cualquier cambio muy importante darle al botón Guardar Cambios")
+    if st.sidebar.button("💾 Guardar cambios"):
         # eliminamos columna de selección antes de guardar
         if "Seleccionar" in edited_df.columns:
             edited_df = edited_df.drop(columns=["Seleccionar"])
         update_data(edited_df)
         st.success("✅ Cambios guardados correctamente")
 
-
-# --------------------------
-# APP FLOW
-# --------------------------
-init_db()
-
-if "logged_in" not in st.session_state:
-    st.session_state["logged_in"] = False
-
-if not st.session_state["logged_in"]:
-    login()
-else:
-    st.sidebar.success(f"Sesión iniciada como: {st.session_state['user']}")
-    if st.sidebar.button("Cerrar sesión"):
-        st.session_state["logged_in"] = False
-        st.rerun()
+    # BOTÓN: Borrar Registros seleccionados
+    st.sidebar.warning("⚠️ Puede seleccione uno o varios registros para eliminarlo, 🚨 cuidado esta acción será permanente.")
+    if st.sidebar.button("🗑️ Eliminar registro"):
+        rows_to_delete = edited_df[edited_df["Seleccionar"] == True]
+        for _, row in rows_to_delete.iterrows():
+            delete_record(row["CLAVE"])
+        st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
+        st.rerun() 
 
 if __name__ == "__main__":
     main()
