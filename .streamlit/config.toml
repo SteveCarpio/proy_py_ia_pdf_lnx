@@ -1,3 +1,11 @@
+[server]
+maxCachedMessageAge = 0
+
+[browser]
+gatherUsageStats = false
+serverAddress = "10.10.30.7"
+serverPort = 8501
+
 [theme]
 base = "light"          # Establece el tema por defecto
 
