@@ -63,10 +63,54 @@ def main():
     st.title("🌐 WebScraping: Eventos Relevantes")
     st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
     st.sidebar.subheader("🌐 : Eventos Relevantes")
+    st.sidebar.subheader("🔐 Control de Acceso")
 
+    # ------------------------------------------------------------------
+    # INICIO: Login
+    # ------------------------------------------------------------------
+    # ── 1. Definir las claves de los "widgets" 
+    USER_KEY = "usuario_input"
+    PASS_KEY = "contraseña_input"
+
+    # ── 2. Botón “Cerrar Sesión” (sTv: se debe poner al principio) 
+    if st.sidebar.button("Cerrar Sesión"):
+        # 2.1 Limpiamos los campos y la sesión
+        st.session_state[USER_KEY] = ""
+        st.session_state[PASS_KEY] = ""
+        st.session_state.pop("usuario", None)
+        st.session_state.pop("rol", None)
+        # 2.2 Se vuelve a renderizar la app con la sesión limpia
+        st.rerun()          # opcional: si quere,os refrescar inmediatamente
+
+    # ── 3. Widget de login usamos "text_input"
+    
+    username = st.sidebar.text_input("Usuario", key=USER_KEY)
+    password = st.sidebar.text_input("Contraseña", type="password", key=PASS_KEY)
+
+    if st.sidebar.button("Acceder"):
+        if username == "admin" and password == "admin1234":
+            st.session_state["usuario"] = "admin"
+            st.session_state["rol"]     = "admin1234"
+            st.rerun()
+        else:
+            st.sidebar.error("❌ Credenciales inválidas")
+
+    # Si le hemos dado "Cerrar Sesión" entrará aquí, hará un stop.
+    if "usuario" not in st.session_state:
+        st.stop()
+    # ------------------------------------------------------------------
+    # FIN: Login
+    # ------------------------------------------------------------------
+
+
+    # ------------------------------------------------------------------------------------------------------------------------------------
+    # Inicio del Programa
+    # ------------------------------------------------------------------------------------------------------------------------------------
+    
+    # Cargamos en un DataFrame los datos de la tabla, si no existe la bbdd la crea.
     df = get_data()
 
-    # Ocultar columnas innecesarias
+    # Ocultar columnas innecesarios del DataFrame
     for col in ["C3", "FILTRO"]:
         if col in df.columns:
             df = df.drop(columns=[col])
@@ -94,7 +138,7 @@ def main():
     )
 
     # BOTÓN: Guardar cambios
-    st.sidebar.info("ℹ️ Después de cualquier cambio muy importante darle al botón Guardar Cambios")
+    #st.sidebar.info("ℹ️ Después de cualquier cambio muy importante darle al botón Guardar Cambios")
     if st.sidebar.button("💾 Guardar cambios"):
         # eliminamos columna de selección antes de guardar
         if "Seleccionar" in edited_df.columns:
@@ -103,7 +147,7 @@ def main():
         st.success("✅ Cambios guardados correctamente")
 
     # BOTÓN: Borrar Registros seleccionados
-    st.sidebar.warning("⚠️ Puede seleccione uno o varios registros para eliminarlo, 🚨 cuidado esta acción será permanente.")
+    #st.sidebar.warning("⚠️ Puede seleccione uno o varios registros para eliminarlo, 🚨 cuidado esta acción será permanente.")
     if st.sidebar.button("🗑️ Eliminar registro"):
         rows_to_delete = edited_df[edited_df["Seleccionar"] == True]
         for _, row in rows_to_delete.iterrows():
@@ -111,5 +155,9 @@ def main():
         st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
         st.rerun() 
 
+
 if __name__ == "__main__":
+
     main()
+
+
