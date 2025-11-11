@@ -1,13 +1,147 @@
 import streamlit as st
+import pandas as pd
+import sqlite3
+import os
 
-# ----------------------------------------
-# EJECUCIÓN PRINCIPAL
-# ----------------------------------------
+# --------------------------
+# CONFIGURACIÓN GENERAL
+# --------------------------
+st.set_page_config(page_title="Configuración del Sistema", layout="wide")
+os.makedirs("data", exist_ok=True)  # Crear carpeta si no existe
+DB_FILE = "data/configuracion.db"
+
+# Usuario y contraseña
+USERS = {"admin": "admin123"}
+
+# --------------------------
+# FUNCIÓN DE LOGIN
+# --------------------------
+def login():
+    st.sidebar.title("🔐 Iniciar sesión")
+    username = st.sidebar.text_input("Usuario")
+    password = st.sidebar.text_input("Contraseña", type="password")
+    if st.sidebar.button("Entrar"):
+        if username in USERS and USERS[username] == password:
+            st.session_state["logged_in"] = True
+            st.session_state["user"] = username
+            st.rerun()
+        else:
+            st.sidebar.error("Usuario o contraseña incorrectos")
+
+# --------------------------
+# BASE DE DATOS
+# --------------------------
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS configuracion (
+            CLAVE TEXT,
+            CODIGO INTEGER,
+            FILTRO TEXT,
+            ESTADO TEXT CHECK(ESTADO IN ('S','N')),
+            GRUPO TEXT,
+            TO_EMAIL TEXT DEFAULT 'stv.madrid@gmail.com',
+            CC_EMAIL TEXT DEFAULT 'paco@gmail.com',
+            C3 TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def get_data():
+    conn = sqlite3.connect(DB_FILE)
+    try:
+        df = pd.read_sql_query("SELECT * FROM configuracion ORDER BY CLAVE ASC", conn)
+    except Exception:
+        init_db()
+        df = pd.DataFrame(columns=[
+            "CLAVE", "CODIGO", "FILTRO", "ESTADO", "GRUPO",
+            "TO_EMAIL", "CC_EMAIL", "C3"
+        ])
+    conn.close()
+    return df
+
+def update_data(df):
+    conn = sqlite3.connect(DB_FILE)
+    conn.execute("DELETE FROM configuracion")
+    df.to_sql("configuracion", conn, if_exists="append", index=False)
+    conn.close()
+
+def delete_record(clave):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("DELETE FROM configuracion WHERE CLAVE = ?", (clave,))
+    conn.commit()
+    conn.close()
+
+# --------------------------
+# INTERFAZ PRINCIPAL
+# --------------------------
 def main():
-    st.title("Web Scraping - Eventos Relevantes")
-    st.subheader("no usar está página por favor.. ")
+    st.title("⚙️ Tabla de Configuración del Sistemacccccc")
+
+    df = get_data()
+
+    # Ocultar columnas innecesarias
+    for col in ["C3", "FILTRO"]:
+        if col in df.columns:
+            df = df.drop(columns=[col])
 
 
+    st.subheader("Tabla de Configuración")
+
+    # Añadimos columna de selección
+    df["Seleccionar"] = False
+
+    # Editor de datos interactivo
+    edited_df = st.data_editor(
+        df,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="data_editor",
+        column_config={
+            "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S=Envió de Email"),
+            "GRUPO":    st.column_config.TextColumn("GRUPO", default="M"),
+            "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
+            "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
+            "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
+            "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
+        }
+    )
+
+    # Botón único para borrar registros seleccionados
+    if st.button("🗑️ Eliminar registros seleccionados.."):
+        rows_to_delete = edited_df[edited_df["Seleccionar"] == True]
+        for _, row in rows_to_delete.iterrows():
+            delete_record(row["CLAVE"])
+        st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
+        st.rerun()  # 🔹 recarga la página
+
+    # Guardar cambios
+    if st.button("💾 Guardar cambios"):
+        # eliminamos columna de selección antes de guardar
+        if "Seleccionar" in edited_df.columns:
+            edited_df = edited_df.drop(columns=["Seleccionar"])
+        update_data(edited_df)
+        st.success("✅ Cambios guardados correctamente")
+
+
+# --------------------------
+# APP FLOW
+# --------------------------
+init_db()
+
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+if not st.session_state["logged_in"]:
+    login()
+else:
+    st.sidebar.success(f"Sesión iniciada como: {st.session_state['user']}")
+    if st.sidebar.button("Cerrar sesión"):
+        st.session_state["logged_in"] = False
+        st.rerun()
 
 if __name__ == "__main__":
     main()

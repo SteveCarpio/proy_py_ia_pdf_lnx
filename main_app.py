@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9, app10
+from app import app0, app1, app10_, app2, app3, app4, app5, app6, app7, app8, app9, app10
 import gc
 
 def mantenimiento():
