@@ -21,6 +21,21 @@ st.set_page_config(
     layout="wide"
 )
 
+# Evitar cacheo en recursos estáticos
+st.markdown(
+    """
+    <script>
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+        });
+    }
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Diccionario Inteligencia Artificial
 IA_APPS = {
     "1 - Facturas PDF": app1,
