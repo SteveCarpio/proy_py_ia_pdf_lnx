@@ -114,47 +114,50 @@ def main():
             df2 = df2.drop(columns=[col])
 
     # TABLA: BIVA ---------------------------------------------------------------------
-    st.subheader("Emisores Activos de: BIVA")
-    # Añadimos columna de selección
-    df1["Seleccionar"] = False
-    # Editor de datos interactivo
-    edited_df1 = st.data_editor(
-        df1,
-        num_rows="dynamic",
-        use_container_width=True,
-        key="data_editor1",
-        column_config={
-            "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
-            "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
-            "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
-            "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
-            "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
-            "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
-            "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
-        }
-    )
+    with st.expander("🗂️ Emisores Activos de: BIVA", expanded=False):
+        # Añadimos columna de selección
+        df1["Seleccionar"] = False
+        # Editor de datos interactivo
+        edited_df1 = st.data_editor(
+            df1,
+            num_rows="dynamic",
+            use_container_width=True,
+            key="data_editor1",
+            column_config={
+                "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
+                "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
+                "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
+                "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
+                "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
+                "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
+                "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
+            }
+        )
+
     # TABLA: BMV ---------------------------------------------------------------------
-    st.subheader("Emisores Activos de: BMV")
-    # Añadimos columna de selección
-    df2["Seleccionar"] = False
-    # Editor de datos interactivo
-    edited_df2 = st.data_editor(
-        df2,
-        num_rows="dynamic",
-        use_container_width=True,
-        key="data_editor2",
-        column_config={
-            "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
-            "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
-            "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
-            "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
-            "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
-            "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
-            "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
-        }
-    )
-
-
+    with st.expander("🗂️ Emisores Activos de: BMV", expanded=False):
+        # Añadimos columna de selección
+        df2["Seleccionar"] = False
+        # Editor de datos interactivo
+        edited_df2 = st.data_editor(
+            df2,
+            num_rows="dynamic",
+            use_container_width=True,
+            key="data_editor2",
+            column_config={
+                "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
+                "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
+                "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
+                "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
+                "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
+                "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
+                "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
+            }
+        )
+ 
+    # ---------------------------------------------------------------------------------------
+    # SECCION BOTONES GUARDAR Y ELIMINAR
+    # ---------------------------------------------------------------------------------------
     st.sidebar.caption("---")
 
     # Sección GUARDAR REGISTROS -------------------------------------------------------------
