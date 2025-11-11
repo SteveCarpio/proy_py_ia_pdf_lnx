@@ -7,7 +7,7 @@ import os
 # CONFIGURACIÓN GENERAL
 # --------------------------
 os.makedirs("data", exist_ok=True)  
-DB_FILE = "data/configuracion.db"
+DB_FILE = "data/configuracion_BIVA.db"
 
 # --------------------------
 # BASE DE DATOS
