@@ -16,8 +16,8 @@ def mantenimiento():
 
 # Configuración
 st.set_page_config(
-    page_title="Portal Python TdA",
-    page_icon="💼",
+    page_title="Portal IA",
+    page_icon="🤖",
     layout="wide"
 )
 
