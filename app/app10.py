@@ -4,7 +4,7 @@ import streamlit as st
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
-    st.title("Pruebas.. --")
+    st.title("Web Scraping - Eventos Relevantes")
     st.subheader("no usar está página por favor.. ")
 
 
