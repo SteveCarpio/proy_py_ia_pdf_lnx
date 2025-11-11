@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
+import pathlib
 import os
 
 # --------------------------
@@ -9,6 +10,20 @@ import os
 os.makedirs("data", exist_ok=True)  
 DB_FILE1 = "data/app10_config_BIVA.db"
 DB_FILE2 = "data/app10_config_BMV.db"
+LOG_DIR1 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BIVA/LOG")
+LOG_DIR2 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BMV/LOG")
+
+# --------------------------
+# BUSCAR LOG DE UNA CARPETA
+# --------------------------
+def obtener_ultimos_logs(directorio: pathlib.Path, cantidad=10):
+    """
+    Devuelve una lista de pathlib.Path con los `cantidad` logs más recientes.
+    Solo considera archivos con extensión .log.
+    """
+    logs = [f for f in directorio.glob("*.log") if f.is_file()]
+    logs.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+    return logs[:cantidad]
 
 # --------------------------
 # BASE DE DATOS
@@ -64,7 +79,6 @@ def main():
     st.title("🌐 WebScraping: Eventos Relevantes")
     st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
     st.sidebar.subheader("🌐 : Eventos Relevantes")
-    #st.sidebar.subheader("🔐 Control de Acceso")
 
     # ------------------------------------------------------------------
     # INICIO: Login
@@ -105,6 +119,10 @@ def main():
     df1 = get_data(DB_FILE1)
     df2 = get_data(DB_FILE2)
 
+    # Obtener una lista con las logs de las Bolsas
+    lista_logs1 = obtener_ultimos_logs(LOG_DIR1, 10)
+    lista_logs2 = obtener_ultimos_logs(LOG_DIR2, 10)
+
     # Ocultar columnas innecesarios del DataFrame
     for col in ["C3", "FILTRO"]:
         if col in df1.columns:
@@ -113,8 +131,11 @@ def main():
         if col in df2.columns:
             df2 = df2.drop(columns=[col])
 
-    # TABLA: BIVA ---------------------------------------------------------------------
-    with st.expander("🗂️ Emisores Activos de: BIVA", expanded=False):
+    # DATOS: ---------------------------------------------------------------------------------------------------------------------------
+
+    # TABLA: BIVA --------------------------------------------------------------------- 
+    st.subheader("BIVA: ")
+    with st.expander("📗 Listado de Emisores", expanded=False):
         # Añadimos columna de selección
         df1["Seleccionar"] = False
         # Editor de datos interactivo
@@ -134,8 +155,34 @@ def main():
             }
         )
 
+    with st.expander("🗂️ Logs de ejecución"):
+        if not lista_logs1:
+            st.warning("No se encontraron archivos *.log en la ruta especificada.")
+        else:
+            # Nombres legibles para el usuario
+            nombres_logs = [f.name for f in lista_logs1]
+            # Selección
+            log_seleccionado = st.selectbox("Selecciona un log para ver su contenido:", nombres_logs)
+
+            # Ruta completa del log elegido
+            ruta_completa = LOG_DIR1 / log_seleccionado
+
+            # Lectura y visualización
+            try:
+                # Si tu log está en otra codificación, cambia el encoding
+                with open(ruta_completa, "r", encoding="utf-8") as f:
+                    contenido = f.read()
+                st.code(contenido, language="text")
+            except Exception as e:
+                st.error(f"Error al leer el archivo: {e}")
+
+    
+    with st.expander("📊 Distribución Global"):
+        st.write("ccccccccccccccc")
+
     # TABLA: BMV ---------------------------------------------------------------------
-    with st.expander("🗂️ Emisores Activos de: BMV", expanded=False):
+    st.subheader("BMV: ")
+    with st.expander("📗 Listado de Emisores", expanded=False):
         # Añadimos columna de selección
         df2["Seleccionar"] = False
         # Editor de datos interactivo
@@ -155,9 +202,33 @@ def main():
             }
         )
  
-    # ---------------------------------------------------------------------------------------
+    with st.expander("🗂️ Logs de ejecución"):
+        if not lista_logs2:
+            st.warning("No se encontraron archivos *.log en la ruta especificada.")
+        else:
+            # Nombres legibles para el usuario
+            nombres_logs = [f.name for f in lista_logs2]
+            # Selección
+            log_seleccionado = st.selectbox("Selecciona un log para ver su contenido:", nombres_logs)
+
+            # Ruta completa del log elegido
+            ruta_completa = LOG_DIR2 / log_seleccionado
+
+            # Lectura y visualización
+            try:
+                # Si tu log está en otra codificación, cambia el encoding
+                with open(ruta_completa, "r", encoding="utf-8") as f:
+                    contenido = f.read()
+                st.code(contenido, language="text")
+            except Exception as e:
+                st.error(f"Error al leer el archivo: {e}")
+
+    with st.expander("📊 Distribución Global"):
+        st.write("ccccccccccccccc")
+
+    # ------------------------------------------------------------------------------------------------------------------------------------
     # SECCION BOTONES GUARDAR Y ELIMINAR
-    # ---------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------------------------
     st.sidebar.caption("---")
 
     # Sección GUARDAR REGISTROS -------------------------------------------------------------
