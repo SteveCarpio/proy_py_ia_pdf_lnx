@@ -64,7 +64,7 @@ def main():
     st.title("🌐 WebScraping: Eventos Relevantes")
     st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
     st.sidebar.subheader("🌐 : Eventos Relevantes")
-    st.sidebar.subheader("🔐 Control de Acceso")
+    #st.sidebar.subheader("🔐 Control de Acceso")
 
     # ------------------------------------------------------------------
     # INICIO: Login
@@ -73,12 +73,12 @@ def main():
     USER_KEY = "usuario_input"
     PASS_KEY = "contraseña_input"
     # ── 2. Botón “Cerrar Sesión” (sTv: se debe poner al principio el botón) 
-    if st.sidebar.button("❌ Cerrar Sesión"):
-        st.session_state[USER_KEY] = ""
-        st.session_state[PASS_KEY] = ""
-        st.session_state.pop("usuario", None)
-        st.session_state.pop("rol", None)
-        st.rerun()          # opcional: si quere,os refrescar inmediatamente
+    #if st.sidebar.button("❌ Cerrar Sesión"):
+    #    st.session_state[USER_KEY] = ""
+    #    st.session_state[PASS_KEY] = ""
+    #    st.session_state.pop("usuario", None)
+    #    st.session_state.pop("rol", None)
+    #    st.rerun()          # opcional: si quere,os refrescar inmediatamente
     # ── 3. Widget de login usamos "text_input"
     username = st.sidebar.text_input("Usuario", key=USER_KEY)
     password = st.sidebar.text_input("Contraseña", type="password", key=PASS_KEY)
@@ -161,40 +161,28 @@ def main():
     st.sidebar.caption("---")
 
     # Sección GUARDAR REGISTROS -------------------------------------------------------------
-    st.sidebar.caption("Guardar Datos BIVA/BMV")
-    col1, col2 = st.sidebar.columns(2)
+    st.sidebar.write("**BIVA:** Guardar o Eliminar Registros")
+    col1, col3, col111, col333 = st.sidebar.columns(4)
     
     # 1️⃣ BOTÓN: Guardar cambios BIVA
-    if col1.button("💾 BIVA"):
+    if col1.button("💾 "):
         # eliminamos columna de selección antes de guardar
         if "Seleccionar" in edited_df1.columns:
             edited_df1 = edited_df1.drop(columns=["Seleccionar"])
         update_data(edited_df1, DB_FILE1)
         st.success("✅ Cambios guardados correctamente en la tabla BIVA")
 
-    # 2️⃣ BOTÓN: Guardar cambios BMV
-    if col2.button("💾 BMV"):
-        # eliminamos columna de selección antes de guardar
-        if "Seleccionar" in edited_df2.columns:
-            edited_df2 = edited_df2.drop(columns=["Seleccionar"])
-        update_data(edited_df2, DB_FILE2)
-        st.success("✅ Cambios guardados correctamente en la tabla BMV")
-
-    # Sección BORRAR REGISTROS -------------------------------------------------------------
-    st.sidebar.caption("Eliminar Registros BIVA/BMV")
-    col3, col4 = st.sidebar.columns(2)
-
     # 3️⃣ BOTÓN: Borrar Registros BIVA
-    if col3.button("🗑️ BIVA"):
+    if col3.button("🗑️ "):
         # Guardamos en el estado que se ha pulsado el botón
         st.session_state["confirm_borrar1"] = True
     # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
     if st.session_state.get("confirm_borrar1", False):
         # Creamos un contenedor con dos botones
-        with st.container():
-            st.warning("⚠️ ¿Estás seguro de borrar los registros seleccionados de la tabla BIVA?")
-            col1, col2 = st.columns(2)
-            with col1:
+        with st.sidebar.container():
+            st.warning("⚠️ ¿Borrar Registro de BIVA?")
+            col31, col32 = st.columns(2)
+            with col31:
                 if st.button("✅ Sí, borrar", key="confirm_si1"):
                     rows_to_delete = edited_df1[edited_df1["Seleccionar"] == True]
                     for _, row in rows_to_delete.iterrows():
@@ -203,22 +191,34 @@ def main():
                     # Reiniciamos la flag para evitar que se repita la confirmación
                     st.session_state["confirm_borrar1"] = False
                     st.rerun()        
-            with col2:
+            with col32:
                 if st.button("❌ No, cancelar", key="confirm_no1"):
                     st.session_state["confirm_borrar1"] = False
                     st.sidebar.info("✅ Operación cancelada.")
 
+    # Sección BORRAR REGISTROS -------------------------------------------------------------
+    st.sidebar.write("**BMV:** Guardar o Eliminar Registros")
+    col2, col4, col222, col444 = st.sidebar.columns(4)
+
+    # 2️⃣ BOTÓN: Guardar cambios BMV
+    if col2.button(" 💾 "):
+        # eliminamos columna de selección antes de guardar
+        if "Seleccionar" in edited_df2.columns:
+            edited_df2 = edited_df2.drop(columns=["Seleccionar"])
+        update_data(edited_df2, DB_FILE2)
+        st.success("✅ Cambios guardados correctamente en la tabla BMV")
+
     # 4️⃣ BOTÓN: Borrar Registros BMV
-    if col4.button("🗑️ BMV"):
+    if col4.button(" 🗑️ "):
         # Guardamos en el estado que se ha pulsado el botón
         st.session_state["confirm_borrar2"] = True
     # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
     if st.session_state.get("confirm_borrar2", False):
         # Creamos un contenedor con dos botones
-        with st.container():
-            st.warning("⚠️ ¿Estás seguro de borrar los registros seleccionados de la tabla BMV?")
-            col1, col2 = st.columns(2)
-            with col1:
+        with st.sidebar.container():
+            st.warning("⚠️ ¿Borrar Registro de BMV?")
+            col41, col42 = st.columns(2)
+            with col41:
                 if st.button("✅ Sí, borrar", key="confirm_si2"):
                     rows_to_delete = edited_df2[edited_df2["Seleccionar"] == True]
                     for _, row in rows_to_delete.iterrows():
@@ -227,7 +227,7 @@ def main():
                     # Reiniciamos la flag para evitar que se repita la confirmación
                     st.session_state["confirm_borrar2"] = False
                     st.rerun()      
-            with col2:
+            with col42:
                 if st.button("❌ No, cancelar", key="confirm_no2"):
                     st.session_state["confirm_borrar2"] = False
                     st.sidebar.info("✅ Operación cancelada.")
