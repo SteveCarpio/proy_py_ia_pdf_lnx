@@ -39,11 +39,14 @@ def init_db(DB_FILE):
             FILTRO TEXT,
             ESTADO TEXT CHECK(ESTADO IN ('S','N')),
             GRUPO TEXT,
-            TO_EMAIL TEXT DEFAULT 'stv.madrid@gmail.com',
-            CC_EMAIL TEXT DEFAULT 'paco@gmail.com',
+            TO_EMAIL TEXT DEFAULT 'monica.jimenez@multiva.com.mx,erendira.morales@multiva.com.mx,jose.agis@multiva.com.mx,alfredo.basurto@multiva.com.mx,javiereduardo.ortega@multiva.com.mx',
+            CC_EMAIL TEXT DEFAULT 'notificacionespy@tda-sgft.com,repcomun@tda-sgft.com',
             C3 TEXT
         )
     """)
+    # monica.jimenez@multiva.com.mx,erendira.morales@multiva.com.mx,jose.agis@multiva.com.mx,alfredo.basurto@multiva.com.mx,javiereduardo.ortega@multiva.com.mx
+    # notificacionespy@tda-sgft.com,repcomun@tda-sgft.com
+
     conn.commit()
     conn.close()
 
@@ -128,10 +131,10 @@ def main():
     lista_logs2_1  = obtener_ultimos_logs(LOG_DIR2, 1)
 
     # Ocultar columnas innecesarios del DataFrame
-    for col in ["C3", "FILTRO"]:
+    for col in ["C3", "FILTRO", "TO_EMAIL", "CC_EMAIL", "GRUPO"]:
         if col in df1.columns:
             df1 = df1.drop(columns=[col])
-    for col in ["C3", "FILTRO"]:
+    for col in ["C3", "FILTRO", "TO_EMAIL", "CC_EMAIL", "GRUPO"]:
         if col in df2.columns:
             df2 = df2.drop(columns=[col])
 
@@ -183,10 +186,10 @@ def main():
             column_config={
                 "CLAVE":    st.column_config.TextColumn("CLAVE", help="Nombre del Emisor"),
                 "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
-                "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
+                #"GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
                 "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
-                "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
-                "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
+                #"TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
+                #"CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
                 "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
             }
         )
@@ -257,10 +260,10 @@ def main():
             column_config={
                 "CLAVE":    st.column_config.TextColumn("CLAVE", help="Nombre del Emisor"),
                 "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
-                "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
+                #"GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
                 "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
-                "TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
-                "CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
+                #"TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
+                #"CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
                 "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
             }
         )
