@@ -3,8 +3,10 @@ import sqlite3
 import pandas as pd
 import pathlib
 import datetime
+import shutil
 import sys
 import os
+#from datetime import datetime
 
 # --------------------------
 # CONFIGURACIÓN GENERAL
@@ -16,6 +18,9 @@ LOG_DIR1 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BIVA/LOG")
 LOG_DIR2 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BMV/LOG")
 R_BOLSAS = "/srv/apps/MisCompilados/PROY_BOLSA_MX/"
 
+# -----------------------------------
+# EXPORTO BBDD A EXCEL DE PRODUCCION
+# -----------------------------------
 def export_to_excel(db_path, output_path, table_name="configuracion"):
     """
     Exporta los campos deseados de una tabla SQLite a un archivo Excel.
@@ -57,6 +62,31 @@ def export_to_excel(db_path, output_path, table_name="configuracion"):
         print(f"Error al escribir el archivo Excel: {e}")
         sys.exit(1)
 
+# --------------------------------------------------
+# HAGO UNA COPIA DE SEGURIDAD DEL XLS DE PRODUCCION
+# --------------------------------------------------
+def copia_seguridad_xls(ruta_fichero):
+    """
+    Copia 'fichero' en la misma carpeta con un nombre nuevo que termina con _AAAAMMDD_HHMM
+    """
+    # Convierte a Path (más cómodo trabajar con rutas)
+    p = pathlib.Path(ruta_fichero)
+
+    # Si la ruta no existe, lanzamos excepción
+    if not p.is_file():
+        raise FileNotFoundError(f"No existe el fichero: {p}")
+
+    # Formateamos la fecha/hora actual
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+
+    # Construimos el nuevo nombre: <nombre>_<timestamp>.<ext>
+    nuevo_nombre = f"{p.stem}_{ts}{p.suffix}"
+
+    # Ruta completa del destino (mismo directorio)
+    destino = p.parent / nuevo_nombre
+
+    # Copiamos manteniendo metadatos
+    shutil.copy2(p, destino)  
 
 # --------------------------
 # BUSCAR LOG DE UNA CARPETA
@@ -348,6 +378,7 @@ def main():
     
     # 1️⃣ BOTÓN: Guardar cambios BIVA
     if col1.button("💾 "):
+        copia_seguridad_xls(f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx")
         # eliminamos columna de selección antes de guardar
         if "Seleccionar" in edited_df1.columns:
             edited_df1 = edited_df1.drop(columns=["Seleccionar"])
@@ -385,10 +416,12 @@ def main():
 
     # 2️⃣ BOTÓN: Guardar cambios BMV
     if col2.button(" 💾 "):
+        copia_seguridad_xls(f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx")
         # eliminamos columna de selección antes de guardar
         if "Seleccionar" in edited_df2.columns:
             edited_df2 = edited_df2.drop(columns=["Seleccionar"])
         update_data(edited_df2, DB_FILE2)
+        export_to_excel(DB_FILE2, f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx", "configuracion")
         st.toast("Cambios guardados correctamente en la tabla BMV", icon="✅")
 
     # 4️⃣ BOTÓN: Borrar Registros BMV
