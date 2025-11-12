@@ -3,6 +3,7 @@ import sqlite3
 import pandas as pd
 import pathlib
 import datetime
+import sys
 import os
 
 # --------------------------
@@ -13,6 +14,49 @@ DB_FILE1 = "data/app10_config_BIVA.db"
 DB_FILE2 = "data/app10_config_BMV.db"
 LOG_DIR1 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BIVA/LOG")
 LOG_DIR2 = pathlib.Path("/srv/apps/MisCompilados/PROY_BOLSA_MX/BMV/LOG")
+R_BOLSAS = "/srv/apps/MisCompilados/PROY_BOLSA_MX/"
+
+def export_to_excel(db_path, output_path, table_name="configuracion"):
+    """
+    Exporta los campos deseados de una tabla SQLite a un archivo Excel.
+    """
+    # 1️⃣ Conectarse a la base de datos
+    try:
+        conn = sqlite3.connect(db_path)
+    except sqlite3.Error as e:
+        print(f"Error al conectar a la BD: {e}")
+        sys.exit(1)
+
+    # 2️⃣ Crear la consulta SQL
+    query = f"""
+        SELECT CLAVE, CODIGO, FILTRO, ESTADO, GRUPO,
+               TO_EMAIL, CC_EMAIL, C3
+        FROM {table_name}
+    """
+
+    # 3️⃣ Cargar los datos en un DataFrame
+    try:
+        df = pd.read_sql_query(query, conn)
+        df.rename(columns={'TO_EMAIL': 'TO', 'CC_EMAIL': 'CC'}, inplace=True)
+    except Exception as e:
+        print(f"Error al ejecutar la consulta: {e}")
+        conn.close()
+        sys.exit(1)
+
+    # 4️⃣ Cerrar la conexión
+    conn.close()
+
+    # 5️⃣ Si el directorio de salida no existe, crearlo
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # 6️⃣ Guardar en Excel (xlsx)
+    try:
+        df.to_excel(output_path, index=False, engine='openpyxl', sheet_name="FILTRO")
+        print(f"✅ Exportado con éxito a: {output_path}")
+    except Exception as e:
+        print(f"Error al escribir el archivo Excel: {e}")
+        sys.exit(1)
+
 
 # --------------------------
 # BUSCAR LOG DE UNA CARPETA
@@ -38,7 +82,7 @@ def init_db(DB_FILE):
             CODIGO INTEGER,
             FILTRO TEXT,
             ESTADO TEXT CHECK(ESTADO IN ('S','N')),
-            GRUPO TEXT,
+            GRUPO TEXT DEFAULT 'M',
             TO_EMAIL TEXT DEFAULT 'monica.jimenez@multiva.com.mx,erendira.morales@multiva.com.mx,jose.agis@multiva.com.mx,alfredo.basurto@multiva.com.mx,javiereduardo.ortega@multiva.com.mx',
             CC_EMAIL TEXT DEFAULT 'notificacionespy@tda-sgft.com,repcomun@tda-sgft.com',
             C3 TEXT
@@ -308,6 +352,7 @@ def main():
         if "Seleccionar" in edited_df1.columns:
             edited_df1 = edited_df1.drop(columns=["Seleccionar"])
         update_data(edited_df1, DB_FILE1)
+        export_to_excel(DB_FILE1, f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx", "configuracion")
         st.toast("Cambios guardados correctamente en la tabla BIVA", icon="✅")
 
     # 3️⃣ BOTÓN: Borrar Registros BIVA
