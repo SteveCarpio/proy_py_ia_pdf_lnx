@@ -140,33 +140,38 @@ def main():
     # ------------------------------------------------------------------------------------------------------------------------------------
 
     # TABLA: BIVA --------------------------------------------------------------------- 
-    # Extraer propiedades del proceso OK y ERR
+
+    # Bloque del titulo Biva ---------------
+    is_running1 = ""
+    if bool(os.popen('ps aux | grep BIVA.sh | grep -v grep').read().strip()):
+        is_running1 = "ℹ️ Proceso en ejecución"
     info_archivo_ok = os.stat(lista_logs1_1[0])
     info_fecha_ok  = datetime.datetime.fromtimestamp(info_archivo_ok.st_ctime)
-    
     info_nombre_ko  = lista_logs1_1[0].name.replace("_out.log", "_err.log")
     info_ruta_ko    = LOG_DIR1 / info_nombre_ko
     info_archivo_ko = os.stat(info_ruta_ko)
     info_fecha_ko  = datetime.datetime.fromtimestamp(info_archivo_ko.st_ctime)
-
-    if info_archivo_ko.st_size == 0:
-        var_ESTADO  = "⚠️"
-        var_FECHA   = info_fecha_ko.strftime('%Y-%m-%d %H:%M')
-        var_MENSAJE = f"AVISO: Posible **error** en la ejecución del día **{info_fecha_ko.strftime('%Y-%m-%d')}** ejecutado a las **{info_fecha_ko.strftime('%H:%M')}h**, revisar la Log '**{info_nombre_ko}**'"
+    if info_archivo_ko.st_size != 0:
+        var_ESTADO1  = "⚠️"
+        var_FECHA1   = info_fecha_ko.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE1 = f"AVISO: Posible **error** en la ejecución del día **{info_fecha_ko.strftime('%Y-%m-%d')}** ejecutado a las **{info_fecha_ko.strftime('%H:%M')}h**, revisar la Log '**{info_nombre_ko}**'"
     else:
-        var_ESTADO  = "✅"
-        var_FECHA   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
-        var_MENSAJE = ""
-
+        var_ESTADO1  = "☑️" # ☑️ ✅
+        var_FECHA1   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE1 = ""
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        st.subheader(f"{var_ESTADO} - BIVA  ")
+        st.subheader(f"{var_ESTADO1} - BIVA ")
+    with c2:
+        st.subheader(is_running1)
     with c4:
-        st.subheader(f"{var_FECHA} ")
-    st.caption(f"{var_MENSAJE}")
+        st.subheader(f"{var_FECHA1} ")
+    
+    # Mensaje de ayuda    
+    st.caption(f"{var_MENSAJE1}")
 
-    # Expanders --------------------------------------------------------------------------
-    with st.expander("📗 Listado de Emisores", expanded=False):
+    # Bloque de los Expanders ---------------
+    with st.expander(f"📗 Listado de Emisores: (Número de Emisores: {len(df1)} - Activos: {(df1['ESTADO'] == "S").sum()})", expanded=False):
         # Añadimos columna de selección
         df1["Seleccionar"] = False
         # Editor de datos interactivo
@@ -176,7 +181,7 @@ def main():
             use_container_width=True,
             key="data_editor1",
             column_config={
-                "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
+                "CLAVE":    st.column_config.TextColumn("CLAVE", help="Nombre del Emisor"),
                 "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
                 "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
                 "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
@@ -209,8 +214,38 @@ def main():
         st.write("🚧 En construcción 🚧")
 
     # TABLA: BMV ---------------------------------------------------------------------
-    st.subheader("BMV: ")
-    with st.expander("📗 Listado de Emisores", expanded=False):
+    
+    # Bloque del titulo BMV ---------------
+    is_running2 = ""
+    if bool(os.popen('ps aux | grep BMV.sh | grep -v grep').read().strip()):
+        is_running2 = "ℹ️ Proceso en ejecución"
+    info_archivo_ok = os.stat(lista_logs2_1[0])
+    info_fecha_ok  = datetime.datetime.fromtimestamp(info_archivo_ok.st_ctime)
+    info_nombre_ko  = lista_logs2_1[0].name.replace("_out.log", "_err.log")
+    info_ruta_ko    = LOG_DIR2 / info_nombre_ko
+    info_archivo_ko = os.stat(info_ruta_ko)
+    info_fecha_ko  = datetime.datetime.fromtimestamp(info_archivo_ko.st_ctime)
+    if info_archivo_ko.st_size != 0:
+        var_ESTADO2  = "⚠️"
+        var_FECHA2  = info_fecha_ko.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE2 = f"AVISO: Posible **error** en la ejecución del día **{info_fecha_ko.strftime('%Y-%m-%d')}** ejecutado a las **{info_fecha_ko.strftime('%H:%M')}h**, revisar la Log '**{info_nombre_ko}**'"
+    else:
+        var_ESTADO2  = "☑️" # ☑️ ✅
+        var_FECHA2   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE2 = ""
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.subheader(f"{var_ESTADO2} - BMV ")
+    with c2:
+        st.subheader(is_running2)
+    with c4:
+        st.subheader(f"{var_FECHA2} ")
+    
+    # Mensaje de ayuda    
+    st.caption(f"{var_MENSAJE2}")
+
+    # Bloque de los Expanders ---------------
+    with st.expander(f"📗 Listado de Emisores: (Número de Emisores: {len(df2)} - Activos: {(df1['ESTADO'] == "S").sum()})", expanded=False):
         # Añadimos columna de selección
         df2["Seleccionar"] = False
         # Editor de datos interactivo
@@ -220,7 +255,7 @@ def main():
             use_container_width=True,
             key="data_editor2",
             column_config={
-                "CLAVE":    st.column_config.TextColumn("CLAVE_", help="Nombre del Emisor"),
+                "CLAVE":    st.column_config.TextColumn("CLAVE", help="Nombre del Emisor"),
                 "ESTADO":   st.column_config.SelectboxColumn("ESTADO", options=["S", "N"], help="S = Envió de Email"),
                 "GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
                 "CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
@@ -270,7 +305,7 @@ def main():
         if "Seleccionar" in edited_df1.columns:
             edited_df1 = edited_df1.drop(columns=["Seleccionar"])
         update_data(edited_df1, DB_FILE1)
-        st.success("✅ Cambios guardados correctamente en la tabla BIVA")
+        st.toast("Cambios guardados correctamente en la tabla BIVA", icon="✅")
 
     # 3️⃣ BOTÓN: Borrar Registros BIVA
     if col3.button("🗑️ "):
@@ -294,7 +329,7 @@ def main():
             with col32:
                 if st.button("❌ No, cancelar", key="confirm_no1"):
                     st.session_state["confirm_borrar1"] = False
-                    st.sidebar.info("✅ Operación cancelada.")
+                    st.rerun()
 
     # Sección BORRAR REGISTROS -------------------------------------------------------------
     st.sidebar.write("**BMV:** Guardar o Eliminar Registros")
@@ -306,7 +341,7 @@ def main():
         if "Seleccionar" in edited_df2.columns:
             edited_df2 = edited_df2.drop(columns=["Seleccionar"])
         update_data(edited_df2, DB_FILE2)
-        st.success("✅ Cambios guardados correctamente en la tabla BMV")
+        st.toast("Cambios guardados correctamente en la tabla BMV", icon="✅")
 
     # 4️⃣ BOTÓN: Borrar Registros BMV
     if col4.button(" 🗑️ "):
@@ -330,11 +365,12 @@ def main():
             with col42:
                 if st.button("❌ No, cancelar", key="confirm_no2"):
                     st.session_state["confirm_borrar2"] = False
-                    st.sidebar.info("✅ Operación cancelada.")
+                    st.rerun()
 
     st.sidebar.caption("---")
     if st.sidebar.button("🔄 Refrescar"):
         st.rerun()
+
 
 if __name__ == "__main__":
 
