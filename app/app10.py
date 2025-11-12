@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import pathlib
+import datetime
 import os
 
 # --------------------------
@@ -96,10 +97,9 @@ def main():
     # ── 3. Widget de login usamos "text_input"
     username = st.sidebar.text_input("Usuario", key=USER_KEY)
     password = st.sidebar.text_input("Contraseña", type="password", key=PASS_KEY)
-    if st.sidebar.button("🌐 Acceder"):
+    if st.sidebar.button("🔐 Acceder"):
         if username == "admin" and password == "admin1234":
-            st.session_state["usuario"] = "admin"
-            st.session_state["rol"]     = "admin1234"
+            st.session_state["usuario"] = username
             st.rerun()
         else:
             st.sidebar.error("❌ Credenciales inválidas")
@@ -111,6 +111,8 @@ def main():
     # ------------------------------------------------------------------
 
 
+
+
     # ------------------------------------------------------------------------------------------------------------------------------------
     # Inicio del Programa
     # ------------------------------------------------------------------------------------------------------------------------------------
@@ -120,8 +122,10 @@ def main():
     df2 = get_data(DB_FILE2)
 
     # Obtener una lista con las logs de las Bolsas
-    lista_logs1 = obtener_ultimos_logs(LOG_DIR1, 10)
-    lista_logs2 = obtener_ultimos_logs(LOG_DIR2, 10)
+    lista_logs1_10 = obtener_ultimos_logs(LOG_DIR1, 10)
+    lista_logs1_1  = obtener_ultimos_logs(LOG_DIR1, 1)
+    lista_logs2_10 = obtener_ultimos_logs(LOG_DIR2, 10)
+    lista_logs2_1  = obtener_ultimos_logs(LOG_DIR2, 1)
 
     # Ocultar columnas innecesarios del DataFrame
     for col in ["C3", "FILTRO"]:
@@ -131,10 +135,37 @@ def main():
         if col in df2.columns:
             df2 = df2.drop(columns=[col])
 
-    # DATOS: ---------------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------------------------
+    # Datos
+    # ------------------------------------------------------------------------------------------------------------------------------------
 
     # TABLA: BIVA --------------------------------------------------------------------- 
-    st.subheader("BIVA: ")
+    # Extraer propiedades del proceso OK y ERR
+    info_archivo_ok = os.stat(lista_logs1_1[0])
+    info_fecha_ok  = datetime.datetime.fromtimestamp(info_archivo_ok.st_ctime)
+    
+    info_nombre_ko  = lista_logs1_1[0].name.replace("_out.log", "_err.log")
+    info_ruta_ko    = LOG_DIR1 / info_nombre_ko
+    info_archivo_ko = os.stat(info_ruta_ko)
+    info_fecha_ko  = datetime.datetime.fromtimestamp(info_archivo_ko.st_ctime)
+
+    if info_archivo_ko.st_size == 0:
+        var_ESTADO  = "⚠️"
+        var_FECHA   = info_fecha_ko.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE = f"AVISO: Posible **error** en la ejecución del día **{info_fecha_ko.strftime('%Y-%m-%d')}** ejecutado a las **{info_fecha_ko.strftime('%H:%M')}h**, revisar la Log '**{info_nombre_ko}**'"
+    else:
+        var_ESTADO  = "✅"
+        var_FECHA   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
+        var_MENSAJE = ""
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.subheader(f"{var_ESTADO} - BIVA  ")
+    with c4:
+        st.subheader(f"{var_FECHA} ")
+    st.caption(f"{var_MENSAJE}")
+
+    # Expanders --------------------------------------------------------------------------
     with st.expander("📗 Listado de Emisores", expanded=False):
         # Añadimos columna de selección
         df1["Seleccionar"] = False
@@ -154,13 +185,12 @@ def main():
                 "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
             }
         )
-
     with st.expander("🗂️ Logs de ejecución"):
-        if not lista_logs1:
+        if not lista_logs1_10:
             st.warning("No se encontraron archivos *.log en la ruta especificada.")
         else:
             # Nombres legibles para el usuario
-            nombres_logs = [f.name for f in lista_logs1]
+            nombres_logs = [f.name for f in lista_logs1_10]
             # Selección
             log_seleccionado = st.selectbox("Selecciona un log para ver su contenido:", nombres_logs)
 
@@ -175,10 +205,8 @@ def main():
                 st.code(contenido, language="text")
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
-
-    
     with st.expander("📊 Distribución Global"):
-        st.write("ccccccccccccccc")
+        st.write("🚧 En construcción 🚧")
 
     # TABLA: BMV ---------------------------------------------------------------------
     st.subheader("BMV: ")
@@ -203,11 +231,11 @@ def main():
         )
  
     with st.expander("🗂️ Logs de ejecución"):
-        if not lista_logs2:
+        if not lista_logs2_10:
             st.warning("No se encontraron archivos *.log en la ruta especificada.")
         else:
             # Nombres legibles para el usuario
-            nombres_logs = [f.name for f in lista_logs2]
+            nombres_logs = [f.name for f in lista_logs2_10]
             # Selección
             log_seleccionado = st.selectbox("Selecciona un log para ver su contenido:", nombres_logs)
 
@@ -224,12 +252,13 @@ def main():
                 st.error(f"Error al leer el archivo: {e}")
 
     with st.expander("📊 Distribución Global"):
-        st.write("ccccccccccccccc")
+        st.write("🚧 En construcción 🚧")
+
+    st.sidebar.caption("---")
 
     # ------------------------------------------------------------------------------------------------------------------------------------
     # SECCION BOTONES GUARDAR Y ELIMINAR
     # ------------------------------------------------------------------------------------------------------------------------------------
-    st.sidebar.caption("---")
 
     # Sección GUARDAR REGISTROS -------------------------------------------------------------
     st.sidebar.write("**BIVA:** Guardar o Eliminar Registros")
@@ -302,6 +331,11 @@ def main():
                 if st.button("❌ No, cancelar", key="confirm_no2"):
                     st.session_state["confirm_borrar2"] = False
                     st.sidebar.info("✅ Operación cancelada.")
+
+    st.sidebar.caption("---")
+    if st.sidebar.button("🔄 Refrescar"):
+        st.rerun()
+
 if __name__ == "__main__":
 
     main()
