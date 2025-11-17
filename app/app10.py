@@ -248,7 +248,7 @@ def main():
     st.caption(f"{var_MENSAJE1}")
 
     # Bloque de los Expanders ---------------
-    with st.expander(f"📗 Listado de Emisores: (Número de Emisores: {len(df1)} - Activos: {(df1['ESTADO'] == "S").sum()})", expanded=False):
+    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en BIVA: {len(df1)} -- En el radar de TDA: {(df1['ESTADO'] == "S").sum()})]", expanded=False):
         # Añadimos columna de selección
         df1["Seleccionar"] = False
         # Editor de datos interactivo
@@ -287,7 +287,7 @@ def main():
                 st.code(contenido, language="text")
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
-    with st.expander("📊 Distribución Global"):
+    with st.expander("▶️ Panel de Ejecución"):
         st.write("🚧 En construcción 🚧")
 
     # TABLA: BMV ---------------------------------------------------------------------
@@ -322,7 +322,7 @@ def main():
     st.caption(f"{var_MENSAJE2}")
 
     # Bloque de los Expanders ---------------
-    with st.expander(f"📗 Listado de Emisores: (Número de Emisores: {len(df2)} - Activos: {(df1['ESTADO'] == "S").sum()})", expanded=False):
+    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en BMV: {len(df2)} -- En el radar de TDA: {(df1['ESTADO'] == "S").sum()})]", expanded=False):
         # Añadimos columna de selección
         df2["Seleccionar"] = False
         # Editor de datos interactivo
@@ -363,7 +363,7 @@ def main():
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
 
-    with st.expander("📊 Distribución Global"):
+    with st.expander("▶️ Panel de ejecución"):
         st.write("🚧 En construcción 🚧")
 
     st.sidebar.caption("---")
