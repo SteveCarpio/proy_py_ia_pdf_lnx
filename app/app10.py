@@ -127,7 +127,15 @@ def init_db(DB_FILE):
 def get_data(DB_FILE):
     conn = sqlite3.connect(DB_FILE)
     try:
-        df = pd.read_sql_query("SELECT * FROM configuracion ORDER BY CLAVE ASC", conn)
+        df = pd.read_sql_query(
+            """
+            SELECT *
+            FROM configuracion
+            WHERE CLAVE <> 'DESACTIVADO'
+            ORDER BY CLAVE ASC
+            """,
+            conn
+        )  # CLAVE <> DESACTIVADO: ese registro existe para q el grupo Patricia al menos tenga 1 registro y no error.
     except Exception:
         init_db(DB_FILE)
         df = pd.DataFrame(columns=[
@@ -149,6 +157,36 @@ def delete_record(clave, DB_FILE):
     c.execute("DELETE FROM configuracion WHERE CLAVE = ?", (clave,))
     conn.commit()
     conn.close()
+
+def ejecutar_sh_con_parametros(SH_FILE, param1, param2):
+    """
+    Ejecuta el archivo .sh con los parámetros de DIAS y ENTORNO
+    """
+    import subprocess  # Solo lo usará este apartado.
+    # 1. Definir el comando y los parámetros
+
+    comando = [
+        "nohup",  # Desvincula el proceso de la terminal
+        SH_FILE,
+        param1,
+        param2
+    ]
+    
+    try:
+        # `preexec_fn=os.setsid` garantiza que el proceso no se cierre con la sesión
+        proceso = subprocess.Popen(
+            comando,
+            stdout=subprocess.DEVNULL,   # Desconecta la salida estándar
+            stderr=subprocess.DEVNULL,   # Desconecta la salida de error
+            preexec_fn=os.setsid,        # Desvincula del TTY
+            close_fds=True
+        )
+        st.success(f"✅ El script `{SH_FILE}` se está ejecutando en segundo plano (PID: {proceso.pid}).")
+    except FileNotFoundError:
+        st.error(f"❌ El archivo `{SH_FILE}` no existe. Revisa la ruta.")
+    except Exception as e:
+        st.error(f"❌ Error inesperado: {e}")
+
 
 # --------------------------
 # INTERFAZ PRINCIPAL
@@ -267,6 +305,43 @@ def main():
                 "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
             }
         )
+
+        col1, col3, col111, col333 = st.columns(4)
+        
+        # BOTÓN: Guardar cambios BIVA
+        if col1.button("Guardar registro 💾 "):
+            copia_seguridad_xls(f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx")
+            # eliminamos columna de selección antes de guardar
+            if "Seleccionar" in edited_df1.columns:
+                edited_df1 = edited_df1.drop(columns=["Seleccionar"])
+            update_data(edited_df1, DB_FILE1)
+            export_to_excel(DB_FILE1, f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx", "configuracion")
+            st.toast("Cambios guardados correctamente en la tabla BIVA", icon="✅")
+
+        # BOTÓN: Borrar Registros BIVA
+        if col333.button("Eliminar registro seleccionado 🗑️ "):
+            # Guardamos en el estado que se ha pulsado el botón
+            st.session_state["confirm_borrar1"] = True
+        # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
+        if st.session_state.get("confirm_borrar1", False):
+            # Creamos un contenedor con dos botones
+            with st.container():
+                st.warning("⚠️ ¿Borrar Registro de BIVA?")
+                col31, col32 = st.columns(2)
+                with col31:
+                    if st.button("✅ Sí, borrar", key="confirm_si1"):
+                        rows_to_delete = edited_df1[edited_df1["Seleccionar"] == True]
+                        for _, row in rows_to_delete.iterrows():
+                            delete_record(row["CLAVE"], DB_FILE1)
+                        st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
+                        # Reiniciamos la flag para evitar que se repita la confirmación
+                        st.session_state["confirm_borrar1"] = False
+                        st.rerun()        
+                with col32:
+                    if st.button("❌ No, cancelar", key="confirm_no1"):
+                        st.session_state["confirm_borrar1"] = False
+                        st.rerun()
+
     with st.expander("🗂️ Logs de ejecución"):
         if not lista_logs1_10:
             st.warning("No se encontraron archivos *.log en la ruta especificada.")
@@ -288,7 +363,26 @@ def main():
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
     with st.expander("▶️ Panel de Ejecución"):
-        st.write("🚧 En construcción 🚧")
+
+        # --- Configuración del Archivo SH ---
+        SH_FILE = "/home/robot/Python/proy_py_bolsa_mx/BIVA.sh" 
+
+        # 1. Obtener parámetros del usuario
+        parametro_a = st.text_input("**Día de procesamiento:** :gray[(0, 1, 2, 3...etc) 0 indica el día de hoy, 1 el de ayer, etc..]", "0")
+        parametro_b = "PRO"
+        
+        st.write(f"Se ejecutará: **{SH_FILE} {parametro_a} {parametro_b}**")
+
+        # 2. Definir el botón y la acción
+        if st.button("**Ejecutar Proceso WebScraping BIVA**"):
+            # Llamar a la función con los parámetros ingresados por el usuario
+            if is_running1 == "":
+                ejecutar_sh_con_parametros(SH_FILE, parametro_a, parametro_b)
+            else:
+                st.warning("El proceso BIVA se está ejecutando en segundo plano; por favor, espere a que finalice.")
+            st.info("Actualiza la web o haz clic en el botón 'Refrescar'.")
+
+
 
     # TABLA: BMV ---------------------------------------------------------------------
     
@@ -322,7 +416,7 @@ def main():
     st.caption(f"{var_MENSAJE2}")
 
     # Bloque de los Expanders ---------------
-    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en BMV: {len(df2)} -- En el radar de TDA: {(df1['ESTADO'] == "S").sum()})]", expanded=False):
+    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en BMV: {len(df2)} -- En el radar de TDA: {(df2['ESTADO'] == "S").sum()})]", expanded=False):
         # Añadimos columna de selección
         df2["Seleccionar"] = False
         # Editor de datos interactivo
@@ -342,6 +436,42 @@ def main():
             }
         )
  
+        col2, col4, col222, col444 = st.columns(4)
+
+        # BOTÓN: Guardar cambios BMV
+        if col2.button(" Guardar registro 💾 "):
+            copia_seguridad_xls(f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx")
+            # eliminamos columna de selección antes de guardar
+            if "Seleccionar" in edited_df2.columns:
+                edited_df2 = edited_df2.drop(columns=["Seleccionar"])
+            update_data(edited_df2, DB_FILE2)
+            export_to_excel(DB_FILE2, f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx", "configuracion")
+            st.toast("Cambios guardados correctamente en la tabla BMV", icon="✅")
+
+        # BOTÓN: Borrar Registros BMV
+        if col444.button(" Eliminar registro seleccionado 🗑️ "):
+            # Guardamos en el estado que se ha pulsado el botón
+            st.session_state["confirm_borrar2"] = True
+        # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
+        if st.session_state.get("confirm_borrar2", False):
+            # Creamos un contenedor con dos botones
+            with st.container():
+                st.warning("⚠️ ¿Borrar Registro de BMV?")
+                col41, col42 = st.columns(2)
+                with col41:
+                    if st.button("✅ Sí, borrar", key="confirm_si2"):
+                        rows_to_delete = edited_df2[edited_df2["Seleccionar"] == True]
+                        for _, row in rows_to_delete.iterrows():
+                            delete_record(row["CLAVE"], DB_FILE2)
+                        st.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
+                        # Reiniciamos la flag para evitar que se repita la confirmación
+                        st.session_state["confirm_borrar2"] = False
+                        st.rerun()      
+                with col42:
+                    if st.button("❌ No, cancelar", key="confirm_no2"):
+                        st.session_state["confirm_borrar2"] = False
+                        st.rerun()
+
     with st.expander("🗂️ Logs de ejecución"):
         if not lista_logs2_10:
             st.warning("No se encontraron archivos *.log en la ruta especificada.")
@@ -368,89 +498,24 @@ def main():
 
     st.sidebar.caption("---")
 
-    # ------------------------------------------------------------------------------------------------------------------------------------
-    # SECCION BOTONES GUARDAR Y ELIMINAR
-    # ------------------------------------------------------------------------------------------------------------------------------------
-
-    # Sección GUARDAR REGISTROS -------------------------------------------------------------
-    st.sidebar.write("**BIVA:** Guardar o Eliminar Registros")
-    col1, col3, col111, col333 = st.sidebar.columns(4)
-    
-    # 1️⃣ BOTÓN: Guardar cambios BIVA
-    if col1.button("💾 "):
-        copia_seguridad_xls(f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx")
-        # eliminamos columna de selección antes de guardar
-        if "Seleccionar" in edited_df1.columns:
-            edited_df1 = edited_df1.drop(columns=["Seleccionar"])
-        update_data(edited_df1, DB_FILE1)
-        export_to_excel(DB_FILE1, f"{R_BOLSAS}BIVA/CONFIG/BIVA_Filtro_Emisores_PRO.xlsx", "configuracion")
-        st.toast("Cambios guardados correctamente en la tabla BIVA", icon="✅")
-
-    # 3️⃣ BOTÓN: Borrar Registros BIVA
-    if col3.button("🗑️ "):
-        # Guardamos en el estado que se ha pulsado el botón
-        st.session_state["confirm_borrar1"] = True
-    # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
-    if st.session_state.get("confirm_borrar1", False):
-        # Creamos un contenedor con dos botones
-        with st.sidebar.container():
-            st.warning("⚠️ ¿Borrar Registro de BIVA?")
-            col31, col32 = st.columns(2)
-            with col31:
-                if st.button("✅ Sí, borrar", key="confirm_si1"):
-                    rows_to_delete = edited_df1[edited_df1["Seleccionar"] == True]
-                    for _, row in rows_to_delete.iterrows():
-                        delete_record(row["CLAVE"], DB_FILE1)
-                    st.sidebar.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
-                    # Reiniciamos la flag para evitar que se repita la confirmación
-                    st.session_state["confirm_borrar1"] = False
-                    st.rerun()        
-            with col32:
-                if st.button("❌ No, cancelar", key="confirm_no1"):
-                    st.session_state["confirm_borrar1"] = False
-                    st.rerun()
-
-    # Sección BORRAR REGISTROS -------------------------------------------------------------
-    st.sidebar.write("**BMV:** Guardar o Eliminar Registros")
-    col2, col4, col222, col444 = st.sidebar.columns(4)
-
-    # 2️⃣ BOTÓN: Guardar cambios BMV
-    if col2.button(" 💾 "):
-        copia_seguridad_xls(f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx")
-        # eliminamos columna de selección antes de guardar
-        if "Seleccionar" in edited_df2.columns:
-            edited_df2 = edited_df2.drop(columns=["Seleccionar"])
-        update_data(edited_df2, DB_FILE2)
-        export_to_excel(DB_FILE2, f"{R_BOLSAS}BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx", "configuracion")
-        st.toast("Cambios guardados correctamente en la tabla BMV", icon="✅")
-
-    # 4️⃣ BOTÓN: Borrar Registros BMV
-    if col4.button(" 🗑️ "):
-        # Guardamos en el estado que se ha pulsado el botón
-        st.session_state["confirm_borrar2"] = True
-    # Si el usuario ya pulsó el botón, mostramos la ventana de confirmación
-    if st.session_state.get("confirm_borrar2", False):
-        # Creamos un contenedor con dos botones
-        with st.sidebar.container():
-            st.warning("⚠️ ¿Borrar Registro de BMV?")
-            col41, col42 = st.columns(2)
-            with col41:
-                if st.button("✅ Sí, borrar", key="confirm_si2"):
-                    rows_to_delete = edited_df2[edited_df2["Seleccionar"] == True]
-                    for _, row in rows_to_delete.iterrows():
-                        delete_record(row["CLAVE"], DB_FILE2)
-                    st.sidebar.success(f"✅ {len(rows_to_delete)} registro(s) eliminado(s).")
-                    # Reiniciamos la flag para evitar que se repita la confirmación
-                    st.session_state["confirm_borrar2"] = False
-                    st.rerun()      
-            with col42:
-                if st.button("❌ No, cancelar", key="confirm_no2"):
-                    st.session_state["confirm_borrar2"] = False
-                    st.rerun()
-
-    st.sidebar.caption("---")
+    # Botón refrescar
     if st.sidebar.button("🔄 Refrescar"):
         st.rerun()
+    
+    # Aviso informativo
+    st.sidebar.markdown(
+    """
+    <div style="font-size:1rem;"><br><br><b>Importante:</b><br>
+    La ejecución del proceso WebScraping debe estar justificado.<br>
+    - Antes de ejecutarlo, verifica el <b>'día de procesamiento'</b>.<br>
+    - Verificar que los servidores de: 
+        <a href="https://www.biva.mx/empresas/emisoras_inscritas/emisoras_inscritas" target="_blank" style="color:#1f77b4;">BIVA</a> y 
+        <a href="https://www.bmv.com.mx/es/emisoras/informacion-de-emisoras" target="_blank" style="color:#1f77b4;">BMV</a> estén UP.<br>
+    - Intentar no ejecutarlo en horario de planificación 8-10h para evitar solapamientos.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 if __name__ == "__main__":
