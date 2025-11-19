@@ -158,7 +158,7 @@ def delete_record(clave, DB_FILE):
     conn.commit()
     conn.close()
 
-def ejecutar_sh_con_parametros(SH_FILE, param1, param2):
+def ejecutar_sh_con_parametros(SH_FILE, param1, param2, resultado):
     """
     Ejecuta el archivo .sh con los parámetros de DIAS y ENTORNO
     """
@@ -171,7 +171,6 @@ def ejecutar_sh_con_parametros(SH_FILE, param1, param2):
         param1,
         param2
     ]
-    
     try:
         # `preexec_fn=os.setsid` garantiza que el proceso no se cierre con la sesión
         proceso = subprocess.Popen(
@@ -181,16 +180,42 @@ def ejecutar_sh_con_parametros(SH_FILE, param1, param2):
             preexec_fn=os.setsid,        # Desvincula del TTY
             close_fds=True
         )
-        st.success(f"✅ El script `{SH_FILE}` se está ejecutando en segundo plano (PID: {proceso.pid}).")
+        print(f"✅ El script `{SH_FILE}` se está ejecutando en segundo plano (PID: {proceso.pid}).")
     except FileNotFoundError:
-        st.error(f"❌ El archivo `{SH_FILE}` no existe. Revisa la ruta.")
+        resultado.error(f"❌ El archivo `{SH_FILE}` no existe. Revisa la ruta.")
     except Exception as e:
-        st.error(f"❌ Error inesperado: {e}")
+        resultado.error(f"❌ Error inesperado: {e}")
 
 
-# --------------------------
-# INTERFAZ PRINCIPAL
-# --------------------------
+def ejecutar_proceso_sh(is_running, resultado, SH_FILE, BOLSA):
+    if BOLSA == "BIVA":
+        if st.session_state.parametro_c1 == "EJECUTAR":
+            if is_running == "":
+                ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a1, st.session_state.parametro_b1, resultado)
+                resultado.info("Proceso 'BIVA' lanzado en segundo plano; para ver el estado de ejecución pulse el botón de '🔄 Refrescar'")
+            else:
+                resultado.warning("El proceso 'BIVA' se está ejecutando en segundo plano; por favor, espere o pulse el botón de '🔄 Refrescar' ")
+            # Reset del campo
+            st.session_state.parametro_c1 = "xxxxx"   
+        else:
+            resultado.warning(f"¡ La palabra de paso '{st.session_state.parametro_c1}' no es correcta !")
+
+    if BOLSA == "BMV":
+        if st.session_state.parametro_c2 == "EJECUTAR":
+            if is_running == "":
+                ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a2, st.session_state.parametro_b2, resultado)
+                resultado.info("Proceso 'BMV' lanzado en segundo plano; para ver el estado de ejecución pulse el botón de '🔄 Refrescar'")
+            else:
+                resultado.warning("El proceso 'BMV' se está ejecutando en segundo plano; por favor, espere o pulse el botón de '🔄 Refrescar' ")
+            # Reset del campo
+            st.session_state.parametro_c2 = "xxxxx"   
+        else:
+            resultado.warning(f"¡ La palabra de paso '{st.session_state.parametro_c2}' no es correcta !")
+
+
+# -----------------------------------------------------------------------------------------------------------------------------------------
+# MAIN: INTERFAZ PRINCIPAL
+# -----------------------------------------------------------------------------------------------------------------------------------------
 def main():
     st.title("🌐 WebScraping: Eventos Relevantes")
     st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
@@ -225,6 +250,8 @@ def main():
     # FIN: Login
     # ------------------------------------------------------------------
 
+    # VARIABLES DE: Sessión State
+    
 
 
 
@@ -350,10 +377,8 @@ def main():
             nombres_logs = [f.name for f in lista_logs1_10]
             # Selección
             log_seleccionado = st.selectbox("Selecciona un log para ver su contenido:", nombres_logs)
-
             # Ruta completa del log elegido
             ruta_completa = LOG_DIR1 / log_seleccionado
-
             # Lectura y visualización
             try:
                 # Si tu log está en otra codificación, cambia el encoding
@@ -362,33 +387,24 @@ def main():
                 st.code(contenido, language="text")
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
-    with st.expander("▶️ Panel de Ejecución"):
 
+    with st.expander("▶️ Panel de ejecución") as panel: 
+        # Contenedor donde se escribirán los resultados
+        resultado1 = st.container()
         # --- Configuración del Archivo SH ---
-        SH_FILE = "/home/robot/Python/proy_py_bolsa_mx/BIVA.sh" 
+        SH_FILE1 = "/home/robot/Python/proy_py_bolsa_mx/BIVA.sh" 
         col1, col3, col4 = st.columns(3)
         with col1:
             # Obtener parámetros del usuario
-            parametro_a = st.text_input("**Día de procesamiento:**", "0")
+            st.text_input("**Día de procesamiento:**", "0",key="parametro_a1")
             st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
         with col3:
-            parametro_b = st.text_input("**Entorno de Ejecución:**", "PRO")
+            st.text_input("**Entorno de Ejecución:**", "PRO",key="parametro_b1")
         with col4:
-            parametro_c = st.text_input("**Palabra de paso:**", "-----",help="Por seguridad escriba EJECUTAR")
+            st.text_input("**Palabra de paso:**", "-----",key="parametro_c1",help="Por seguridad escriba EJECUTAR")
         st.write(" ")
-        # Definir el botón y la acción
-        if st.button("**Ejecutar Proceso WebScraping BIVA**"):
-            if parametro_c == "EJECUTAR":
-                # Llamar a la función con los parámetros ingresados por el usuario
-                if is_running1 == "":
-                    ejecutar_sh_con_parametros(SH_FILE, parametro_a, parametro_b)
-                else:
-                    st.warning("El proceso BIVA se está ejecutando en segundo plano; por favor, espere a que finalice.")
-                
-                st.info("Actualiza la web o haz clic en el botón 'Refrescar'.")
-            else:
-                st.toast("La palabra de paso no es correcta", icon="ℹ️")    
-        #st.write(f"**{SH_FILE} {parametro_a} {parametro_b}**")
+        # Botón con callback
+        st.button("**Ejecutar Proceso WebScraping BIVA**", on_click=ejecutar_proceso_sh, args=(is_running1, resultado1, SH_FILE1, "BIVA"))
 
 
     # TABLA: BMV ---------------------------------------------------------------------
@@ -500,8 +516,24 @@ def main():
             except Exception as e:
                 st.error(f"Error al leer el archivo: {e}")
 
-    with st.expander("▶️ Panel de ejecución"):
-        st.write("🚧 En construcción 🚧")
+    with st.expander("▶️ Panel de ejecución") as panel: 
+        # Contenedor donde se escribirán los resultados
+        resultado2 = st.container()
+        # --- Configuración del Archivo SH ---
+        SH_FILE2 = "/home/robot/Python/proy_py_bolsa_mx/BMV.sh" 
+        col1, col3, col4 = st.columns(3)
+        with col1:
+            # Obtener parámetros del usuario
+            st.text_input(" **Día de procesamiento:**", "0",key="parametro_a2")
+            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+        with col3:
+            st.text_input(" **Entorno de Ejecución:**", "PRO",key="parametro_b2")
+        with col4:
+            st.text_input(" **Palabra de paso:**", "-----",key="parametro_c2",help="Por seguridad escriba EJECUTAR")
+        st.write(" ")
+        # Botón con callback
+        st.button("**Ejecutar Proceso WebScraping BMV**", on_click=ejecutar_proceso_sh, args=(is_running2, resultado2, SH_FILE2, "BMV"))
+
 
     st.sidebar.caption("---")
 
