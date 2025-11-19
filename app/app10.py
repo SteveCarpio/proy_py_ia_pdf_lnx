@@ -452,7 +452,7 @@ def main():
         # Botón con callback
         st.button("**Ejecutar Proceso WebScraping BIVA**", on_click=ejecutar_proceso_sh, args=(is_running1, resultado1, SH_FILE1, "BIVA"))
 
-
+    st.caption(f" ")
     # TABLA: BMV ---------------------------------------------------------------------
     
     # Bloque del titulo BMV ---------------
@@ -654,7 +654,10 @@ def main():
 
 
 
+    st.caption(f" ")
 
+    # TABLA: ORACLE ---------------------------------------------------------------------
+    st.subheader("🗄️ - Almacenar en Histórico ORACLE")
 
 
 
