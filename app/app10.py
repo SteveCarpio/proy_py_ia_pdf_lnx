@@ -348,7 +348,7 @@ def main():
         st.subheader(is_running1)
     with c4:
         st.caption(f" ")
-        st.caption(f"Última fecha/hora de ejecución: {var_FECHA1}")
+        st.caption(f"Fecha y hora de la última ejecución: {var_FECHA1}")
     
     # Mensaje de ayuda    
     st.caption(f"{var_MENSAJE1}")
@@ -475,7 +475,7 @@ def main():
         st.subheader(is_running2)
     with c4:
         st.caption(f" ")
-        st.caption(f"Última fecha/hora de ejecución: {var_FECHA2}")
+        st.caption(f"Fecha y hora de la última ejecución: {var_FECHA2}")
     
     # Mensaje de ayuda    
     st.caption(f"{var_MENSAJE2}")
