@@ -366,22 +366,29 @@ def main():
 
         # --- Configuración del Archivo SH ---
         SH_FILE = "/home/robot/Python/proy_py_bolsa_mx/BIVA.sh" 
-
-        # 1. Obtener parámetros del usuario
-        parametro_a = st.text_input("**Día de procesamiento:** :gray[(0, 1, 2, 3...etc) 0 indica el día de hoy, 1 el de ayer, etc..]", "0")
-        parametro_b = "PRO"
-        
-        st.write(f"Se ejecutará: **{SH_FILE} {parametro_a} {parametro_b}**")
-
-        # 2. Definir el botón y la acción
+        col1, col3, col4 = st.columns(3)
+        with col1:
+            # Obtener parámetros del usuario
+            parametro_a = st.text_input("**Día de procesamiento:**", "0")
+            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+        with col3:
+            parametro_b = st.text_input("**Entorno de Ejecución:**", "PRO")
+        with col4:
+            parametro_c = st.text_input("**Palabra de paso:**", "-----",help="Por seguridad escriba EJECUTAR")
+        st.write(" ")
+        # Definir el botón y la acción
         if st.button("**Ejecutar Proceso WebScraping BIVA**"):
-            # Llamar a la función con los parámetros ingresados por el usuario
-            if is_running1 == "":
-                ejecutar_sh_con_parametros(SH_FILE, parametro_a, parametro_b)
+            if parametro_c == "EJECUTAR":
+                # Llamar a la función con los parámetros ingresados por el usuario
+                if is_running1 == "":
+                    ejecutar_sh_con_parametros(SH_FILE, parametro_a, parametro_b)
+                else:
+                    st.warning("El proceso BIVA se está ejecutando en segundo plano; por favor, espere a que finalice.")
+                
+                st.info("Actualiza la web o haz clic en el botón 'Refrescar'.")
             else:
-                st.warning("El proceso BIVA se está ejecutando en segundo plano; por favor, espere a que finalice.")
-            st.info("Actualiza la web o haz clic en el botón 'Refrescar'.")
-
+                st.toast("La palabra de paso no es correcta", icon="ℹ️")    
+        #st.write(f"**{SH_FILE} {parametro_a} {parametro_b}**")
 
 
     # TABLA: BMV ---------------------------------------------------------------------
