@@ -7,6 +7,7 @@ import shutil
 import sys
 import os
 #from datetime import datetime
+from datetime import timedelta
 
 # --------------------------
 # CONFIGURACIÓN GENERAL
@@ -212,6 +213,45 @@ def ejecutar_proceso_sh(is_running, resultado, SH_FILE, BOLSA):
         else:
             resultado.warning(f"¡ La palabra de paso '{st.session_state.parametro_c2}' no es correcta !")
 
+    if BOLSA == "BOLSAS":
+        if st.session_state.parametro_c3 == "EJECUTAR":
+            if is_running == "":
+                #ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a3, st.session_state.parametro_b3, resultado)
+                resultado.write(f"{SH_FILE} {st.session_state.parametro_a3} {st.session_state.parametro_b3}")
+                resultado.info("Envió del Email lanzado en segundo plano; para ver el estado de ejecución pulse el botón de '🔄 Refrescar'")
+            else:
+                resultado.warning("El proceso de envió del Email se está ejecutando en segundo plano; por favor, espere o pulse el botón de '🔄 Refrescar' ")
+            # Reset del campo
+            st.session_state.parametro_c3 = "xxxxx"   
+        else:
+            resultado.warning(f"¡ La palabra de paso '{st.session_state.parametro_c3}' no es correcta !")
+
+def comprobar_excel_email(x):
+    # Generemos una fecha según el día de procesamiento, tener en cuenta que buscaremos el día X - 1
+    dias = int(x) + 1  
+    hoy = datetime.datetime.now()
+    fecha = hoy - timedelta(days=dias)
+    fecha_final = fecha.strftime("%Y%m%d")
+
+    ruta1 = f"/srv/apps/MisCompilados/PROY_BOLSA_MX/BIVA/INFORMES/BIVA_{fecha_final}_M.xlsx"
+    ruta2 = f"/srv/apps/MisCompilados/PROY_BOLSA_MX/BMV/INFORMES/BMV_{fecha_final}_M.xlsx"
+
+    se_manda_email = "NO"
+    if os.path.isfile(ruta1) and os.path.isfile(ruta2):
+        se_manda_email = "SI"
+
+    if os.path.isfile(ruta1):
+        res1 = f"✅ Existen datos en la tabla de **BIVA** para mandar el email"
+    else:
+        res1 = f"❌ No hay datos de **BIVA** para mandar el email"
+
+    if os.path.isfile(ruta2):
+        res2 = f"✅ Existen datos en la tabla de **BMV** para mandar el email"
+    else:
+        res2 = f"❌ No hay datos de **BMV** para mandar el email"
+
+    return res1, res2, se_manda_email
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
 # MAIN: INTERFAZ PRINCIPAL
@@ -307,7 +347,8 @@ def main():
     with c2:
         st.subheader(is_running1)
     with c4:
-        st.subheader(f"{var_FECHA1} ")
+        st.caption(f" ")
+        st.caption(f"Última fecha/hora de ejecución: {var_FECHA1}")
     
     # Mensaje de ayuda    
     st.caption(f"{var_MENSAJE1}")
@@ -433,7 +474,8 @@ def main():
     with c2:
         st.subheader(is_running2)
     with c4:
-        st.subheader(f"{var_FECHA2} ")
+        st.caption(f" ")
+        st.caption(f"Última fecha/hora de ejecución: {var_FECHA2}")
     
     # Mensaje de ayuda    
     st.caption(f"{var_MENSAJE2}")
@@ -534,13 +576,64 @@ def main():
         # Botón con callback
         st.button("**Ejecutar Proceso WebScraping BMV**", on_click=ejecutar_proceso_sh, args=(is_running2, resultado2, SH_FILE2, "BMV"))
 
+    st.caption(f" ")
 
+    # TABLA: ENVIO DE EMAIL ---------------------------------------------------------------------
+    st.subheader("📧 - Envió de Email")
+
+    is_running3 = ""
+    if bool(os.popen('ps aux | grep BOLSAS.sh | grep -v grep').read().strip()):
+        is_running3 = "ℹ️ Proceso en ejecución"
+
+    with st.expander("▶️ Panel de envió") as panel: 
+        # Contenedor donde se escribirán los resultados
+        resultado3 = st.container()
+        # --- Configuración del Archivo SH ---
+        SH_FILE3 = "/home/robot/Python/proy_py_bolsa_mx/BOLSAS.sh" 
+        col1, col3, col4 = st.columns(3)
+        with col1:
+            # Obtener parámetros del usuario
+            st.text_input("  **Día de procesamiento:**", "0",key="parametro_a3")
+
+            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+        with col3:
+            st.selectbox(
+                label="  **Entorno de Ejecución:**",
+                options=["DEV", "PRO"],      # Valores disponibles
+                index=0,                     # Valor por defecto (0 → "DEV")
+                key="parametro_b3"           # Identificador único
+            )
+        with col4:
+            st.text_input("  **Palabra de paso:**", "-----",key="parametro_c3",help="Por seguridad escriba EJECUTAR")
+
+
+        # Valida si existe el excel con ese día de procesarmiento.
+        res_excel1, res_excel2, se_manda_email = comprobar_excel_email(st.session_state.parametro_a3)
+        st.write(f"{res_excel1}")
+        st.write(f"{res_excel2}")
+
+        st.write(" ")
+        # Botón con callback
+        if se_manda_email == "SI":
+            st.button("**Enviar Email con los Eventos Relevanes**", on_click=ejecutar_proceso_sh, args=(is_running3, resultado3, SH_FILE3, "BOLSAS"))
+        else:
+            st.write("No se puede mandar el email, es necesario que BMV y BIVA tengan datos.")
+
+
+
+
+
+
+
+
+
+
+
+    # PIE DE PAGINA DEL SIDEBAR -----------------------------------------------------------------
     st.sidebar.caption("---")
-
     # Botón refrescar
     if st.sidebar.button("🔄 Refrescar"):
         st.rerun()
-    
     # Aviso informativo
     st.sidebar.markdown(
     """
@@ -553,8 +646,7 @@ def main():
     - Intentar no ejecutarlo en horario de planificación 8-10h para evitar solapamientos.
     </div>
     """,
-    unsafe_allow_html=True
-)
+    unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
