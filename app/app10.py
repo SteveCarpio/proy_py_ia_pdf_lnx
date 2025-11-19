@@ -216,9 +216,9 @@ def ejecutar_proceso_sh(is_running, resultado, SH_FILE, BOLSA):
     if BOLSA == "BOLSAS":
         if st.session_state.parametro_c3 == "EJECUTAR":
             if is_running == "":
-                #ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a3, st.session_state.parametro_b3, resultado)
-                resultado.write(f"{SH_FILE} {st.session_state.parametro_a3} {st.session_state.parametro_b3}")
-                resultado.info("Envió del Email lanzado en segundo plano; para ver el estado de ejecución pulse el botón de '🔄 Refrescar'")
+                ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a3, st.session_state.parametro_b3, resultado)
+                #resultado.write(f"{SH_FILE} {st.session_state.parametro_a3} {st.session_state.parametro_b3}")
+                resultado.info("Email enviado; verifique su cuenta de correo 📧 Zimbra")
             else:
                 resultado.warning("El proceso de envió del Email se está ejecutando en segundo plano; por favor, espere o pulse el botón de '🔄 Refrescar' ")
             # Reset del campo
@@ -430,12 +430,22 @@ def main():
         # --- Configuración del Archivo SH ---
         SH_FILE1 = "/home/robot/Python/proy_py_bolsa_mx/BIVA.sh" 
         col1, col3, col4 = st.columns(3)
+        # Obtener parámetros del usuario
         with col1:
-            # Obtener parámetros del usuario
-            st.text_input("**Día de procesamiento:**", "0",key="parametro_a1")
-            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+            st.selectbox(
+                label="  **Día de ejecución:**",
+                options=["0", "1", "2", "3", "4"],      # Valores disponibles
+                index=0,                                # Valor por defecto (0 → "0")
+                key="parametro_a1",                     # Identificador único
+                help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
+            )
         with col3:
-            st.text_input("**Entorno de Ejecución:**", "PRO",key="parametro_b1")
+            st.selectbox(
+                label="  **Entorno de ejecución:**",
+                options=["PRO"],             # Valores disponibles
+                index=0,                     # Valor por defecto (0 → "PRO")
+                key="parametro_b1"           # Identificador único
+            )
         with col4:
             st.text_input("**Palabra de paso:**", "-----",key="parametro_c1",help="Por seguridad escriba EJECUTAR")
         st.write(" ")
@@ -559,12 +569,22 @@ def main():
         # --- Configuración del Archivo SH ---
         SH_FILE2 = "/home/robot/Python/proy_py_bolsa_mx/BMV.sh" 
         col1, col3, col4 = st.columns(3)
+        # Obtener parámetros del usuario
         with col1:
-            # Obtener parámetros del usuario
-            st.text_input(" **Día de procesamiento:**", "0",key="parametro_a2")
-            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+            st.selectbox(
+                label="  **Día de ejecución:**",
+                options=["0", "1", "2", "3", "4"],      # Valores disponibles
+                index=0,                                # Valor por defecto (0 → "0")
+                key="parametro_a2",                     # Identificador único
+                help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
+            )
         with col3:
-            st.text_input(" **Entorno de Ejecución:**", "PRO",key="parametro_b2")
+            st.selectbox(
+                label="  **Entorno de ejecución:**",
+                options=["PRO"],             # Valores disponibles
+                index=0,                     # Valor por defecto (0 → "PRO")
+                key="parametro_b2"           # Identificador único
+            )
         with col4:
             st.text_input(" **Palabra de paso:**", "-----",key="parametro_c2",help="Por seguridad escriba EJECUTAR")
         st.write(" ")
@@ -586,14 +606,18 @@ def main():
         # --- Configuración del Archivo SH ---
         SH_FILE3 = "/home/robot/Python/proy_py_bolsa_mx/BOLSAS.sh" 
         col1, col3, col4 = st.columns(3)
+        # Obtener parámetros del usuario
         with col1:
-            # Obtener parámetros del usuario
-            st.text_input("  **Día de procesamiento:**", "0",key="parametro_a3")
-
-            st.caption("Ej.: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el de ayer, etc..")
+            st.selectbox(
+                label="  **Día de ejecución:**",
+                options=["0", "1", "2", "3", "4"],      # Valores disponibles
+                index=0,                                # Valor por defecto (0 → "0")
+                key="parametro_a3",                     # Identificador único
+                help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
+            )
         with col3:
             st.selectbox(
-                label="  **Entorno de Ejecución:**",
+                label="  **Entorno de ejecución:**",
                 options=["DEV", "PRO"],      # Valores disponibles
                 index=0,                     # Valor por defecto (0 → "DEV")
                 key="parametro_b3"           # Identificador único
@@ -605,21 +629,15 @@ def main():
         # Valida si existe el excel con ese día de procesarmiento.
         res_excel1, res_excel2, se_manda_email, ruta1, ruta2 = comprobar_excel_email(st.session_state.parametro_a3)
 
-
-
-
         st.write(" ")
 
         # Botón con callback
         if se_manda_email == "SI":
-
             col_email1, col_email2 = st.columns(2)
-
             with col_email1:
                 df_excel1 = pd.read_excel(ruta1)
                 df_excel1.index = df_excel1.index + 1
                 st.write(f"{res_excel1}: ({len(df_excel1)} registros)")
-                
                 columna_excel1 = ['FECHA', 'CLAVE', 'ASUNTO']
                 st.dataframe(df_excel1[columna_excel1])
 
@@ -629,7 +647,7 @@ def main():
                 st.write(f"{res_excel2}: ({len(df_excel2)} registros)")
                 columna_excel2 = ['FECHA', 'CLAVE', 'ASUNTO']
                 st.dataframe(df_excel2[columna_excel2])
-
+            # Botón: Envio de email
             st.button("**Enviar Email con los Eventos Relevanes**", on_click=ejecutar_proceso_sh, args=(is_running3, resultado3, SH_FILE3, "BOLSAS"))
         else:
             st.write("No se puede mandar el email, es necesario que BIVA y BMV tengan datos.")
