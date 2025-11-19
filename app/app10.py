@@ -241,16 +241,16 @@ def comprobar_excel_email(x):
         se_manda_email = "SI"
 
     if os.path.isfile(ruta1):
-        res1 = f"✅ Existen datos en la tabla de **BIVA** para mandar el email"
+        res1 = f"✅ Existen datos en la tabla de **BIVA**"
     else:
         res1 = f"❌ No hay datos de **BIVA** para mandar el email"
 
     if os.path.isfile(ruta2):
-        res2 = f"✅ Existen datos en la tabla de **BMV** para mandar el email"
+        res2 = f"✅ Existen datos en la tabla de **BMV**"
     else:
         res2 = f"❌ No hay datos de **BMV** para mandar el email"
 
-    return res1, res2, se_manda_email
+    return res1, res2, se_manda_email, ruta1, ruta2
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
@@ -289,11 +289,6 @@ def main():
     # ------------------------------------------------------------------
     # FIN: Login
     # ------------------------------------------------------------------
-
-    # VARIABLES DE: Sessión State
-    
-
-
 
     # ------------------------------------------------------------------------------------------------------------------------------------
     # Inicio del Programa
@@ -608,16 +603,36 @@ def main():
 
 
         # Valida si existe el excel con ese día de procesarmiento.
-        res_excel1, res_excel2, se_manda_email = comprobar_excel_email(st.session_state.parametro_a3)
-        st.write(f"{res_excel1}")
-        st.write(f"{res_excel2}")
+        res_excel1, res_excel2, se_manda_email, ruta1, ruta2 = comprobar_excel_email(st.session_state.parametro_a3)
+
+
+
 
         st.write(" ")
+
         # Botón con callback
         if se_manda_email == "SI":
+
+            col_email1, col_email2 = st.columns(2)
+
+            with col_email1:
+                df_excel1 = pd.read_excel(ruta1)
+                df_excel1.index = df_excel1.index + 1
+                st.write(f"{res_excel1}: ({len(df_excel1)} registros)")
+                
+                columna_excel1 = ['FECHA', 'CLAVE', 'ASUNTO']
+                st.dataframe(df_excel1[columna_excel1])
+
+            with col_email2:
+                df_excel2 = pd.read_excel(ruta2)
+                df_excel2.index = df_excel2.index + 1
+                st.write(f"{res_excel2}: ({len(df_excel2)} registros)")
+                columna_excel2 = ['FECHA', 'CLAVE', 'ASUNTO']
+                st.dataframe(df_excel2[columna_excel2])
+
             st.button("**Enviar Email con los Eventos Relevanes**", on_click=ejecutar_proceso_sh, args=(is_running3, resultado3, SH_FILE3, "BOLSAS"))
         else:
-            st.write("No se puede mandar el email, es necesario que BMV y BIVA tengan datos.")
+            st.write("No se puede mandar el email, es necesario que BIVA y BMV tengan datos.")
 
 
 
