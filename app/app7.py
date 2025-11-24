@@ -9,6 +9,7 @@ def main():
     from app.appOra import get_oracle_connection
     from datetime import datetime, timedelta
     import plotly.express as px
+    import time
 
     st.title("📈 Reporte de Eventos Relevantes")
     st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico. (app7.py)")
@@ -17,9 +18,11 @@ def main():
     # Cargar datos desde Oracle
     @st.cache_data(show_spinner="Cargando datos desde Oracle...")
     def load_data():
+        start = time.time()
         query = "SELECT * FROM P_BOLSAS_EVENTOS_RELEVANTES"
         with get_oracle_connection() as conn:
             df = pd.read_sql(query, conn)
+            st.write("Tiempo:", time.time() - start)
         return df
 
     if st.sidebar.button("🔄 Recargar datos"):
@@ -27,14 +30,14 @@ def main():
 
     # ✅ Cargar y convertir fechas antes de cualquier filtrado
     df = load_data()
-
+    
     for col in ["FECHA", "FPROCESO"]:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col])
 
     # ====== SIDEBAR: FILTROS ======
     #st.sidebar.header("🔎 Filtros")
-
+    
     # --- Filtro 1: FPROCESO (input de fecha manual corregido) ---
     if "FPROCESO" in df.columns:
         fproc_min = df["FPROCESO"].min().date()
@@ -47,7 +50,6 @@ def main():
         fproc_fin_dt = pd.to_datetime(fproc_fin) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
         df = df[(df["FPROCESO"] >= pd.to_datetime(fproc_inicio)) & (df["FPROCESO"] <= fproc_fin_dt)]
 
-
     # --- Filtro 2: CLAVE (sin filtro por defecto) ---
     if "CLAVE" in df.columns:
         claves_unicas = sorted(df["CLAVE"].dropna().unique().tolist())
@@ -59,14 +61,12 @@ def main():
         if claves_seleccionadas:
             df = df[df["CLAVE"].isin(claves_seleccionadas)]
 
-
     # --- Filtro 3: SECCION (multiselect con todos seleccionados) ---
     if "SECCION" in df.columns:
         secciones = sorted(df["SECCION"].dropna().unique().tolist())
         secciones_seleccionadas = st.sidebar.multiselect("📚 SECCION", options=secciones)
         if secciones_seleccionadas:
             df = df[df["SECCION"].isin(secciones_seleccionadas)]
-
 
     # --- Filtro 4: ASUNTO (texto libre) ---
     if "ASUNTO" in df.columns:
@@ -99,11 +99,9 @@ def main():
     # Formatear campos de salida: 
     df_ordenado['FECHA'] = df_ordenado['FECHA'].dt.date  # FECHA solo AAAA-MM-DD
 
-
     #st.dataframe(df_ordenado, use_container_width=True)
 
     ########################
-
 
 
     def make_link(x):
@@ -113,7 +111,6 @@ def main():
 
     df_ordenado["URL"] = df_ordenado["URL"].apply(make_link)
     df_ordenado["ARCHIVO"] = df_ordenado["ARCHIVO"].apply(make_link)
-
 
 
     # --- 🎨 CSS personalizado ---
@@ -178,7 +175,6 @@ def main():
     biva_df = df_ordenado[df_ordenado['ORIGEN'] == 'BIVA']                            # df BIVA
     bmv_df = df_ordenado[df_ordenado['ORIGEN'] == 'BMV']                              # df de BMV
 
-
     # Contadores
     num_total = len(df_ordenado)
     num_biva=len(biva_df)
@@ -214,7 +210,6 @@ def main():
         fig.update_xaxes(title_text=" ")     # Titulo de eje X
 
         st.plotly_chart(fig)
-
 
 if __name__ == "__main__":
     main()
