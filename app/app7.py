@@ -1,5 +1,4 @@
 # 📈 Reporting Eventos Relevantes
-import streamlit as st
 
 # ----------------------------------------
 # EJECUCIÓN PRINCIPAL
@@ -10,109 +9,108 @@ def main():
     from datetime import datetime, timedelta
     import plotly.express as px
     import time
+    import streamlit as st
 
     st.title("📈 Reporte de Eventos Relevantes")
     st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico. (app7.py)")
     st.sidebar.subheader("📈 : Eventos Relevantes")
 
-    # Cargar datos desde Oracle
+    # ==========================
+    #     CARGA DE DATOS
+    # ==========================
     @st.cache_data(show_spinner="Cargando datos desde Oracle...")
     def load_data():
         start = time.time()
         query = "SELECT * FROM P_BOLSAS_EVENTOS_RELEVANTES"
         with get_oracle_connection() as conn:
             df = pd.read_sql(query, conn)
-            st.write("Tiempo:", time.time() - start)
+        st.write("Tiempo carga Oracle:", time.time() - start)
+
+        # Convertir fechas UNA sola vez
+        for col in ["FECHA", "FPROCESO"]:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce')
         return df
 
     if st.sidebar.button("🔄 Recargar datos"):
         st.cache_data.clear()
 
-    # ✅ Cargar y convertir fechas antes de cualquier filtrado
     df = load_data()
-    
-    for col in ["FECHA", "FPROCESO"]:
-        if col in df.columns:
-            df[col] = pd.to_datetime(df[col])
 
-    # ====== SIDEBAR: FILTROS ======
-    #st.sidebar.header("🔎 Filtros")
-    
-    # --- Filtro 1: FPROCESO (input de fecha manual corregido) ---
+    # ==========================
+    #       FILTROS
+    # ==========================
+    mask = pd.Series(True, index=df.index)
+
+    # FPROCESO
     if "FPROCESO" in df.columns:
         fproc_min = df["FPROCESO"].min().date()
         fproc_max = df["FPROCESO"].max().date()
-        #st.sidebar.subheader("🗓️ Rango de FPROCESO")
-        fproc_inicio = st.sidebar.date_input("📅 FPROCESO: Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_inicio")
-        fproc_fin = st.sidebar.date_input("📅 FPROCESO: Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max, key="fproc_fin")
 
-        # ✅ Ajuste para incluir todo el día de la fecha final
+        fproc_inicio = st.sidebar.date_input("📅 FPROCESO: Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max)
+        fproc_fin    = st.sidebar.date_input("📅 FPROCESO: Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max)
+
         fproc_fin_dt = pd.to_datetime(fproc_fin) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
-        df = df[(df["FPROCESO"] >= pd.to_datetime(fproc_inicio)) & (df["FPROCESO"] <= fproc_fin_dt)]
+        mask &= (df["FPROCESO"] >= pd.to_datetime(fproc_inicio)) & (df["FPROCESO"] <= fproc_fin_dt)
 
-    # --- Filtro 2: CLAVE (sin filtro por defecto) ---
+    # CLAVE
     if "CLAVE" in df.columns:
         claves_unicas = sorted(df["CLAVE"].dropna().unique().tolist())
-        claves_seleccionadas = st.sidebar.multiselect(
-            "🔑 CLAVE",
-            options=claves_unicas,
-            help="Selecciona una o varias claves"
-        )
+        claves_seleccionadas = st.sidebar.multiselect("🔑 CLAVE", options=claves_unicas)
         if claves_seleccionadas:
-            df = df[df["CLAVE"].isin(claves_seleccionadas)]
+            mask &= df["CLAVE"].isin(claves_seleccionadas)
 
-    # --- Filtro 3: SECCION (multiselect con todos seleccionados) ---
+    # SECCION
     if "SECCION" in df.columns:
         secciones = sorted(df["SECCION"].dropna().unique().tolist())
         secciones_seleccionadas = st.sidebar.multiselect("📚 SECCION", options=secciones)
         if secciones_seleccionadas:
-            df = df[df["SECCION"].isin(secciones_seleccionadas)]
+            mask &= df["SECCION"].isin(secciones_seleccionadas)
 
-    # --- Filtro 4: ASUNTO (texto libre) ---
+    # ASUNTO
     if "ASUNTO" in df.columns:
         texto_asunto = st.sidebar.text_input("📝 Buscar en ASUNTO", placeholder="Escribe una palabra clave...")
         if texto_asunto:
-            df = df[df["ASUNTO"].str.contains(texto_asunto, case=False, na=False)]
+            mask &= df["ASUNTO"].str.contains(texto_asunto, case=False, na=False)
 
-    # --- Filtro 5: ORIGEN (2 opciones, ambas activas por defecto) ---
+    # ORIGEN
     if "ORIGEN" in df.columns:
         origenes = sorted(df["ORIGEN"].dropna().unique().tolist())
         origenes_seleccionados = st.sidebar.multiselect("🌍 ORIGEN", options=origenes, default=origenes)
-        df = df[df["ORIGEN"].isin(origenes_seleccionados)]
+        mask &= df["ORIGEN"].isin(origenes_seleccionados)
 
-    # --- Filtro 6: FILTRO (multiselect con todos activos por defecto) ---
+    # FILTRO
     if "FILTRO" in df.columns:
         filtro_valores = sorted(df["FILTRO"].dropna().unique().tolist())
         filtros_seleccionados = st.sidebar.multiselect("⚙️ FILTRO", options=filtro_valores, default=filtro_valores)
-        df = df[df["FILTRO"].isin(filtros_seleccionados)]
+        mask &= df["FILTRO"].isin(filtros_seleccionados)
 
-    # ====== RESULTADOS ======
+    # Aplicar todos los filtros a la vez
+    df = df[mask]
+
+    # ==========================
+    #       RESULTADOS
+    # ==========================
     st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
-    #st.dataframe(df, use_container_width=True)
 
-    # Reordenar columnas y mostrar solo las que quiero
     columnas_principales = ["FECHA", "ORIGEN", "CLAVE", "SECCION", "ASUNTO", "URL", "ARCHIVO"]
+    df_ordenado = df[columnas_principales].copy()
 
-    # Creo un nuevo DF con los campos que quiero y ordenados
-    df_ordenado = df[columnas_principales]
+    df_ordenado['FECHA'] = df_ordenado['FECHA'].dt.date
 
-    # Formatear campos de salida: 
-    df_ordenado['FECHA'] = df_ordenado['FECHA'].dt.date  # FECHA solo AAAA-MM-DD
+    # Vectorización para enlaces (más rápido que apply)
+    df_ordenado["URL"] = df_ordenado["URL"].where(
+        ~df_ordenado["URL"].astype(str).str.contains("https", na=False),
+        '<a href="' + df_ordenado["URL"].astype(str) + '" target="_blank">Click aquí</a>'
+    )
+    df_ordenado["ARCHIVO"] = df_ordenado["ARCHIVO"].where(
+        ~df_ordenado["ARCHIVO"].astype(str).str.contains("https", na=False),
+        '<a href="' + df_ordenado["ARCHIVO"].astype(str) + '" target="_blank">Click aquí</a>'
+    )
 
-    #st.dataframe(df_ordenado, use_container_width=True)
-
-    ########################
-
-
-    def make_link(x):
-        if isinstance(x, str) and "https" in x:
-            return f'<a href="{x}" target="_blank">Click aquí</a> '
-        return x
-
-    df_ordenado["URL"] = df_ordenado["URL"].apply(make_link)
-    df_ordenado["ARCHIVO"] = df_ordenado["ARCHIVO"].apply(make_link)
-
-
+    # ==========================
+    #    MOSTRAR TABLA HTML
+    # ==========================
     # --- 🎨 CSS personalizado ---
     st.markdown("""
     <style>
@@ -160,31 +158,41 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    # Mostrar la TABLA DE DATOS
+    df_nuevo = df_ordenado.copy()  
+
+    # 1. Asegúrate de que la columna FECHA sea de tipo datetime (opcional pero recomendado)
+    df_nuevo['FECHA'] = pd.to_datetime(df_nuevo['FECHA'])
+
+    # 2. Ordena por las columnas indicadas
+    df_nuevo = df_nuevo.sort_values(
+        by=['FECHA', 'ORIGEN', 'CLAVE', 'SECCION', 'ASUNTO'],
+        ascending=[False, True, True, True, True]   #  False=descending | True=ascending
+    ) 
+
+    # 3. Si quieres volver a indexar el dataframe
+    df_nuevo = df_nuevo.reset_index(drop=True)
+
+
     with st.expander("📜 Listado de Datos:"):
-        # --- 💅 Mostrar DataFrame como HTML con enlaces activos ---
         st.markdown(
-            df_ordenado.to_html(escape=False, index=False),
+            df_nuevo.to_html(escape=False, index=False),
             unsafe_allow_html=True
         )
 
-     # Mostrar la VISUALIZACIONES
+    # ==========================
+    #      VISUALIZACIONES
+    # ==========================
+    df_ordenado['FECHA'] = pd.to_datetime(df_ordenado['FECHA'], format='%Y-%m-%d')
+    biva_df = df_ordenado[df_ordenado['ORIGEN'] == 'BIVA']
+    bmv_df = df_ordenado[df_ordenado['ORIGEN'] == 'BMV']
 
-    # Df de apoyo
-    df_ordenado['FECHA'] = pd.to_datetime(df_ordenado['FECHA'], format='%Y-%m-%d')    # Convertir la columna 'FECHA' a formato datetime
-    biva_df = df_ordenado[df_ordenado['ORIGEN'] == 'BIVA']                            # df BIVA
-    bmv_df = df_ordenado[df_ordenado['ORIGEN'] == 'BMV']                              # df de BMV
-
-    # Contadores
     num_total = len(df_ordenado)
-    num_biva=len(biva_df)
-    num_bmv=len(bmv_df)
-    origen_counts = df_ordenado['ORIGEN'].value_counts() # Contar los valores únicos en la columna 'ORIGEN'
+    num_biva = len(biva_df)
+    num_bmv = len(bmv_df)
+    origen_counts = df_ordenado['ORIGEN'].value_counts()
 
-    # Gráfico de tarta
     fig_pie = px.pie(origen_counts, names=origen_counts.index, values=origen_counts.values, title=' ')
 
-    # Mostrar EXTENDER
     with st.expander("📊 Visualizaciones:"):
         col1, col2 = st.columns([1, 3])
         with col1:
@@ -194,22 +202,17 @@ def main():
         with col2:
             st.plotly_chart(fig_pie)
 
-        # Grafico de Lineal
-        biva_fecha_counts = biva_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index() # Agrupar x fecha y contar el -
-        bmv_fecha_counts = bmv_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()   # num de eventos x cada origen
-        biva_fecha_counts.columns = ['FECHA', 'BIVA'] # Renombrar las columnas para claridad 
-        bmv_fecha_counts.columns = ['FECHA', 'BMV']   # Renombrar las columnas para claridad
-        merged_df = pd.merge(biva_fecha_counts,bmv_fecha_counts, on='FECHA') # Combinar los datos de BMV y BIVA por fecha
-        fig = px.bar(merged_df, 
-             x='FECHA', 
-             y=['BIVA', 'BMV'], 
-             title='Número de Eventos Relevantes por Bolsas',
-             labels={'variable': 'Bolsas'})  # Titulo de leyenda
+        biva_fecha_counts = biva_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()
+        bmv_fecha_counts = bmv_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()
+        biva_fecha_counts.columns = ['FECHA', 'BIVA']
+        bmv_fecha_counts.columns = ['FECHA', 'BMV']
+        merged_df = pd.merge(biva_fecha_counts, bmv_fecha_counts, on='FECHA', how='outer').fillna(0)
 
-        fig.update_yaxes(title_text=" ")     # Titulo de eje Y
-        fig.update_xaxes(title_text=" ")     # Titulo de eje X
-
+        fig = px.bar(merged_df, x='FECHA', y=['BIVA', 'BMV'], title='Número de Eventos Relevantes por Bolsas')
+        fig.update_yaxes(title_text=" ")
+        fig.update_xaxes(title_text=" ")
         st.plotly_chart(fig)
+
 
 if __name__ == "__main__":
     main()
