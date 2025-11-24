@@ -35,12 +35,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Diccionario Inteligencia Artificial
 IA_APPS = {
     "1 - Facturas PDF": app1,
     "2 - Transcripción de Audio": app2,
-    "3 - ChatTdA": app3,
+    "3 - Chat-TdA": app3,
     "4 - SmartMail": app5,
     "5 - Contratos PDF": app6
 }
@@ -276,11 +275,21 @@ def mostrar_inicio():
 if "selected_app_key" not in st.session_state:
     st.session_state.selected_app_key = None
 
-# Siempre mostrar botón "Ir a Inicio"
-if st.sidebar.button("🏠 Ir a Inicio"):
-    st.session_state.selected_app_key = None
-    st.rerun()
+# Mostrar dos columnas con los botones Inicio y Chat-TdA
+col1x, col2x = st.sidebar.columns(2)
+with col1x:
+    # Siempre mostrar botón "Ir a Inicio"
+    if st.button("🏠 Ir a Inicio"):
+        st.session_state.selected_app_key = None
+        st.rerun()
+with col2x:
+    valorx = list(IA_APPS.keys())[2]
+    # Crear AQUI BOTON a la APP3
+    if st.button("🤖 Chat-TdA 🤖", key="btn_app3"):
+        st.session_state.selected_app_key = valorx
+        st.rerun()
 
+   
 # Si NO hay app seleccionada → mostrar los expanders
 if st.session_state.selected_app_key is None:
 
@@ -290,6 +299,7 @@ if st.session_state.selected_app_key is None:
             if st.button(name, key=f"btn_ia_{name}"):
                 st.session_state.selected_app_key = name
                 st.rerun()
+                
 
     # Botones para Data Science
     with st.sidebar.expander("🔬 Data Science"):
