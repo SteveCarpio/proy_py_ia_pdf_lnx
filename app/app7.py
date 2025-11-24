@@ -108,6 +108,15 @@ def main():
         '<a href="' + df_ordenado["ARCHIVO"].astype(str) + '" target="_blank">Click aquí</a>'
     )
 
+    # Prepara tabla para una salida con valores ordenados
+    df_final = df_ordenado.copy()  
+
+     # Ordena por las columnas indicadas
+    df_final = df_final.sort_values(
+        by=['FECHA', 'ORIGEN', 'CLAVE', 'SECCION', 'ASUNTO'],
+        ascending=[False, True, True, True, True]   #  False=descending | True=ascending
+    ) 
+
     # ==========================
     #    MOSTRAR TABLA HTML
     # ==========================
@@ -158,54 +167,40 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    df_nuevo = df_ordenado.copy()  
-
-    # 1. Asegúrate de que la columna FECHA sea de tipo datetime (opcional pero recomendado)
-    df_nuevo['FECHA'] = pd.to_datetime(df_nuevo['FECHA'])
-
-    # 2. Ordena por las columnas indicadas
-    df_nuevo = df_nuevo.sort_values(
-        by=['FECHA', 'ORIGEN', 'CLAVE', 'SECCION', 'ASUNTO'],
-        ascending=[False, True, True, True, True]   #  False=descending | True=ascending
-    ) 
-
-    # 3. Si quieres volver a indexar el dataframe
-    df_nuevo = df_nuevo.reset_index(drop=True)
-
-
     with st.expander("📜 Listado de Datos:"):
         st.markdown(
-            df_nuevo.to_html(escape=False, index=False),
+            df_final.to_html(escape=False, index=False),
             unsafe_allow_html=True
         )
 
     # ==========================
     #      VISUALIZACIONES
     # ==========================
-    df_ordenado['FECHA'] = pd.to_datetime(df_ordenado['FECHA'], format='%Y-%m-%d')
-    biva_df = df_ordenado[df_ordenado['ORIGEN'] == 'BIVA']
-    bmv_df = df_ordenado[df_ordenado['ORIGEN'] == 'BMV']
+    df_final['FECHA'] = pd.to_datetime(df_final['FECHA'], format='%Y-%m-%d')
+    biva_df = df_final[df_final['ORIGEN'] == 'BIVA']
+    bmv_df = df_final[df_final['ORIGEN'] == 'BMV']
 
-    num_total = len(df_ordenado)
+    num_total = len(df_final)
     num_biva = len(biva_df)
     num_bmv = len(bmv_df)
-    origen_counts = df_ordenado['ORIGEN'].value_counts()
+    origen_counts = df_final['ORIGEN'].value_counts()
 
     fig_pie = px.pie(origen_counts, names=origen_counts.index, values=origen_counts.values, title=' ')
 
     with st.expander("📊 Visualizaciones:"):
         col1, col2 = st.columns([1, 3])
         with col1:
-            st.metric(label="Número de Evento Filtrados:", value=num_total)
+            st.metric(label="Número de Eventos Filtrados:", value=num_total)
             st.metric(label="BIVA", value=num_biva)
             st.metric(label="BMV", value=num_bmv)
+            
         with col2:
             st.plotly_chart(fig_pie)
 
         biva_fecha_counts = biva_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()
-        bmv_fecha_counts = bmv_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()
+        bmv_fecha_counts  = bmv_df.groupby(pd.Grouper(key='FECHA', freq='D')).size().reset_index()
         biva_fecha_counts.columns = ['FECHA', 'BIVA']
-        bmv_fecha_counts.columns = ['FECHA', 'BMV']
+        bmv_fecha_counts.columns  = ['FECHA', 'BMV']
         merged_df = pd.merge(biva_fecha_counts, bmv_fecha_counts, on='FECHA', how='outer').fillna(0)
 
         fig = px.bar(merged_df, x='FECHA', y=['BIVA', 'BMV'], title='Número de Eventos Relevantes por Bolsas')
