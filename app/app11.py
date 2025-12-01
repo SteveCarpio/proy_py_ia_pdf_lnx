@@ -40,16 +40,41 @@ def formatear_importes(df):
         df[col] = df[col].apply(lambda x: f"{x:,.0f}".replace(",", "."))
     return df
 
-# sombrear el campo total
+# Sombrear el campo total
 def highlight_total(row):
     if row['PERIODO'] == 'TOTAL':
-        return ['background-color: #f8f8f8']*row.shape[0]
+        return ['background-color: #EEEEEE ']*row.shape[0]   # #D3D3D3  # muy_claro: f8f8f8
     return ['']*row.shape[0]
+
+# Diseño 2 de metricas, actualmente no lo uso
+def diseno_metricas():
+    card_style = """
+    <style>
+    .card {
+        padding: 15px;
+        background-color: #1f2937;
+        border-radius: 12px;
+        text-align: right;
+        font-size: 1.5rem;
+        color: white;
+        margin: 5px;
+    }
+    .card-title {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-align: left;
+    }
+    </style>
+    """
+    return card_style
+
+
 
 # ----------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ----------------------------------------
 def main():
+    import pandas as pd
     st.title("📈 Reporte de Estados Financieros")
     st.caption("Se extraerán datos de la BBDD de Histórica de Estados Financieros a un DataFrame dinámico. (app11.py)")
     st.sidebar.subheader("📈 : Eventos Relevantes")
@@ -109,18 +134,20 @@ def main():
     total_general6 = df_final['UTILPERDOPERACION'].sum()
     total_general7 = df_final['UTILPERDNETA'].sum()
     dic_totales = {
-    "TACTIVOS": total_general1,
-    "TACTIVOSCIRCULANTES": total_general2,
-    "TCAPITALCONTABLE": total_general3,
-    "TPASIVOSCIRCULANTES": total_general4,
-    "TPASIVOS": total_general5,
-    "UTILPERDOPERACION": total_general6,
-    "UTILPERDNETA": total_general7
+    "**Total Activos**": total_general1,
+    "**Total Activos Circulantes**": total_general2,
+    "**Total Capital Contable**": total_general3,
+    "**Total Pasivos Circulantes**": total_general4,
+    "**Total Pasivos**": total_general5,
+    "**Utilidad (pérdida) Operación**": total_general6,
+    "**Utilidad (pérdida) neta**": total_general7
     }
 
     # Añadir una fila “TOTAL” al final del DataFrame  de salida
     row_total = pd.DataFrame({
         'PERIODO': ['TOTAL'],
+        'CLAVEPIZARRA': [' '],
+        'FENVIO': [' '],
         'TACTIVOS': [total_general1],
         'TACTIVOSCIRCULANTES': [total_general2],
         'TCAPITALCONTABLE': [total_general3],
@@ -130,6 +157,9 @@ def main():
         'UTILPERDNETA': [total_general7]
     })
     df_totales = pd.concat([df_final, row_total], ignore_index=True)
+
+    # Reiniciar el número de índice al valor 1
+    df_totales.index = df_totales.index + 1
     
     # Poner los valores con separdor de miles a todas las variables numericas
     df_totales = formatear_importes(df_totales)
@@ -137,22 +167,36 @@ def main():
     # sombrear el registro nuevo creado con los totales
     df_totales = df_totales.style.apply(highlight_total, axis=1)
 
-
     # ==========================
     #       WIDGETS MAIN 
     # ==========================
-
-    # APARTADO 1: Titulo de número de registros
-    st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
 
     # APARTADO 2: Metricas
     cols = st.columns(7)
     for i, (label, value) in enumerate(dic_totales.items()):
         with cols[i % 7]:
-            st.metric(label, human_format(value))
+            if i == 0:
+                st.metric(label, human_format(value) , help="K=Miles, M=Million, B=Billion, T=Trillion")
+            else:
+                st.metric(label, human_format(value) )
+
+    #card_style = diseno_metricas()
+    #st.markdown(card_style, unsafe_allow_html=True)
+    #cols = st.columns(7)
+    #for i, (label, value) in enumerate(dic_totales.items()):
+    #    with cols[i % 7]:
+    #        st.markdown(f"""
+    #        <div class="card">
+    #            <div class="card-title">{label}</div>
+    #            {human_format(value)}
+    #        </div>
+    #        """, unsafe_allow_html=True)
+
+    # APARTADO 1: Titulo de número de registros
+    #st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
 
     # APARTADO 3: Visualización de la tabla 
-    with st.expander("📜 Listado de Datos:"):
+    with st.expander(f"📜 Listado de Datos: {len(df)} registros encontrados"):
         st.dataframe(df_totales)
 
     # APARTADO 4: Gráficos con los datos filtrados
