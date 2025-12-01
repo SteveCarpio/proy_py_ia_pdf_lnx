@@ -4,9 +4,9 @@ import pandas as pd
 import pathlib
 import datetime
 import shutil
+import locale
 import sys
 import os
-#from datetime import datetime
 from datetime import timedelta
 
 # --------------------------
@@ -252,6 +252,20 @@ def comprobar_excel_email(x):
 
     return res1, res2, se_manda_email, ruta1, ruta2
 
+def fecha_de_proceso_seleccionado(dias):
+    # Para que me de los días de la semana en español
+    locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
+    # Obtenemos el día de hoy 
+    hoy = datetime.datetime.today()
+    # Calcular fechas restando N días
+    fecha1 = hoy - timedelta(days=int(dias))
+    fecha2 = hoy - timedelta(days=int(dias) + 1)
+    # Establezco un formato
+    formato = "%A %d de %B %Y"
+    # Creo las variables con el formato deseado
+    VAR1 = fecha1.strftime(formato)
+    VAR2 = fecha2.strftime(formato)
+    return VAR1, VAR2
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
 # MAIN: INTERFAZ PRINCIPAL
@@ -439,6 +453,9 @@ def main():
                 key="parametro_a1",                     # Identificador único
                 help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
             )
+            VAR1, VAR2 = fecha_de_proceso_seleccionado(st.session_state.parametro_a1)
+            st.caption(f"Ejecución del: **{VAR1}**")
+            st.caption(f"Con datos del: **{VAR2}**")
         with col3:
             st.selectbox(
                 label="  **Entorno de ejecución:**",
@@ -578,6 +595,9 @@ def main():
                 key="parametro_a2",                     # Identificador único
                 help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
             )
+            VAR1, VAR2 = fecha_de_proceso_seleccionado(st.session_state.parametro_a2)
+            st.caption(f"Ejecución del: **{VAR1}**")
+            st.caption(f"Con datos del: **{VAR2}**")
         with col3:
             st.selectbox(
                 label="  **Entorno de ejecución:**",
@@ -615,6 +635,9 @@ def main():
                 key="parametro_a3",                     # Identificador único
                 help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
             )
+            VAR1, VAR2 = fecha_de_proceso_seleccionado(st.session_state.parametro_a3)
+            st.caption(f"Ejecución del: **{VAR1}**")
+            st.caption(f"Con datos del: **{VAR2}**")
         with col3:
             st.selectbox(
                 label="  **Entorno de ejecución:**",
@@ -648,7 +671,7 @@ def main():
                 columna_excel2 = ['FECHA', 'CLAVE', 'ASUNTO']
                 st.dataframe(df_excel2[columna_excel2])
             # Botón: Envio de email
-            st.button("**Enviar Email con los Eventos Relevanes**", on_click=ejecutar_proceso_sh, args=(is_running3, resultado3, SH_FILE3, "BOLSAS"))
+            st.button("**Enviar Email con los Eventos Relevantes**", on_click=ejecutar_proceso_sh, args=(is_running3, resultado3, SH_FILE3, "BOLSAS"))
         else:
             st.write("No se puede mandar el email, es necesario que BIVA y BMV tengan datos.")
 
