@@ -167,6 +167,8 @@ def main():
     # sombrear el registro nuevo creado con los totales
     df_totales = df_totales.style.apply(highlight_total, axis=1)
 
+    
+
     # ==========================
     #       WIDGETS MAIN 
     # ==========================
@@ -201,6 +203,54 @@ def main():
 
     # APARTADO 4: Gráficos con los datos filtrados
     with st.expander("📊 Visualizaciones:"):
+
+
+        df_pct = df_final.copy()
+        cols_valores = [
+            'TACTIVOS', 'TACTIVOSCIRCULANTES', 'TCAPITALCONTABLE',
+            'TPASIVOSCIRCULANTES', 'TPASIVOS', 'UTILPERDOPERACION', 'UTILPERDNETA'
+        ]
+
+        # Convertir a % del total por campo
+        for col in cols_valores:
+            df_pct[col] = (df_final[col] / df_final[col].sum()) * 100
+
+
+
+
+
+
+        # Filtrar solo columnas necesarias para el gráfico
+        fig1 = px.bar(
+            df_pct,
+            x='PERIODO',
+            y=['TACTIVOS', 'TACTIVOSCIRCULANTES', 'TCAPITALCONTABLE', 'TPASIVOSCIRCULANTES', 'TPASIVOS', 'UTILPERDOPERACION', 'UTILPERDNETA'],
+            color='CLAVEPIZARRA',
+            barmode='group',
+            title="Porcentaje de TACTIVOS , TACTIVOSCIRCULANTES por Periodo y Clave Pizarra (%)"
+        )
+
+        fig1.update_layout(yaxis_title="% del total")
+        st.plotly_chart(fig1, use_container_width=True)
+
+
+
+        df_g2 = df_pct.groupby('CLAVEPIZARRA')[['TACTIVOS', 'TACTIVOSCIRCULANTES', 'TCAPITALCONTABLE', 'TPASIVOSCIRCULANTES', 'TPASIVOS', 'UTILPERDOPERACION', 'UTILPERDNETA']].sum().reset_index()
+        fig2 = px.bar(
+            df_g2,
+            x='CLAVEPIZARRA',
+            y=['TACTIVOS', 'TACTIVOSCIRCULANTES', 'TCAPITALCONTABLE', 'TPASIVOSCIRCULANTES', 'TPASIVOS', 'UTILPERDOPERACION', 'UTILPERDNETA'],
+            barmode='group',
+            title="Totales por Clave Pizarra expresados como % del total"
+        )
+
+        fig2.update_layout(yaxis_title="% del total")
+        st.plotly_chart(fig2, use_container_width=True)
+
+
+
+
+
         col1, col2 = st.columns([1, 3])
         with col1:
             st.caption("En construcción")
