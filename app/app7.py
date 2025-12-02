@@ -5,35 +5,48 @@
 # ----------------------------------------
 def main():
     import pandas as pd
+    from dateutil.relativedelta import relativedelta
     from app.appOra import get_oracle_connection
     from datetime import datetime, timedelta
     import plotly.express as px
     import time
     import streamlit as st
+    from io import BytesIO
 
     st.title("📈 Reporte de Eventos Relevantes")
     st.caption("Se extraerán datos de la BBDD de Histórica de Eventos Relevantes en un DataFrame dinámico. (app7.py)")
     st.sidebar.subheader("📈 : Eventos Relevantes")
+    st.sidebar.caption("  ")
 
     # ==========================
-    #     CARGA DE DATOS
+    #     FUNCIONES VARIAS
     # ==========================
+
+    # Función para Cargar Datos de Oracle
     @st.cache_data(show_spinner="Cargando datos desde Oracle...")
     def load_data():
         start = time.time()
         query = "SELECT * FROM P_BOLSAS_EVENTOS_RELEVANTES"
         with get_oracle_connection() as conn:
             df = pd.read_sql(query, conn)
-        st.write("Tiempo carga Oracle:", time.time() - start)
+        #st.write("Tiempo carga Oracle:", time.time() - start)
 
         # Convertir fechas UNA sola vez
         for col in ["FECHA", "FPROCESO"]:
             if col in df.columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
         return df
+    
+    # Función para descargar fichero excel
+    def to_excel(df):
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+        return output.getvalue()
 
-    if st.sidebar.button("🔄 Recargar datos"):
-        st.cache_data.clear()
+    # ===============================
+    #       INICIO DEL PROGRAMA
+    # ===============================
 
     df = load_data()
 
@@ -46,9 +59,11 @@ def main():
     if "FPROCESO" in df.columns:
         fproc_min = df["FPROCESO"].min().date()
         fproc_max = df["FPROCESO"].max().date()
-
-        fproc_inicio = st.sidebar.date_input("📅 FPROCESO: Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max)
-        fproc_fin    = st.sidebar.date_input("📅 FPROCESO: Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max)
+        coldate1, coldate2 = st.sidebar.columns(2)
+        with coldate1:
+            fproc_inicio = st.date_input("📅 Desde", value=fproc_max, min_value=fproc_min, max_value=fproc_max, help="Histórico desde: 2020/01/02")
+        with coldate2:
+            fproc_fin    = st.date_input("📅 Hasta", value=fproc_max, min_value=fproc_min, max_value=fproc_max)
 
         fproc_fin_dt = pd.to_datetime(fproc_fin) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
         mask &= (df["FPROCESO"] >= pd.to_datetime(fproc_inicio)) & (df["FPROCESO"] <= fproc_fin_dt)
@@ -91,7 +106,7 @@ def main():
     # ==========================
     #       RESULTADOS
     # ==========================
-    st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
+    #st.markdown(f"### 🧾 Resultados: {len(df)} registros encontrados")
 
     columnas_principales = ["FECHA", "ORIGEN", "CLAVE", "SECCION", "ASUNTO", "URL", "ARCHIVO"]
     df_ordenado = df[columnas_principales].copy()
@@ -166,12 +181,40 @@ def main():
     }
     </style>
     """, unsafe_allow_html=True)
+    
 
-    with st.expander("📜 Listado de Datos:"):
-        st.markdown(
-            df_final.to_html(escape=False, index=False),
-            unsafe_allow_html=True
-        )
+
+    with st.container():
+        col1, col2, col3 = st.columns([2,1,2])
+        with col1:
+            st.subheader("📜 Listado de Datos")
+        with col2:
+            st.metric("Núm.Registros", len(df_final))
+        with col3:
+            xxx, btn_col1, btn_col2 = st.columns([6,1,1])
+            with btn_col1:
+                if st.button("🔄", help="Recargar datos de Oracle"):
+                    st.rerun()
+            with btn_col2:
+                st.download_button(
+                    label="📥",
+                    data=to_excel(df_final),
+                    file_name="EventosRelevantes.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    help=f"Descargar los {len(df_final)} registros a Excel"
+                )
+
+
+
+
+    #  Si el intervalo entre la fecha 'Desde' y 'Hasta' es inferior a 1 mes, la tabla se muestra en un formato o otro.
+    hace_N_meses  = datetime.now() - relativedelta(months=1) 
+    fproc_inicio_dt = datetime.combine(fproc_inicio, datetime.min.time())
+    if fproc_inicio_dt < hace_N_meses:
+        st.dataframe(df_final)
+        st.caption("** Si el intervalo entre la fecha 'Desde' y 'Hasta' es inferior a 1 mes, la tabla se muestra en este formato por temas de rendimiento.")
+    else:
+        st.markdown(df_final.to_html(escape=False, index=False),unsafe_allow_html=True)
 
     # ==========================
     #      VISUALIZACIONES

@@ -19,7 +19,7 @@ def main():
         query = "SELECT * FROM P_CNBV_EEFF_TOTALES2"
         with get_oracle_connection() as conn:
             df = pd.read_sql(query, conn)
-        st.write("Tiempo carga Oracle:", time.time() - start)
+        #st.write("Tiempo carga Oracle:", time.time() - start)
 
         # Convertir fechas UNA sola vez
         for col in ["FEnvio"]:
@@ -87,14 +87,12 @@ def main():
     st.title("📈 Reporte de Estados Financieros")
     st.caption("Se extraerán datos de la BBDD de Histórica de Estados Financieros a un DataFrame dinámico. (app11.py)")
     st.sidebar.subheader("📈 : Eventos Relevantes")
+    st.sidebar.caption(" ")
 
     # ==========================
     #       SIDEBAR FILTROS
     # ==========================
 
-    # BOTON: RECARGAR DATOS
-    if st.sidebar.button("🔄 Recargar datos"):
-        st.cache_data.clear()
     df = load_data()
    
     # Acumulador de opciones de Filtros
@@ -118,6 +116,12 @@ def main():
     # Aplicar todos los filtros del acumulador
     df = df[mask]
 
+    st.sidebar.caption(" ")
+
+    # BOTON: RECARGAR DATOS
+    if st.sidebar.button("🔄 Recargar datos", help="Recargar datos de Oracle"):
+        st.cache_data.clear()
+
     # BOTON: DESCARGA DATAFRAME FILTRADO TO EXCEL
     buffer = io.BytesIO()
     df.to_excel(buffer, index=False, engine='openpyxl')  # openpyxl es el engine recomendado
@@ -126,7 +130,8 @@ def main():
         label="📥 Descargar -> Excel",
         data=buffer,
         file_name="EstadosFinancieros.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        help=f"Descargar los {len(df)} registros a Excel"
     )
     
     # ==========================
