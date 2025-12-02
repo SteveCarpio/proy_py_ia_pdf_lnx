@@ -248,7 +248,7 @@ def mostrar_inicio():
         unsafe_allow_html=True
     )
 
-    with st.sidebar.expander("ℹ️ Info"):
+    with st.sidebar.expander("Info", icon=":material/info:"):  # ℹ️
         st.caption("""
         - Agregar la IP http://10.10.30.7:8501/ como ruta de confianza
         - El puerto 8501 debe estar habilitado.
@@ -279,22 +279,21 @@ if "selected_app_key" not in st.session_state:
 col1x, col2x = st.sidebar.columns(2)
 with col1x:
     # Siempre mostrar botón "Ir a Inicio"
-    if st.button("🏠 Ir a Inicio"):
+    if st.button("Ir a Inicio", icon=":material/home:"):  #  🏠   
         st.session_state.selected_app_key = None
         st.rerun()
 with col2x:
     valorx = list(IA_APPS.keys())[2]
     # Crear AQUI BOTON a la APP3
-    if st.button("🤖 Chat-TdA 🤖", key="btn_app3"):
+    if st.button("IA TdA", key="btn_app3", help="Chatea con la IA de TdA", icon=":material/smart_toy:"): # Chat-TdA 🤖
         st.session_state.selected_app_key = valorx
         st.rerun()
-
    
 # Si NO hay app seleccionada → mostrar los expanders
 if st.session_state.selected_app_key is None:
 
     # Botones para IA
-    with st.sidebar.expander("🤖 Inteligencia Artificial"):
+    with st.sidebar.expander("Inteligencia Artificial", icon=":material/smart_toy:"): # 🤖
         for name in IA_APPS:
             if st.button(name, key=f"btn_ia_{name}"):
                 st.session_state.selected_app_key = name
@@ -302,28 +301,28 @@ if st.session_state.selected_app_key is None:
                 
 
     # Botones para Data Science
-    with st.sidebar.expander("🔬 Data Science"):
+    with st.sidebar.expander("Data Science", icon=":material/biotech:"):  #  🔬
         for name in DS_APPS:
             if st.button(name, key=f"btn_ds_{name}"):
                 st.session_state.selected_app_key = name
                 st.rerun()
 
     # Botones para Web Scraping
-    with st.sidebar.expander("🌐 Web Scraping"):
+    with st.sidebar.expander("Web Scraping", icon=":material/language:"):  #  🌐
         for name in WS_APPS:
             if st.button(name, key=f"btn_ws_{name}"):
                 st.session_state.selected_app_key = name
                 st.rerun()
 
     # Botones para Reporting
-    with st.sidebar.expander("📈 Reporting"):
+    with st.sidebar.expander("Reporting", icon=":material/query_stats:"):  #  📈
         for name in RP_APPS:
             if st.button(name, key=f"btn_rp_{name}"):
                 st.session_state.selected_app_key = name
                 st.rerun()
 
     # Botones para Gestor de Proyectos
-    with st.sidebar.expander("📁 Gestor Proyectos"):
+    with st.sidebar.expander("Gestor Proyectos", icon=":material/library_books:"):  # 📁
         for name in GP_APPS:
             if st.button(name, key=f"btn_gp_{name}"):
                 st.session_state.selected_app_key = name
