@@ -1,3 +1,4 @@
+# WebScraping: Estados Financieros - BIVA y BMV
 import streamlit as st
 import sqlite3
 import pandas as pd
@@ -13,7 +14,7 @@ from datetime import timedelta
 # CONFIGURACIÓN GENERAL
 # --------------------------
 os.makedirs("data", exist_ok=True)  
-DB_FILE1 = "data/app10_config_CNBV.db"
+DB_FILE1 = "data/app12_config_CNBV.db"
 LOG_DIR1 = pathlib.Path("/srv/apps/MisCompilados/PROY_CNBV_EEFF/LOG")
 R_CNBV = "/srv/apps/MisCompilados/PROY_CNBV_EEFF/"
            
@@ -172,7 +173,7 @@ def ejecutar_sh_con_parametros(SH_FILE, param1, param2, resultado):
         resultado.error(f"❌ Error inesperado: {e}")
 
 
-def ejecutar_proceso_sh(is_running, resultado, SH_FILE, BOLSA):
+def ejecutar_proceso_sh(is_running, resultado, SH_FILE):
     
     if st.session_state.parametro_c1 == "EJECUTAR":
         if is_running == "":
@@ -268,7 +269,7 @@ def main():
     df1 = get_data(DB_FILE1)
     
 
-    # Obtener una lista con las logs de las Bolsas
+    # Obtener una lista con las logs
     lista_logs1_10 = obtener_ultimos_logs(LOG_DIR1, 10)
     lista_logs1_1  = obtener_ultimos_logs(LOG_DIR1, 1)
     
@@ -418,7 +419,7 @@ def main():
             st.text_input("**Palabra de paso:**", "-----",key="parametro_c1",help="Por seguridad escriba EJECUTAR")
         st.write(" ")
         # Botón con callback
-        st.button("**Ejecutar Proceso WebScraping CNBV**", on_click=ejecutar_proceso_sh, args=(is_running1, resultado1, SH_FILE1, "CNBV"))
+        st.button("**Ejecutar Proceso WebScraping CNBV**", on_click=ejecutar_proceso_sh, args=(is_running1, resultado1, SH_FILE1))
 
     st.caption(f" ")
 
@@ -446,8 +447,7 @@ def main():
     La ejecución del proceso WebScraping debe estar justificado.<br>
     - Antes de ejecutarlo, verifica el <b>'día de procesamiento'</b>.<br>
     - Verificar que los servidores de: 
-        <a href="https://www.biva.mx/empresas/emisoras_inscritas/emisoras_inscritas" target="_blank" style="color:#1f77b4;">BIVA</a> y 
-        <a href="https://www.bmv.com.mx/es/emisoras/informacion-de-emisoras" target="_blank" style="color:#1f77b4;">BMV</a> estén UP.<br>
+        <a href="https://xbrl.cnbv.gob.mx/visorXbrl.html?v=1.0.3#/enviosInformacionFinanciera" target="_blank" style="color:#1f77b4;">CNBV</a> estén UP.<br>
     - Intentar no ejecutarlo en horario de planificación 8-10h para evitar solapamientos.
     </div>
     """,

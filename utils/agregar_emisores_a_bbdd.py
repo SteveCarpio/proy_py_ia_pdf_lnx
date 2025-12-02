@@ -3,20 +3,33 @@
 import pandas as pd
 import sqlite3
 
-def CARGA_DATOS(EXCEL_RUTA, DB_RUTA):
+def CARGA_DATOS1(EXCEL_RUTA, DB_RUTA):
     # ---------- 1. Leer el Excel ----------
     df = pd.read_excel(EXCEL_RUTA, sheet_name='FILTRO', engine='openpyxl')
     # Renombrar columnas para que coincidan con la tabla SQLite
     df.rename(columns={'TO': 'TO_EMAIL', 'CC': 'CC_EMAIL'}, inplace=True)
     # Reordenar columnas
     df = df[['CLAVE', 'CODIGO', 'FILTRO', 'ESTADO', 'GRUPO', 'TO_EMAIL', 'CC_EMAIL', 'C3']]
-
     # ---------- 2. Conectar a SQLite ----------
     conn = sqlite3.connect(DB_RUTA)
     # ---------- 3. Insertar en la tabla ----------
     df.to_sql(name='configuracion', con=conn, if_exists='append', index=False)
     # ---------- 4. Ver contenido de la tabla -------- 
+    # ---------- 5. Cerrar conexión ----------    
+    conn.close()
 
+def CARGA_DATOS3(EXCEL_RUTA, DB_RUTA):
+    # ---------- 1. Leer el Excel ----------
+    df = pd.read_excel(EXCEL_RUTA, engine='openpyxl')
+    # Renombrar columnas para que coincidan con la tabla SQLite
+    df.rename(columns={'ClavePizarra': 'CLAVEPIZARRA', 'Activo': 'ACTIVO'}, inplace=True)
+    # Reordenar columnas
+    
+    # ---------- 2. Conectar a SQLite ----------
+    conn = sqlite3.connect(DB_RUTA)
+    # ---------- 3. Insertar en la tabla ----------
+    df.to_sql(name='configuracion', con=conn, if_exists='append', index=False)
+    # ---------- 4. Ver contenido de la tabla -------- 
     # ---------- 5. Cerrar conexión ----------    
     conn.close()
 
@@ -25,7 +38,10 @@ EXCEL_RUTA1 = '/srv/apps/MisCompilados/PROY_BOLSA_MX/BIVA/CONFIG/BIVA_Filtro_Emi
 DB_RUTA1 = '/home/robot/Python/proy_py_ia_pdf_lnx/data/app10_config_BIVA.db'
 EXCEL_RUTA2 = '/srv/apps/MisCompilados/PROY_BOLSA_MX/BMV/CONFIG/BMV_Filtro_Emisores_PRO.xlsx'
 DB_RUTA2 = '/home/robot/Python/proy_py_ia_pdf_lnx/data/app10_config_BMV.db'
+# Cambia la ruta al archivo que corresponda
+EXCEL_RUTA3 = '/srv/apps/MisCompilados/PROY_CNBV_EEFF/CONFIG/CNBV_EEFF_Claves_Pizarra.xlsx'
+DB_RUTA3 = '/home/robot/Python/proy_py_ia_pdf_lnx/data/app12_config_CNBV.db'
 
-
-#CARGA_DATOS(EXCEL_RUTA1, DB_RUTA1)
-#CARGA_DATOS(EXCEL_RUTA2, DB_RUTA2)
+#CARGA_DATOS1(EXCEL_RUTA1, DB_RUTA1)
+#CARGA_DATOS1(EXCEL_RUTA2, DB_RUTA2)
+#CARGA_DATOS3(EXCEL_RUTA3, DB_RUTA3)
