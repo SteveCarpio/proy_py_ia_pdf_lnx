@@ -288,7 +288,8 @@ def main():
     with c1:
         st.subheader(f"{var_ESTADO1} - CNBV ")
     with c2:
-        st.subheader(is_running1)
+        st.caption(f" ")
+        st.caption(is_running1)
     with c4:
         st.caption(f" ")
         st.caption(f"Fecha y hora de la última ejecución: {var_FECHA1}")
