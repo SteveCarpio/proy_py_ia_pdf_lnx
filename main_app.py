@@ -5,7 +5,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 from PIL import Image
-from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9, app10, app11
+from app import app0, app1, app2, app3, app4, app5, app6, app7, app8, app9, app10, app11, app12
 import gc
 
 def mantenimiento():
@@ -50,7 +50,7 @@ DS_APPS = {
 # Diccionario WebScraping
 WS_APPS = {
     "1 - Eventos Relevantes.": app10,
-    "2 - Estados Financieros.": app0
+    "2 - Estados Financieros.": app12
 }
 # Diccionario Reporting
 RP_APPS = {

@@ -1,3 +1,4 @@
+# WebScraping: Eventos Relevantes - BIVA y BMV
 import streamlit as st
 import sqlite3
 import pandas as pd
@@ -271,7 +272,7 @@ def fecha_de_proceso_seleccionado(dias):
 # MAIN: INTERFAZ PRINCIPAL
 # -----------------------------------------------------------------------------------------------------------------------------------------
 def main():
-    st.title("🌐 WebScraping: Eventos Relevantes")
+    st.title("🌐 WebScraping: Eventos Relevantes - BIVA y BMV")
     st.caption("Panel de configuración del prceso de Eventos Relavantes de las Bolsas (BIVA y BMV). (app10.py)")
     st.sidebar.subheader("🌐 : Eventos Relevantes")
 
