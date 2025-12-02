@@ -1,4 +1,4 @@
-# 📈 Reporting Eventos Relevantes
+# 📈 Reporting Estados Financieros
 def main():
     import io
     import time
@@ -103,7 +103,8 @@ def main():
     # MULTISELECT: PERIODO
     if "PERIODO" in df.columns:
         claves_unicas = sorted(df["PERIODO"].dropna().unique().tolist())
-        claves_seleccionadas = st.sidebar.multiselect("📅 PERIODO", options=claves_unicas)
+        claves_maxima = max(claves_unicas)
+        claves_seleccionadas = st.sidebar.multiselect("📅 PERIODO", options=claves_unicas, default=claves_maxima)
         if claves_seleccionadas:
             mask &= df["PERIODO"].isin(claves_seleccionadas)
 
@@ -127,7 +128,7 @@ def main():
         file_name="EstadosFinancieros.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
+    
     # ==========================
     #       MAIN WEB 
     # ==========================
@@ -262,8 +263,6 @@ def main():
         )
         fig2.update_layout(yaxis_title="% del total")
         st.plotly_chart(fig2, use_container_width=True)
-
-
 
 if __name__ == "__main__":
     main()
