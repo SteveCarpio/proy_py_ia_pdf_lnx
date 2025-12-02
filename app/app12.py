@@ -144,7 +144,7 @@ def delete_record(clave, DB_FILE):
     conn.commit()
     conn.close()
 
-def ejecutar_sh_con_parametros(SH_FILE, param1, param2, resultado):
+def ejecutar_sh_con_parametros(SH_FILE, param1, param2, param3, param4, param5, resultado):
     """
     Ejecuta el archivo .sh con los parámetros de DIAS y ENTORNO
     """
@@ -155,7 +155,10 @@ def ejecutar_sh_con_parametros(SH_FILE, param1, param2, resultado):
         "nohup",  # Desvincula el proceso de la terminal
         SH_FILE,
         param1,
-        param2
+        param2,
+        param3,
+        param4,
+        param5
     ]
     try:
         # `preexec_fn=os.setsid` garantiza que el proceso no se cierre con la sesión
@@ -177,7 +180,7 @@ def ejecutar_proceso_sh(is_running, resultado, SH_FILE):
     
     if st.session_state.parametro_c1 == "EJECUTAR":
         if is_running == "":
-            ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_a1, st.session_state.parametro_b1, resultado)
+            ejecutar_sh_con_parametros(SH_FILE, st.session_state.parametro_b1, "1", st.session_state.parametro_a1, st.session_state.parametro_d1, "1" , resultado)
             resultado.info("Proceso 'CNBV' lanzado en segundo plano; para ver el estado de ejecución pulse el botón de '🔄 Refrescar'")
         else:
             resultado.warning("El proceso 'CNBV' se está ejecutando en segundo plano; por favor, espere o pulse el botón de '🔄 Refrescar' ")
@@ -205,24 +208,8 @@ def comprobar_excel_email(x, coletilla):
     else:
         res1 = f"❌ No hay datos de **CNBV** para mandar el email"
 
-
-
     return res1, se_manda_email, ruta1
 
-def fecha_de_proceso_seleccionado(dias):
-    # Para que me de los días de la semana en español
-    locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
-    # Obtenemos el día de hoy 
-    hoy = datetime.datetime.today()
-    # Calcular fechas restando N días
-    fecha1 = hoy - timedelta(days=int(dias))
-    fecha2 = hoy - timedelta(days=int(dias) + 1)
-    # Establezco un formato
-    formato = "%A %d de %B %Y"
-    # Creo las variables con el formato deseado
-    VAR1 = fecha1.strftime(formato)
-    VAR2 = fecha2.strftime(formato)
-    return VAR1, VAR2
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
 # MAIN: INTERFAZ PRINCIPAL
@@ -267,16 +254,10 @@ def main():
     
     # Cargamos en un DataFrame los datos de la tabla, si no existe la bbdd la crea.
     df1 = get_data(DB_FILE1)
-    
 
     # Obtener una lista con las logs
     lista_logs1_10 = obtener_ultimos_logs(LOG_DIR1, 10)
     lista_logs1_1  = obtener_ultimos_logs(LOG_DIR1, 1)
-    
-    # Ocultar columnas innecesarios del DataFrame
-    #for col in ["C3", "FILTRO", "TO_EMAIL", "CC_EMAIL", "GRUPO"]:
-    #    if col in df1.columns:
-    #        df1 = df1.drop(columns=[col])
     
     # ------------------------------------------------------------------------------------------------------------------------------------
     # Datos
@@ -294,6 +275,7 @@ def main():
     info_ruta_ko    = LOG_DIR1 / info_nombre_ko
     info_archivo_ko = os.stat(info_ruta_ko)
     info_fecha_ko  = datetime.datetime.fromtimestamp(info_archivo_ko.st_ctime)
+
     if info_archivo_ko.st_size != 0:
         var_ESTADO1  = "⚠️"
         var_FECHA1   = info_fecha_ko.strftime('%Y-%m-%d %H:%M')
@@ -302,7 +284,7 @@ def main():
         var_ESTADO1  = "☑️" # ☑️ ✅
         var_FECHA1   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
         var_MENSAJE1 = ""
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4 = st.columns([2,1,1,2])
     with c1:
         st.subheader(f"{var_ESTADO1} - CNBV ")
     with c2:
@@ -327,10 +309,6 @@ def main():
             column_config={
                 "CLAVEPIZARRA":    st.column_config.TextColumn("CLAVEPIZARRA", help="Nombre del Emisor"),
                 "ACTIVO":   st.column_config.SelectboxColumn("ACTIVO", options=["S", "N", "VALIDAR"], help="S = Envió de Email"),
-                #"GRUPO":    st.column_config.TextColumn("GRUPO", default="M", help="M = Mónica "),
-                #"CODIGO":   st.column_config.NumberColumn("CODIGO", help="Debe ser número entero"),
-                #"TO_EMAIL": st.column_config.TextColumn("TO", default="stv.madrid@gmail.com"),
-                #"CC_EMAIL": st.column_config.TextColumn("CC", default="paco@gmail.com"),
                 "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
             }
         )
@@ -344,7 +322,7 @@ def main():
             if "Seleccionar" in edited_df1.columns:
                 edited_df1 = edited_df1.drop(columns=["Seleccionar"])
             update_data(edited_df1, DB_FILE1)
-            export_to_excel(DB_FILE1, f"{R_CNBV}/CONFIG/CNBV_EEFF_Claves_Pizarra_.xlsx", "configuracion")
+            export_to_excel(DB_FILE1, f"{R_CNBV}/CONFIG/CNBV_EEFF_Claves_Pizarra.xlsx", "configuracion")
             st.toast("Cambios guardados correctamente en la tabla CNBV", icon="✅")
 
         # BOTÓN: Borrar Registros CNBV
@@ -395,53 +373,50 @@ def main():
         resultado1 = st.container()
         # --- Configuración del Archivo SH ---
         SH_FILE1 = "/home/robot/Python/proy_py_cnbv_eeff/CNBV_EEFF.sh" 
-        col1, col3, col4 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         # Obtener parámetros del usuario
         with col1:
             st.selectbox(
-                label="  **Día de ejecución:**",
-                options=["0", "1", "2", "3", "4"],      # Valores disponibles
-                index=0,                                # Valor por defecto (0 → "0")
+                label="  **Trimeste:**",
+                options=["1", "2", "3", "4", "4D"],     # Valores disponibles
+                index=0,                                # Valor por defecto (0 → "1")
                 key="parametro_a1",                     # Identificador único
-                help="Ejemplo: 0, 1, 2, 3...etc -- '0' indica el día de hoy, '1' el día de ayer, etc.. "
+                help="Ejemplo: 1, 2, 3, 4 y 4D"
             )
-            VAR1, VAR2 = fecha_de_proceso_seleccionado(st.session_state.parametro_a1)
-            st.caption(f"Ejecución del: **{VAR1}**")
-            st.caption(f"Con datos del: **{VAR2}**")
+  
+        with col2:
+            st.selectbox(
+                label="  **Año:**",
+                options=["2026", "2025", "2024", "2023", "2022", "2021", "2020"],     # Valores disponibles
+                index=1,                                                              # Valor por defecto (0 → "2025")
+                key="parametro_d1"                                                    # Identificador único
+            )
         with col3:
             st.selectbox(
                 label="  **Entorno de ejecución:**",
-                options=["PRO"],             # Valores disponibles
+                options=["DEV", "PRO"],      # Valores disponibles
                 index=0,                     # Valor por defecto (0 → "PRO")
                 key="parametro_b1"           # Identificador único
             )
         with col4:
             st.text_input("**Palabra de paso:**", "-----",key="parametro_c1",help="Por seguridad escriba EJECUTAR")
-        st.write(" ")
+        
         # Botón con callback
+        st.write(" ")
         st.button("**Ejecutar Proceso WebScraping CNBV**", on_click=ejecutar_proceso_sh, args=(is_running1, resultado1, SH_FILE1))
 
     st.caption(f" ")
 
 
-    
-
-    # TABLA: ORACLE ---------------------------------------------------------------------
-    st.subheader("🗄️ - Almacenar en Histórico ORACLE")
-
-
-
-
-
-
-
+ 
     # PIE DE PAGINA DEL SIDEBAR -----------------------------------------------------------------
     st.sidebar.caption("---")
     # Botón refrescar
     if st.sidebar.button("🔄 Refrescar"):
         st.rerun()
+
     # Aviso informativo
-    st.sidebar.markdown(
+    st.sidebar.caption(
     """
     <div style="font-size:1rem;"><br><br><b>Importante:</b><br>
     La ejecución del proceso WebScraping debe estar justificado.<br>

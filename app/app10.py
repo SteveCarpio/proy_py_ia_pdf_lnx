@@ -351,7 +351,7 @@ def main():
         var_ESTADO1  = "☑️" # ☑️ ✅
         var_FECHA1   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
         var_MENSAJE1 = ""
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4 = st.columns([2,1,1,2])
     with c1:
         st.subheader(f"{var_ESTADO1} - BIVA ")
     with c2:
@@ -491,7 +491,7 @@ def main():
         var_ESTADO2  = "☑️" # ☑️ ✅
         var_FECHA2   = info_fecha_ok.strftime('%Y-%m-%d %H:%M')
         var_MENSAJE2 = ""
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4 = st.columns([2,1,1,2])
     with c1:
         st.subheader(f"{var_ESTADO2} - BMV ")
     with c2:
