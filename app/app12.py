@@ -255,6 +255,8 @@ def main():
     # Cargamos en un DataFrame los datos de la tabla, si no existe la bbdd la crea.
     df1 = get_data(DB_FILE1)
 
+
+
     # Obtener una lista con las logs
     lista_logs1_10 = obtener_ultimos_logs(LOG_DIR1, 10)
     lista_logs1_1  = obtener_ultimos_logs(LOG_DIR1, 1)
@@ -298,7 +300,11 @@ def main():
     st.caption(f"{var_MENSAJE1}")
 
     # Bloque de los Expanders ---------------
-    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en CNBV: {len(df1)} -- En el radar de TDA: {(df1['ACTIVO'] == "S").sum()})]", expanded=False):
+    df_validar = pd.read_excel('/srv/apps/MisCompilados/PROY_CNBV_EEFF/CONFIG/CNBV_EEFF_Claves_Pizarra_Validar.xlsx')
+    mensajeValidar = ""
+    if len(df_validar) > 0:
+        mensajeValidar = f" -- :red[ AVISO existen ({len(df_validar)}) ClavesPizarra por validar]"
+    with st.expander(f"📗 Listado de Emisores: :gray[(Número de emisores activos en CNBV: {len(df1)} -- En el radar de TDA: {(df1['ACTIVO'] == "S").sum()})] {mensajeValidar}", expanded=False):
         # Añadimos columna de selección
         df1["Seleccionar"] = False
         # Editor de datos interactivo
