@@ -301,6 +301,7 @@ def main():
 
     # Bloque de los Expanders ---------------
     df_validar = pd.read_excel('/srv/apps/MisCompilados/PROY_CNBV_EEFF/CONFIG/CNBV_EEFF_Claves_Pizarra_Validar.xlsx')
+    df_validar["Seleccionar"] = False
     mensajeValidar = ""
     if len(df_validar) > 0:
         mensajeValidar = f" -- :red[ AVISO existen ({len(df_validar)}) ClavesPizarra por validar]"
@@ -314,12 +315,20 @@ def main():
             use_container_width=True,
             key="data_editor1",
             column_config={
-                "CLAVEPIZARRA":    st.column_config.TextColumn("CLAVEPIZARRA", help="Nombre del Emisor"),
-                "ACTIVO":   st.column_config.SelectboxColumn("ACTIVO", options=["S", "N", "VALIDAR"], help="S = Envió de Email"),
-                "Seleccionar": st.column_config.CheckboxColumn("Seleccionar")
+                "CLAVEPIZARRA":  st.column_config.TextColumn("CLAVEPIZARRA", help="Nombre del Emisor"),
+                "ACTIVO":        st.column_config.SelectboxColumn("ACTIVO", options=["S", "N"], help="S = Envió de Email"),
+                "Seleccionar":   st.column_config.CheckboxColumn("Seleccionar")
             }
         )
 
+        # Visualizo el DataFram de Claves de Pizarra por Validar.
+        valor_acumulador = ""
+        for valor in df_validar["CLAVEPIZARRA"]:
+            valor_acumulador = valor_acumulador + "(" + valor + ") "
+        st.markdown(f"**Existen {len(df_validar)} ClavePizarra por revisar**: <p style='color:red; font-size:16px;'>{valor_acumulador}</p>", unsafe_allow_html=True)
+
+
+        # Preparo número de columnas
         col1, col3, col111, col333 = st.columns(4)
         
         # BOTÓN: Guardar cambios CNBV
@@ -385,10 +394,10 @@ def main():
         with col1:
             st.selectbox(
                 label="  **Trimeste:**",
-                options=["1", "2", "3", "4", "4D"],     # Valores disponibles
-                index=0,                                # Valor por defecto (0 → "1")
-                key="parametro_a1",                     # Identificador único
-                help="Ejemplo: 1, 2, 3, 4 y 4D"
+                options=["1", "2", "2D", "3", "4", "4D"],     # Valores disponibles
+                index=0,                                      # Valor por defecto (0 → "1")
+                key="parametro_a1",                           # Identificador único
+                help="Indica el trimestre del año"
             )
   
         with col2:
@@ -403,7 +412,8 @@ def main():
                 label="  **Entorno de ejecución:**",
                 options=["DEV", "PRO"],      # Valores disponibles
                 index=0,                     # Valor por defecto (0 → "PRO")
-                key="parametro_b1"           # Identificador único
+                key="parametro_b1",           # Identificador único
+                help="Indica el entorno de ejecución si PRODUCCIÓN o DESARROLLO (en modo DEV ejecutará el proceso para 4 ClavesPizarra)"
             )
         with col4:
             st.text_input("**Palabra de paso:**", "-----",key="parametro_c1",help="Por seguridad escriba EJECUTAR")
