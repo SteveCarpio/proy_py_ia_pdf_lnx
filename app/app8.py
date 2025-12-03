@@ -12,6 +12,16 @@ ESTADOS = ["En ejecución", "Terminado", "Bloqueado", "En revisión", "Pendiente
 PRIORIDADES = ["Alta", "Media", "Baja"]
 
 def main():
+
+    # ---------------------------------
+    # Inicializar session_state seguro
+    # ---------------------------------
+    if "rol" not in st.session_state:
+        st.session_state["rol"] = None
+
+    if "usuario" not in st.session_state:
+        st.session_state["usuario"] = None
+
     # ---------------------------------
     # Inicializar base de datos y página
     # ---------------------------------
@@ -32,7 +42,8 @@ def main():
         else:
             st.sidebar.error("❌ Credenciales inválidas")
 
-    if "usuario" not in st.session_state:
+    
+    if st.session_state["usuario"] is None:
         st.stop()
 
     # ---------------------------------
