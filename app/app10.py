@@ -697,7 +697,7 @@ def main():
     if st.sidebar.button("🔄 Refrescar"):
         st.rerun()
     # Aviso informativo
-    st.sidebar.markdown(
+    st.sidebar.caption(
     """
     <div style="font-size:1rem;"><br><br><b>Importante:</b><br>
     La ejecución del proceso WebScraping debe estar justificado.<br>
