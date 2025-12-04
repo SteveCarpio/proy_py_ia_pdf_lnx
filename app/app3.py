@@ -1,3 +1,4 @@
+# CHAT TDA
 import streamlit as st
 import time
 import ollama
@@ -78,7 +79,7 @@ def main():
         # ["llama3:instruct", "mistral:latest", "jobautomation/OpenEuroLLM-Spanish", "gpt-oss:20b"]
         model_choice = st.selectbox(
             "🧠 Modelo:",
-            ["tda-llama3", "tda-gpt20b", "codellama:34b", "deepseek-coder-v2"], 
+            ["tda-llama31", "tda-gpt20b", "tda_ds_r1", "tda-llama3", "codellama:34b", "deepseek-coder-v2"], 
             index=0
         )
 
@@ -138,7 +139,7 @@ def main():
 
         with st.expander("📃 Vista previa del archivo cargado", expanded=False):
             if file_ext in ['xlsx', 'csv'] and st.session_state.get("file_df") is not None:
-                st.dataframe(st.session_state.file_df.head(50).reset_index(drop=True).rename_axis('').set_index(pd.RangeIndex(1, 1 + len(st.session_state.file_df.head(50)))))
+                st.dataframe(st.session_state.file_df.head(50).reset_index(drop=True).rename_axis('').set_index(pd.RangeIndex(1, 1 + len(st.session_state.file_df.head(50)))))  #type: ignore
             else:
                 resumen = resumir_contenido(st.session_state.file_content)
                 st.text_area("Resumen:", resumen, height=200)
