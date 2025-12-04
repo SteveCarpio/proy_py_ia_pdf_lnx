@@ -91,8 +91,17 @@ def main():
         """)
 
     # CONTENIDO PRINCIPAL
-    st.title(f"🤖 Chat #{st.session_state.chat_counter}")
+    st.title(f"🤖 Chat #{st.session_state.chat_counter} ")
     st.caption("Interfaz de chat IA con soporte para archivos y modelo local.")
+
+
+    # ---- Configuración del toast de bienvenida ----
+    # Toast que aparece la primera vez que entra el usuario en la sesión
+    if "toast_shown" not in st.session_state:
+        # Posición: mensaje, icono (opcional), duración (en segundos)
+        st.toast(":green[ Nuevo modelo tda-llama31 con una ventana de contexto de 128k]:", icon="ℹ️", duration=8)
+        st.toast(":green[ Nuevo modelo tda-ds-r1 con una ventana de contexto de 32k]:", icon="ℹ️", duration=7)
+        st.session_state.toast_shown = True       
 
     # SUBIDA DE ARCHIVO
     uploaded_file = st.file_uploader("📎 Sube un archivo", type=["txt", "pdf", "xlsx", "csv"])
